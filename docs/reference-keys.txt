@@ -1,4 +1,3 @@
 precis
-chapter-2.-small-worlds-and-large-worlds
-solutions-to-exercises
 small-worlds-and-large-worlds
+solutions-to-exercises
