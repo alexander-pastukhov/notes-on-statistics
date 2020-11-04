@@ -1,2 +1,2 @@
 # notes-on-statistical-rethinking
-Notes and solution for Statistical Rethinking
+Notes and solutions for Statistical Rethinking seminar
