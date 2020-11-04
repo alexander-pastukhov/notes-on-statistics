@@ -1,0 +1,15 @@
+--- 
+title: "Notes on and Solutions for Statistical Rethinking"
+author: "Alexander Pastukhov"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib]
+biblio-style: apalike
+link-citations: yes
+description: "Notes and exercise solutions for Statistical Rethinking book."
+---
+
+# Precis
+
+This is a collection of solutions for exercises but also of notes that attempt to provide further details and intuition for some topics, such as information theory, information criteria, MCMC algorithms, etc.
