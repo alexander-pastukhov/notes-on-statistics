@@ -121,7 +121,7 @@ Suppose you have a deck with only three cards. Each card has two sides, and each
 
 There are three possible outcomes, given the visible side is black and two out of three lead to a black back side:  $\frac{2}{3}$.
 
-### 2M5 {-}
+#### 2M5 {-}
 Now suppose there are four cards: B/B, B/W, W/W, and another B/B. Again suppose a card is drawn from the bag and a black side appears face up. Again calculate the probability that the other side is black.
 
 * B|B: B(1) → **B(2): 1**
