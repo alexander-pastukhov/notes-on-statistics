@@ -116,7 +116,7 @@ ggplot(data=NULL, aes(x=samples)) +
 #### 3M3 {-}
 Construct a posterior predictive check for this model and data. This means simulate the distribution of samples, averaging over the posterior uncertainty in p . What is the probability of observing 8 water in 15 tosses?
 ```{r 3M3}
-predicted_water <- 
+predicted_water8_15 <- 
   tibble(N = rbinom(length(samples), size=15, prob=samples)) %>%
   group_by(N) %>%
   summarize(count = n(), .groups = 'drop')  %>%
@@ -124,18 +124,18 @@ predicted_water <-
   mutate(p = count / sum(count))
   
 p8 <- 
-  predicted_water %>%
+  predicted_water8_15 %>%
   filter(N == 8) %>%
   pull(p)
 
-ggplot(predicted_water, aes(x=N, y= p)) + 
+ggplot(predicted_water8_15, aes(x=N, y= p)) + 
     geom_point() + 
   labs(subtitle = glue::glue("The probability of observing 8 water in 15 tosses is {p8}"))
 ```
-#### 3M4
+#### 3M4 {-}
 Using the posterior distribution constructed from the new (8/15) data, now calculate the probability of observing 6 water in 9 tosses.
 ```{r 3M4}
-predicted_water <- 
+predicted_water6_9 <- 
   tibble(N = rbinom(length(samples), size=9, prob=samples)) %>%
   group_by(N) %>%
   summarize(count = n(), .groups = 'drop')  %>%
@@ -143,12 +143,80 @@ predicted_water <-
   mutate(p = count / sum(count))
   
 p6 <- 
-  predicted_water %>%
+  predicted_water6_9 %>%
   filter(N == 6) %>%
   pull(p)
 
-ggplot(predicted_water, aes(x=N, y= p)) + 
+ggplot(predicted_water6_9, aes(x=N, y= p)) + 
     geom_point() + 
   labs(subtitle = glue::glue("The probability of observing 6 water in 9 tosses is {p6}"))
 ```
 
+#### 3M5 {-}
+Start over at 3M1 , but now use a prior that is zero below p = 0.5 and a constant above p = 0.5. This corresponds to prior information that a majority of the Earth’s surface is water. Repeat each problem above and compare the inferences. What difference does the better prior make? If it helps, compare inferences (using both priors) to the true value p = 0.7.
+
+```{r 3M5-1}
+p_grid <- seq(from=0, to=1, length.out=1000)
+prior <- as.numeric(p_grid >= 0.5)
+likelihood <- dbinom(8, size=15, prob=p_grid)
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+
+ggplot(data=NULL, aes(x=p_grid, y=posterior)) + 
+  geom_line() +
+  labs(subtitle="8 water in 15 tosses")
+```
+
+```{r 3M5-2}
+set.seed(100)
+samples <- sample(p_grid, prob=posterior, size=1e4, replace=TRUE)
+
+hpdi90 <- HPDI(samples, 0.9)
+ggplot(data=NULL, aes(x=samples)) + 
+  geom_histogram(bins=50) + 
+  geom_vline(xintercept = hpdi90, color="red") + 
+  labs(title = "Remake of 3M2",
+       subtitle = glue::glue("HPDI 90% is {round(hpdi66[1], 3)}..{round(hpdi66[2], 3)}"))
+```
+
+```{r 3M5-3}
+predicted_water8_15_remake <- 
+  tibble(N = rbinom(length(samples), size=15, prob=samples)) %>%
+  group_by(N) %>%
+  summarize(count = n(), .groups = 'drop')  %>%
+  ungroup() %>%
+  mutate(p = count / sum(count))
+  
+p8 <- 
+  predicted_water8_15_remake %>%
+  filter(N == 8) %>%
+  pull(p)
+
+ggplot(predicted_water8_15_remake, aes(x=N, y= p)) + 
+  geom_point() + 
+  geom_line(data=predicted_water8_15, color="red") +
+  labs(title = "Remake of 3M3",
+       subtitle = glue::glue("The probability of observing 8 water in 15 tosses is {p8}"))
+```
+
+```{r 3M5-4}
+predicted_water6_9_remake <- 
+  tibble(N = rbinom(length(samples), size=9, prob=samples)) %>%
+  group_by(N) %>%
+  summarize(count = n(), .groups = 'drop')  %>%
+  ungroup() %>%
+  mutate(p = count / sum(count))
+  
+p6 <- 
+  predicted_water6_9_remake %>%
+  filter(N == 6) %>%
+  pull(p)
+
+ggplot(predicted_water6_9_remake, aes(x=N, y= p)) + 
+  geom_point() + 
+  geom_line(data=predicted_water6_9, color="red") +
+  labs(subtitle = glue::glue("The probability of observing 6 water in 9 tosses is {p6}"))
+```
+
+#### 3M6 {-}
+Suppose you want to estimate the Earth’s proportion of water very precisely. Specifically, you want the 99% percentile interval of the posterior distribution of p to be only 0.05 wide. This means the distance between the upper and lower bound of the interval should be 0.05. How many times will you have to toss the globe to do this?
