@@ -220,3 +220,108 @@ ggplot(predicted_water6_9_remake, aes(x=N, y= p)) +
 
 #### 3M6 {-}
 Suppose you want to estimate the Earth’s proportion of water very precisely. Specifically, you want the 99% percentile interval of the posterior distribution of p to be only 0.05 wide. This means the distance between the upper and lower bound of the interval should be 0.05. How many times will you have to toss the globe to do this?
+
+```{r 3M6-qbinom}
+true_proportion <- 0.5
+toss_quantiles <- 
+  tibble(tossesN = seq(10, 3000, by=1)) %>%
+  mutate(lowerN = qbinom(0.005, tossesN, true_proportion),
+         upperN = qbinom(0.995, tossesN, true_proportion),
+         lowerP = lowerN / tossesN,
+         upperP = upperN / tossesN,
+         deltaP = upperP - lowerP)
+
+minimal_N <- 
+  toss_quantiles %>%
+  filter(deltaP < 0.05) %>%
+  slice(1) %>%
+  pull(tossesN)
+
+ggplot(toss_quantiles, aes(x=tossesN, y=deltaP)) + 
+  geom_line() + 
+  geom_hline(yintercept = 0.05, color="red") + 
+  scale_y_log10() + 
+  labs(title = "Via qbinom",
+       subtitle = glue::glue("For proportion {true_proportion} you need {minimal_N} tosses to get 99% PI under 0.05"))
+```
+
+```{r 3M6-simulation}
+simulate_and_compute_PI99 <- function(tossN, true_proportion){
+  simulated_N <- rbinom(1e4, tossN, true_proportion)
+  simulated_P <- simulated_N / tossN
+  diff(rethinking::PI(simulated_P, prob=0.99))
+}
+
+true_proportion <- 0.5
+toss_sims <- 
+  tibble(tossesN = seq(10, 3000, by=1)) %>%
+  rowwise() %>%
+  mutate(deltaP =simulate_and_compute_PI99(tossesN, true_proportion))
+
+minimal_N <- 
+  toss_sims %>%
+  filter(deltaP < 0.05) %>%
+  slice(1) %>%
+  pull(tossesN)
+
+ggplot(toss_sims, aes(x=tossesN, y=deltaP)) + 
+  geom_line() + 
+  geom_hline(yintercept = 0.05, color="red") + 
+  scale_y_log10() + 
+  labs(title = "Via rbinom simulations",
+       subtitle = glue::glue("For proportion {true_proportion} you need {minimal_N} tosses to get 99% PI under 0.05"))
+```
+
+#### Hard {-}
+
+```{r 3H}
+data(homeworkch3)
+```
+
+#### 3H1 {-}
+Using grid approximation, compute the posterior distribution for the probability of a birth being a boy. Assume a uniform prior probability. Which parameter value maximizes the posterior probability?
+
+```{r 3H1}
+birth <- c(birth1, birth2)
+birthN <- length(birth)
+boyN <- sum(birth)
+
+p_grid <- seq(from=0, to=1, length.out=1000)
+prior <- rep(1,1000)
+likelihood <- dbinom(boyN, size=birthN, prob=p_grid)
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+
+boyP <- p_grid[which.max(posterior)]
+
+ggplot(data=NULL, aes(x=p_grid, y=posterior)) + 
+  geom_line()+
+  geom_vline(xintercept = boyP, color="red") + 
+  labs(subtitle = glue::glue("Mode: {round(boyP, 3)}"))
+```
+
+#### 3H2 {-}
+Using the sample function, draw 10,000 random parameter values from the posterior distribution you calculated above. Use these samples to estimate the 50%, 89%, and 97% highest posterior density intervals.
+
+```{r 3H2}
+set.seed(100)
+samples <- sample(p_grid, prob=posterior, size=1e4, replace=TRUE)
+
+HPDI50 <- rethinking::HPDI(samples, prob = 0.5)
+HPDI89 <- rethinking::HPDI(samples, prob = 0.89)
+HPDI97 <- rethinking::HPDI(samples, prob = 0.97)
+
+all_HPDI <- c(HPDI50, HPDI89, HPDI97)
+names(all_HPDI) <- NULL
+
+
+ggplot(data=NULL, aes(x=samples)) + 
+  geom_histogram(bins=40) + 
+  geom_vline(xintercept = HPDI50, color="green") +
+  geom_vline(xintercept = HPDI89, color="blue") + 
+  geom_vline(xintercept = HPDI97, color="red") +
+  scale_x_continuous(breaks = all_HPDI, labels = round(all_HPDI, 3))
+```
+
+#### 3H3 {-}
+Use rbinom to simulate 10,000 replicates of 200 births. You should end up with 10,000 numbers, each one a count of boys out of 200 births. Compare the distribution of predicted numbers of boys to the actual count in the data (111 boys out of 200 births). There are many good ways to visualize the simulations, but the dens command (part of the rethinking package) is probably the easiest way in this case. Does it look like the model fits the data well? That is, does the distribution of predictions include the actual observation as a central, likely outcome?
