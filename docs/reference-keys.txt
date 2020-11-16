@@ -1,3 +1,6 @@
 precis
 small-worlds-and-large-worlds
 solutions-to-exercises
+sampling-the-imaginary
+solutions-to-exercises-1
+initialization-code-for-easy-exercises
