@@ -113,7 +113,7 @@
 
 \title{Notes on and Solutions for Statistical Rethinking}
 \author{Alexander Pastukhov}
-\date{2020-11-04}
+\date{2020-11-19}
 
 \begin{document}
 \maketitle
@@ -127,8 +127,114 @@
 
 This is a collection of solutions for exercises but also of notes that attempt to provide further details and intuition for some topics, such as information theory, information criteria, MCMC algorithms, etc.
 
-\hypertarget{small-worlds-and-large-worlds}{%
-\chapter{Small Worlds and Large Worlds}\label{small-worlds-and-large-worlds}}
+\hypertarget{loss-functions}{%
+\chapter{Loss functions}\label{loss-functions}}
+
+The purpose of this comment is to give you an intuition about loss functions, mentioned in chapter 3. In particular, I want you to understand why different loss functions (L0, L1, and L2) correspond to different point-estimates (mode, median, and mean). Plus, I want you to understand that you can view a choice of a likelihood function, as in picking Gaussian in chapter 4, as being analogous to picking a loss function.
+
+I am afraid that the easiest way to explain why an \emph{L2} loss results in \emph{mean} is a via derivative. So, if you are not confident in your basic calculus skill, it might be useful for you to first watch a few episodes of \href{https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr}{Essense of Calculus} series by Grant Sanderson, a.k.a. \href{https://www.3blue1brown.com/}{3Blue1Brown}. I would suggest watching at least the first three episodes (actually, I would recommend to watch the whole series) but if you are short on time watch only episode 2\footnote{Although, if you skip episode 1, you won't know why it is \emph{obvious} that area of a circle is \(\pi\cdot r^2\)}.
+
+\hypertarget{loss-function-the-concept}{%
+\section{Loss function, the concept}\label{loss-function-the-concept}}
+
+Imagine that you are selling ice-cream on a beach, so we can assume it is a narrow strip of sand and, therefore, a one-dimensional problem. It is hot, so \emph{everyone} wants ice-cream (obviously) and you want to maximize the number of ice-creams you sell (obviously). People are distributed in some random (not necessarily uniform or symmetric) way along the beach, so the question is: Where do you put your \emph{single} ice-cream stand to maximize your profits? The answer depends on your choice of the \emph{loss function} that describes how distance between a particular person and your stand influences whether person will buy your ice-cream. In other words, it describes the \emph{cost} of getting to you stand, i.e.~walking all-the-way through the sand in that heat. This \emph{cost} clearly depends on the distance and in the simplest case, it is linearly proportional to the distance: If you need to walk twice the distance, your costs for getting an ice-cream are twice as high. However, the relationship between the distance and cost does not have to be so simple and linear and this is why we have many different \emph{loss} / \emph{cost} functions.
+
+We can write a loss/cost function more formally as \(L(stand, person_i)\) where \texttt{stand} is the location of your stand and \texttt{person\_i} is a location of a particular ith person. The cost can be either zero or positive, i.e., we assume there is no benefit in walking all the way, only no or some cost. So, where should you put you ice-cream stand?
+
+\begin{center}\includegraphics[width=1\linewidth]{images/loss-functions-where-to} \end{center}
+
+\hypertarget{l0-mode}{%
+\section{L0 (mode)}\label{l0-mode}}
+
+The simplest loss function is\\
+\[L0(stand, person_i) =  \begin{cases}
+0, stand == person_i \\
+\infty, stand \neq person_i
+\end{cases}\]
+
+This function assumes that everybody hates walking so much, that \emph{any} walk is unbearable and should be avoided. Thus, there is no cost for getting your ice-cream only for people who are positioned right next to your stand. For everybody else, even one meter away, the costs of walking are infinite, so they won't bother and, therefore, won't buy your ice-cream. Still, we are in the business of selling one, so where do we put our stand given how lazy our customers are? Well, we just find the biggest group of people and put our stand next to them. No one else will come but at least you got the biggest group of customers you could. If you look at the \emph{distribution} of your customers along the beach this is the highest peak (that you peak) and it is called the \emph{mode} of the distribution.
+
+\begin{center}\includegraphics[width=1\linewidth]{images/loss-functions-L0} \end{center}
+
+\hypertarget{l1-median}{%
+\section{L1 (median)}\label{l1-median}}
+
+The next loss function, that I already mention, assumes a simple linear relationship between the distance and the cost
+\[L1(stand, person_i) = |person_i - stand|\]
+In other words, the cost is equal to distance (we need \texttt{\textbar{}\ \textbar{}} to get an absolute value, because the person could be ``to the left of'' of stand, in which case \texttt{person\ -\ stand} distance will be negative). So, where should we put our stand? Let us start at a fairly random location so that 3 of our customers are on the left and 7 are on the right.
+
+\begin{center}\includegraphics[width=1\linewidth]{images/loss-functions-L1-off-median} \end{center}
+
+We can, in principle, compute the actual cost but it is simpler to ask the question of whether we can \emph{improve} on that cost by moving somewhere else? Imagine that we move to the left where \emph{minority} of our customers are. Now we have 1 on the left and 8 on the right (plus 2 more at our location).
+
+\begin{center}\includegraphics[width=1\linewidth]{images/loss-functions-L1-left} \end{center}
+
+The problem is, we moved \emph{away} from the majority of the people so our total cost is \emph{original cost - 3 (improvement due to moving close to minority) + 8 (increase in loss due to moving away from majority)}, so \(\Delta L1 = +5\). Oops, we made it worse! How about moving to the \emph{right}?
+
+\begin{center}\includegraphics[width=1\linewidth]{images/loss-functions-L1-right} \end{center}
+
+Now that we move \emph{towards} the majority of customers, we have four on the left and six on the right (plus one at our location). The change in cost is \emph{original cost + 4 (loss due to moving away from minority) - 6 (improvement due to moving towards majority)}, so \(\Delta L1 = -2\). Which gives us an idea: we should try to get even closer to that majority by keeping walking to the right! Eventually, you will get to point of the 50/50. Should you keep moving to the right? Should you move to the left? Should you move at all?
+
+\begin{center}\includegraphics[width=1\linewidth]{images/loss-functions-L1-median} \end{center}
+
+There is no point in moving to the left. You just came from where because moving to the right made things better. However, if you keep moving to the right, you will keep passing people, so that majority now will be on the left and you would be walking \emph{away} from the majority, raising the costs (and your loses). So, once you get to point where half of your customers are on the left and half are on the right, you cannot do any better. Any movement that gets you from 50/50 means there are more customers on one side (say left, if you moved to the right) and, as we already figured out, your best strategy is to move towards the majority, which gets you back where you started at 50/50 point. That 50/50 points split, when half of customers / probability mass is on one side and half is on the other, is called \emph{median}.
+
+\hypertarget{l2-mean}{%
+\section{L2 (mean)}\label{l2-mean}}
+
+The classic loss function is Euclidean distance \[L2(stand, person_i) = (person - stand)^2\]
+Here, every next step becomes progressively harder for our customers. The cost of walking 1 meter is 1 (unit of effort). But walking 2 is \(2^2 = 4\) and is \(3^2=9\) for 3 meters. Thus, the penalty (cost/loss) for being further away from your stand increases as a power law. Still, one needs to sell ice-cream, so one needs to find the best spot where total cost is minimal
+
+\[L2(stand, person) = \sum_{i=1}^{N}{(person_i - stand)^2}\]
+
+\begin{center}\includegraphics[width=1\linewidth]{images/loss-functions-L2-mean} \end{center}
+
+Or, we can compute the minimal \emph{average} cost by dividing the sum by the total number of customers \texttt{N}:
+\[<L2(stand, person)> = \frac{1}{N}\sum_{i=1}^{N}{(person_i - stand)^2}\]
+
+Conceptually, you find that minimum by walking along the beach in the direction that reduces the cost until you hit the point where it start going up again. This strategy is called \emph{gradient descent} and, generally speaking, this is how computer finds minima computationally: They make steps in a different directions to see which way is down and keep going until things start going up. However, in one-dimensional well-behaving case we have here things are even simpler as you can use calculus to figure out the solution analytically. If you watched the videos I advertised above, you'll know that the \emph{derivative} of the function is zero at the extrema (minima or maxima), so we just need to differentiate our average \emph{L2} over position of the stand and find where it is zero\footnote{I've nicked the derivations from {[}\url{https://stats.stackexchange.com/a/312997}{]}}.
+
+\[\frac{\partial L2}{\partial stand} = -\frac{2}{N}\sum_{i=1}^{N}{(person_i - stand)}\]
+As we want \(\frac{\partial L2}{\partial stand} = 0\), we state
+\[-\frac{2}{N}\sum_{i=1}^{N}{(person_i - stand)} = 0\].
+Opening up brackets and rearranging we get
+\[-\frac{2}{N}\sum_{i=1}^{N}{person_i} + \frac{2\cdot N}{N}\cdot stand = 0\\
+2\cdot stand = \frac{2}{N}\sum_{i=1}^{N}{person_i} \\
+stand = \frac{1}{N}\sum_{i=1}^{N}{person_i}
+\]
+
+So, the optimal location of your stand is the \emph{mean}: an average location of all people on the beach.
+
+\hypertarget{l1-median-vs.-l2-mean}{%
+\section{L1 (median) vs.~L2 (mean)}\label{l1-median-vs.-l2-mean}}
+
+One problem about the \emph{mean} is that it is sensitive to outliers. Because the costs grow as a power law, this approach favors a lot of medium-sized distances over lots of smalls ones plus one really large one. Thus, a single person at a far side of the beach would have a big influence on your stand's location (you already saw the difference in the example above). In data analysis, this means that those outliers will pull your estimates away from the majority of responses. Which is why it might be a good idea to consider using \texttt{median} rather than \texttt{mean}. If you distribution is symmetric, the difference will be negligible but in presence of outliers \texttt{median}, as a point-estimate, is more robust.
+
+\hypertarget{choosing-a-likelihood}{%
+\section{Choosing a likelihood}\label{choosing-a-likelihood}}
+
+So far we talked about selling ice-cream on the beach but same question of choosing your loss function applies when you are trying to fit a distribution or a regression line, as in chapter 4. Here, you also have a point-estimate (regression line at each point) and you try to put it in such a way as to minimize the costs of having data points off that line (the distance from the point-estimate of the line and each data point is call a \emph{residual}). The classic way is to use \emph{L2} distance and the approach is called \emph{ordinary least squares}, as you try to minimize squared residuals.
+
+Alternatively, you can express same costs-of-being-off-the-line using a distribution, such as Gaussian. You put its peak (mean) at the (candidate) location of your point estimate (that point has highest probability, so lowest cost) and the loss is computed as a probability of the residual (distance-to-the-point). You can think about it in terms of the probability that a person will go and buy ice-cream from your stand.
+
+\begin{center}\includegraphics[width=1\linewidth]{images/loss-functions-Gaussian} \end{center}
+
+The Gaussian is special because it uses L2 distance, see \((x - \mu)^2\) inside the exponential:
+\[f(x) = \frac{1}{\sigma \sqrt(2 \pi)}\left(-\frac{1}{2}\frac{(x - \mu)^2}{\sigma^2}\right)\]
+
+so using it is equivalent to fitting via ordinary least squares. However, as McElreath hinted, you can choose different priors that are different not only in the distance-to-loss formula (like \emph{L1} is different from \emph{L2}) but also in symmetry. Both \emph{L1} and \emph{L2} (and Gaussian) ignore the sign of the distance. It does not matter whether customers are on the left or on the right. Other distributions, such as Beta, Gamma, or Log Normal are not symmetric, so the same distance will cost differently depending on the side the customer is at.
+
+\begin{center}\includegraphics[width=1\linewidth]{images/loss-functions-Gamma} \end{center}
+
+This allows you to think about the choice of your likelihood distribution in terms of choosing a loss function: Should it be symmetric? Should it operate only within certain range (1..7 for a Likert scale, 0..1 for proportions, positive values for Gamma)? As you saw in the examples above, picking a different function moves your cart (regression line), so you should keep in mind that using a different likelihood will move the regression line and produce different estimates and predictions. Good news: You will learn about your options in the book, so you will have an idea about how to pick them.
+
+\hypertarget{gaussian-in-frenquentist-versus-bayesian-statistics}{%
+\section{Gaussian in frenquentist versus Bayesian statistics}\label{gaussian-in-frenquentist-versus-bayesian-statistics}}
+
+Later on in the book McElreath will note that erroneously assuming normal distribution for residuals ruins your inferences in frequentist statistics but not in Bayesian. This is because of parametric nature of inferences in frequentist statistics. By assuming that residuals are normal, you can approximate significance by using t- or F-distribution with appropriate degrees of freedom. However, if your initial assumption is wrong, your inferences will be based on idealized not real residuals. If you residuals tend to be asymmetric, as in any proportion data, the numbers you see are about \emph{symmetric} residuals with the observed variance, not your real \emph{asymmetric} residuals. Numbers will be off and it won't be easy (although probably possible) to say by how much. In contrast, Bayesian statistics does not use approximations and builds the posterior distribution directly. Thus it treats Gaussian (or any other distribution) as a loss function and the asymmetry or abnormality of residuals is less critical (merely not optimal).
+
+\hypertarget{solutions-for-chapter-2}{%
+\chapter{Solutions for Chapter 2}\label{solutions-for-chapter-2}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -136,9 +242,6 @@ This is a collection of solutions for exercises but also of notes that attempt t
 \KeywordTok{library}\NormalTok{(rethinking)}
 \end{Highlighting}
 \end{Shaded}
-
-\hypertarget{solutions-to-exercises}{%
-\section{Solutions to Exercises}\label{solutions-to-exercises}}
 
 \hypertarget{e1}{%
 \subsubsection*{2E1}\label{e1}}
@@ -517,6 +620,523 @@ Given the singleton, this becomes
 \[uPr(A | test, twins, singleton) = Pr(A | test, twins) * (1 - Pr(twins | A)) = 0.533 * 0.9 = 0.48\\
 uPr(B | test, twins, singleton) = Pr(B | test, twins) * (1 - Pr(twins | B)) = 0.467 * 0.8 = 0.3736\]
 After normalization \(Pr(A | test, twins, singleton) \approx 0.5625\) and \(Pr(B | test, twins, singleton) \approx 0.4375\).
+
+\hypertarget{solutions-for-chapter-3}{%
+\chapter{Solutions for Chapter 3}\label{solutions-for-chapter-3}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\KeywordTok{library}\NormalTok{(rethinking)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{initialization-code-for-easy-exercises}{%
+\subsubsection{Initialization code for easy exercises}\label{initialization-code-for-easy-exercises}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p\_grid \textless{}{-}}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DataTypeTok{from=}\DecValTok{0}\NormalTok{, }\DataTypeTok{to=}\DecValTok{1}\NormalTok{, }\DataTypeTok{length.out=}\DecValTok{1000}\NormalTok{)}
+\NormalTok{prior \textless{}{-}}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
+\NormalTok{likelihood \textless{}{-}}\StringTok{ }\KeywordTok{dbinom}\NormalTok{(}\DecValTok{6}\NormalTok{, }\DataTypeTok{size=}\DecValTok{9}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{p\_grid)}
+\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{likelihood }\OperatorTok{*}\StringTok{ }\NormalTok{prior}
+\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{posterior }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(posterior)}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\NormalTok{samples \textless{}{-}}\StringTok{ }\KeywordTok{sample}\NormalTok{(p\_grid, }\DataTypeTok{prob=}\NormalTok{posterior, }\DataTypeTok{size=}\FloatTok{1e4}\NormalTok{, }\DataTypeTok{replace=}\OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{e1-1}{%
+\subsubsection*{3E1}\label{e1-1}}
+\addcontentsline{toc}{subsubsection}{3E1}
+
+How much posterior probability lies below p = 0.2?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =} \FloatTok{0.2}\NormalTok{, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"p below 0.2: \{mean(samples \textless{} 0.2)\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E1-1.pdf}
+
+\hypertarget{e2-1}{%
+\subsubsection*{3E2}\label{e2-1}}
+\addcontentsline{toc}{subsubsection}{3E2}
+
+How much posterior probability lies below p = 0.8?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =} \FloatTok{0.8}\NormalTok{, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"p below 0.8: \{mean(samples \textless{} 0.8)\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E2-1.pdf}
+
+\hypertarget{e3-1}{%
+\subsubsection*{3E3}\label{e3-1}}
+\addcontentsline{toc}{subsubsection}{3E3}
+
+How much posterior probability lies between p = 0.2 and p = 0.8?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.2}\NormalTok{, }\FloatTok{0.8}\NormalTok{), }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"p between 0.2 and 0.8: \{mean(samples \textless{} 0.8 \& samples \textgreater{} 0.2)\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E3-1.pdf}
+
+\hypertarget{e4-1}{%
+\subsubsection*{3E4}\label{e4-1}}
+\addcontentsline{toc}{subsubsection}{3E4}
+
+20\% of the posterior probability lies below which value of p?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{q20 \textless{}{-}}\StringTok{ }\KeywordTok{quantile}\NormalTok{(samples, }\FloatTok{0.2}\NormalTok{)}
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ q20, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"20\% of the posterior probability lies below \{round(q20, 2)\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E4-1.pdf}
+
+\hypertarget{e5}{%
+\subsubsection*{3E5}\label{e5}}
+\addcontentsline{toc}{subsubsection}{3E5}
+
+20\% of the posterior probability lies above which value of p?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{q80 \textless{}{-}}\StringTok{ }\KeywordTok{quantile}\NormalTok{(samples, }\FloatTok{0.8}\NormalTok{)}
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ q80, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"20\% of the posterior probability lies above \{round(q80, 2)\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E5-1.pdf}
+
+\hypertarget{e6}{%
+\subsubsection*{3E6}\label{e6}}
+\addcontentsline{toc}{subsubsection}{3E6}
+
+Which values of p contain the narrowest interval equal to 66\% of the posterior probability?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{hpdi66 \textless{}{-}}\StringTok{ }\KeywordTok{HPDI}\NormalTok{(samples, }\FloatTok{0.66}\NormalTok{)}
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ hpdi66, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"Narrowest interval equal to 66\% of the posterior probability is \{round(hpdi66[1], 3)\}..\{round(hpdi66[2], 3)\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E6-1.pdf}
+
+\hypertarget{e7}{%
+\subsubsection*{3E7}\label{e7}}
+\addcontentsline{toc}{subsubsection}{3E7}
+
+Which values of p contain 66\% of the posterior probability, assuming equal posterior probability both below and above the interval?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pi66 \textless{}{-}}\StringTok{ }\KeywordTok{PI}\NormalTok{(samples, }\FloatTok{0.66}\NormalTok{)}
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ pi66, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"66\% of the posterior probability, assuming equal posterior probability are between \{round(pi66[1], 3)\}..\{round(pi66[2], 3)\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E7-1.pdf}
+
+\hypertarget{m1-1}{%
+\subsubsection*{3M1}\label{m1-1}}
+\addcontentsline{toc}{subsubsection}{3M1}
+
+Suppose the globe tossing data had turned out to be 8 water in 15 tosses. Construct the posterior distribution, using grid approximation. Use the same flat prior as before.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p\_grid \textless{}{-}}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DataTypeTok{from=}\DecValTok{0}\NormalTok{, }\DataTypeTok{to=}\DecValTok{1}\NormalTok{, }\DataTypeTok{length.out=}\DecValTok{1000}\NormalTok{)}
+\NormalTok{prior \textless{}{-}}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
+\NormalTok{likelihood \textless{}{-}}\StringTok{ }\KeywordTok{dbinom}\NormalTok{(}\DecValTok{8}\NormalTok{, }\DataTypeTok{size=}\DecValTok{15}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{p\_grid)}
+\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{likelihood }\OperatorTok{*}\StringTok{ }\NormalTok{prior}
+\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{posterior }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(posterior)}
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{p\_grid, }\DataTypeTok{y=}\NormalTok{posterior)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_line}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle=}\StringTok{"8 water in 15 tosses"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M1-1.pdf}
+
+\hypertarget{m2-1}{%
+\subsubsection*{3M2}\label{m2-1}}
+\addcontentsline{toc}{subsubsection}{3M2}
+
+Draw 10,000 samples from the grid approximation from above. Then use the samples to calculate the 90\% HPDI for p.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\NormalTok{samples \textless{}{-}}\StringTok{ }\KeywordTok{sample}\NormalTok{(p\_grid, }\DataTypeTok{prob=}\NormalTok{posterior, }\DataTypeTok{size=}\FloatTok{1e4}\NormalTok{, }\DataTypeTok{replace=}\OtherTok{TRUE}\NormalTok{)}
+
+\NormalTok{hpdi90 \textless{}{-}}\StringTok{ }\KeywordTok{HPDI}\NormalTok{(samples, }\FloatTok{0.9}\NormalTok{)}
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ hpdi90, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"HPDI 90\% is \{round(hpdi66[1], 3)\}..\{round(hpdi66[2], 3)\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M2-1.pdf}
+
+\hypertarget{m3-1}{%
+\subsubsection*{3M3}\label{m3-1}}
+\addcontentsline{toc}{subsubsection}{3M3}
+
+Construct a posterior predictive check for this model and data. This means simulate the distribution of samples, averaging over the posterior uncertainty in p . What is the probability of observing 8 water in 15 tosses?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{predicted\_water8\_}\DecValTok{15}\NormalTok{ \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{N =} \KeywordTok{rbinom}\NormalTok{(}\KeywordTok{length}\NormalTok{(samples), }\DataTypeTok{size=}\DecValTok{15}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{samples)) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{group\_by}\NormalTok{(N) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{count =} \KeywordTok{n}\NormalTok{(), }\DataTypeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{p =}\NormalTok{ count }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(count))}
+  
+\NormalTok{p8 \textless{}{-}}\StringTok{ }
+\StringTok{  }\NormalTok{predicted\_water8\_}\DecValTok{15} \OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(N }\OperatorTok{==}\StringTok{ }\DecValTok{8}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{pull}\NormalTok{(p)}
+
+\KeywordTok{ggplot}\NormalTok{(predicted\_water8\_}\DecValTok{15}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{N, }\DataTypeTok{y=}\NormalTok{ p)) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"The probability of observing 8 water in 15 tosses is \{p8\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M3-1.pdf}
+\#\#\#\# 3M4 \{-\}
+Using the posterior distribution constructed from the new (8/15) data, now calculate the probability of observing 6 water in 9 tosses.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{predicted\_water6\_}\DecValTok{9}\NormalTok{ \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{N =} \KeywordTok{rbinom}\NormalTok{(}\KeywordTok{length}\NormalTok{(samples), }\DataTypeTok{size=}\DecValTok{9}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{samples)) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{group\_by}\NormalTok{(N) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{count =} \KeywordTok{n}\NormalTok{(), }\DataTypeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{p =}\NormalTok{ count }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(count))}
+  
+\NormalTok{p6 \textless{}{-}}\StringTok{ }
+\StringTok{  }\NormalTok{predicted\_water6\_}\DecValTok{9} \OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(N }\OperatorTok{==}\StringTok{ }\DecValTok{6}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{pull}\NormalTok{(p)}
+
+\KeywordTok{ggplot}\NormalTok{(predicted\_water6\_}\DecValTok{9}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{N, }\DataTypeTok{y=}\NormalTok{ p)) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"The probability of observing 6 water in 9 tosses is \{p6\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M4-1.pdf}
+
+\hypertarget{m5-1}{%
+\subsubsection*{3M5}\label{m5-1}}
+\addcontentsline{toc}{subsubsection}{3M5}
+
+Start over at 3M1 , but now use a prior that is zero below p = 0.5 and a constant above p = 0.5. This corresponds to prior information that a majority of the Earth's surface is water. Repeat each problem above and compare the inferences. What difference does the better prior make? If it helps, compare inferences (using both priors) to the true value p = 0.7.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p\_grid \textless{}{-}}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DataTypeTok{from=}\DecValTok{0}\NormalTok{, }\DataTypeTok{to=}\DecValTok{1}\NormalTok{, }\DataTypeTok{length.out=}\DecValTok{1000}\NormalTok{)}
+\NormalTok{prior \textless{}{-}}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(p\_grid }\OperatorTok{\textgreater{}=}\StringTok{ }\FloatTok{0.5}\NormalTok{)}
+\NormalTok{likelihood \textless{}{-}}\StringTok{ }\KeywordTok{dbinom}\NormalTok{(}\DecValTok{8}\NormalTok{, }\DataTypeTok{size=}\DecValTok{15}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{p\_grid)}
+\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{likelihood }\OperatorTok{*}\StringTok{ }\NormalTok{prior}
+\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{posterior }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(posterior)}
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{p\_grid, }\DataTypeTok{y=}\NormalTok{posterior)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_line}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle=}\StringTok{"8 water in 15 tosses"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M5-1-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\NormalTok{samples \textless{}{-}}\StringTok{ }\KeywordTok{sample}\NormalTok{(p\_grid, }\DataTypeTok{prob=}\NormalTok{posterior, }\DataTypeTok{size=}\FloatTok{1e4}\NormalTok{, }\DataTypeTok{replace=}\OtherTok{TRUE}\NormalTok{)}
+
+\NormalTok{hpdi90 \textless{}{-}}\StringTok{ }\KeywordTok{HPDI}\NormalTok{(samples, }\FloatTok{0.9}\NormalTok{)}
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ hpdi90, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"Remake of 3M2"}\NormalTok{,}
+       \DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"HPDI 90\% is \{round(hpdi66[1], 3)\}..\{round(hpdi66[2], 3)\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M5-2-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{predicted\_water8\_}\DecValTok{15}\NormalTok{\_remake \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{N =} \KeywordTok{rbinom}\NormalTok{(}\KeywordTok{length}\NormalTok{(samples), }\DataTypeTok{size=}\DecValTok{15}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{samples)) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{group\_by}\NormalTok{(N) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{count =} \KeywordTok{n}\NormalTok{(), }\DataTypeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{p =}\NormalTok{ count }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(count))}
+  
+\NormalTok{p8 \textless{}{-}}\StringTok{ }
+\StringTok{  }\NormalTok{predicted\_water8\_}\DecValTok{15}\NormalTok{\_remake }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(N }\OperatorTok{==}\StringTok{ }\DecValTok{8}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{pull}\NormalTok{(p)}
+
+\KeywordTok{ggplot}\NormalTok{(predicted\_water8\_}\DecValTok{15}\NormalTok{\_remake, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{N, }\DataTypeTok{y=}\NormalTok{ p)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_line}\NormalTok{(}\DataTypeTok{data=}\NormalTok{predicted\_water8\_}\DecValTok{15}\NormalTok{, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"Remake of 3M3"}\NormalTok{,}
+       \DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"The probability of observing 8 water in 15 tosses is \{p8\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M5-3-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{predicted\_water6\_}\DecValTok{9}\NormalTok{\_remake \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{N =} \KeywordTok{rbinom}\NormalTok{(}\KeywordTok{length}\NormalTok{(samples), }\DataTypeTok{size=}\DecValTok{9}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{samples)) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{group\_by}\NormalTok{(N) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{count =} \KeywordTok{n}\NormalTok{(), }\DataTypeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{p =}\NormalTok{ count }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(count))}
+  
+\NormalTok{p6 \textless{}{-}}\StringTok{ }
+\StringTok{  }\NormalTok{predicted\_water6\_}\DecValTok{9}\NormalTok{\_remake }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(N }\OperatorTok{==}\StringTok{ }\DecValTok{6}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{pull}\NormalTok{(p)}
+
+\KeywordTok{ggplot}\NormalTok{(predicted\_water6\_}\DecValTok{9}\NormalTok{\_remake, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{N, }\DataTypeTok{y=}\NormalTok{ p)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_line}\NormalTok{(}\DataTypeTok{data=}\NormalTok{predicted\_water6\_}\DecValTok{9}\NormalTok{, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"The probability of observing 6 water in 9 tosses is \{p6\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M5-4-1.pdf}
+
+\hypertarget{m6-1}{%
+\subsubsection*{3M6}\label{m6-1}}
+\addcontentsline{toc}{subsubsection}{3M6}
+
+Suppose you want to estimate the Earth's proportion of water very precisely. Specifically, you want the 99\% percentile interval of the posterior distribution of p to be only 0.05 wide. This means the distance between the upper and lower bound of the interval should be 0.05. How many times will you have to toss the globe to do this?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{true\_proportion \textless{}{-}}\StringTok{ }\FloatTok{0.5}
+\NormalTok{toss\_quantiles \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{tossesN =} \KeywordTok{seq}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{3000}\NormalTok{, }\DataTypeTok{by=}\DecValTok{1}\NormalTok{)) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{lowerN =} \KeywordTok{qbinom}\NormalTok{(}\FloatTok{0.005}\NormalTok{, tossesN, true\_proportion),}
+         \DataTypeTok{upperN =} \KeywordTok{qbinom}\NormalTok{(}\FloatTok{0.995}\NormalTok{, tossesN, true\_proportion),}
+         \DataTypeTok{lowerP =}\NormalTok{ lowerN }\OperatorTok{/}\StringTok{ }\NormalTok{tossesN,}
+         \DataTypeTok{upperP =}\NormalTok{ upperN }\OperatorTok{/}\StringTok{ }\NormalTok{tossesN,}
+         \DataTypeTok{deltaP =}\NormalTok{ upperP }\OperatorTok{{-}}\StringTok{ }\NormalTok{lowerP)}
+
+\NormalTok{minimal\_N \textless{}{-}}\StringTok{ }
+\StringTok{  }\NormalTok{toss\_quantiles }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(deltaP }\OperatorTok{\textless{}}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{pull}\NormalTok{(tossesN)}
+
+\KeywordTok{ggplot}\NormalTok{(toss\_quantiles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{tossesN, }\DataTypeTok{y=}\NormalTok{deltaP)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_line}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_hline}\NormalTok{(}\DataTypeTok{yintercept =} \FloatTok{0.05}\NormalTok{, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{scale\_y\_log10}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"Via qbinom"}\NormalTok{,}
+       \DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"For proportion \{true\_proportion\} you need \{minimal\_N\} tosses to get 99\% PI under 0.05"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M6-qbinom-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{simulate\_and\_compute\_PI99 \textless{}{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(tossN, true\_proportion)\{}
+\NormalTok{  simulated\_N \textless{}{-}}\StringTok{ }\KeywordTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, tossN, true\_proportion)}
+\NormalTok{  simulated\_P \textless{}{-}}\StringTok{ }\NormalTok{simulated\_N }\OperatorTok{/}\StringTok{ }\NormalTok{tossN}
+  \KeywordTok{diff}\NormalTok{(rethinking}\OperatorTok{::}\KeywordTok{PI}\NormalTok{(simulated\_P, }\DataTypeTok{prob=}\FloatTok{0.99}\NormalTok{))}
+\NormalTok{\}}
+
+\NormalTok{true\_proportion \textless{}{-}}\StringTok{ }\FloatTok{0.5}
+\NormalTok{toss\_sims \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{tossesN =} \KeywordTok{seq}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{3000}\NormalTok{, }\DataTypeTok{by=}\DecValTok{1}\NormalTok{)) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{rowwise}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{deltaP =}\KeywordTok{simulate\_and\_compute\_PI99}\NormalTok{(tossesN, true\_proportion))}
+
+\NormalTok{minimal\_N \textless{}{-}}\StringTok{ }
+\StringTok{  }\NormalTok{toss\_sims }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(deltaP }\OperatorTok{\textless{}}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{pull}\NormalTok{(tossesN)}
+
+\KeywordTok{ggplot}\NormalTok{(toss\_sims, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{tossesN, }\DataTypeTok{y=}\NormalTok{deltaP)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_line}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_hline}\NormalTok{(}\DataTypeTok{yintercept =} \FloatTok{0.05}\NormalTok{, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{scale\_y\_log10}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"Via rbinom simulations"}\NormalTok{,}
+       \DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"For proportion \{true\_proportion\} you need \{minimal\_N\} tosses to get 99\% PI under 0.05"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M6-simulation-1.pdf}
+
+\hypertarget{hard}{%
+\subsubsection*{Hard}\label{hard}}
+\addcontentsline{toc}{subsubsection}{Hard}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{data}\NormalTok{(homeworkch3)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{h1-1}{%
+\subsubsection*{3H1}\label{h1-1}}
+\addcontentsline{toc}{subsubsection}{3H1}
+
+Using grid approximation, compute the posterior distribution for the probability of a birth being a boy. Assume a uniform prior probability. Which parameter value maximizes the posterior probability?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{birth \textless{}{-}}\StringTok{ }\KeywordTok{c}\NormalTok{(birth1, birth2)}
+\NormalTok{birthN \textless{}{-}}\StringTok{ }\KeywordTok{length}\NormalTok{(birth)}
+\NormalTok{boyN \textless{}{-}}\StringTok{ }\KeywordTok{sum}\NormalTok{(birth)}
+
+\NormalTok{p\_grid \textless{}{-}}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DataTypeTok{from=}\DecValTok{0}\NormalTok{, }\DataTypeTok{to=}\DecValTok{1}\NormalTok{, }\DataTypeTok{length.out=}\DecValTok{1000}\NormalTok{)}
+\NormalTok{prior \textless{}{-}}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
+\NormalTok{likelihood \textless{}{-}}\StringTok{ }\KeywordTok{dbinom}\NormalTok{(boyN, }\DataTypeTok{size=}\NormalTok{birthN, }\DataTypeTok{prob=}\NormalTok{p\_grid)}
+\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{likelihood }\OperatorTok{*}\StringTok{ }\NormalTok{prior}
+\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{posterior }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(posterior)}
+
+\NormalTok{boyP \textless{}{-}}\StringTok{ }\NormalTok{p\_grid[}\KeywordTok{which.max}\NormalTok{(posterior)]}
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{p\_grid, }\DataTypeTok{y=}\NormalTok{posterior)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_line}\NormalTok{()}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ boyP, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"Mode: \{round(boyP, 3)\}"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3H1-1.pdf}
+
+\hypertarget{h2-1}{%
+\subsubsection*{3H2}\label{h2-1}}
+\addcontentsline{toc}{subsubsection}{3H2}
+
+Using the sample function, draw 10,000 random parameter values from the posterior distribution you calculated above. Use these samples to estimate the 50\%, 89\%, and 97\% highest posterior density intervals.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\NormalTok{samples \textless{}{-}}\StringTok{ }\KeywordTok{sample}\NormalTok{(p\_grid, }\DataTypeTok{prob=}\NormalTok{posterior, }\DataTypeTok{size=}\FloatTok{1e4}\NormalTok{, }\DataTypeTok{replace=}\OtherTok{TRUE}\NormalTok{)}
+
+\NormalTok{HPDI50 \textless{}{-}}\StringTok{ }\NormalTok{rethinking}\OperatorTok{::}\KeywordTok{HPDI}\NormalTok{(samples, }\DataTypeTok{prob =} \FloatTok{0.5}\NormalTok{)}
+\NormalTok{HPDI89 \textless{}{-}}\StringTok{ }\NormalTok{rethinking}\OperatorTok{::}\KeywordTok{HPDI}\NormalTok{(samples, }\DataTypeTok{prob =} \FloatTok{0.89}\NormalTok{)}
+\NormalTok{HPDI97 \textless{}{-}}\StringTok{ }\NormalTok{rethinking}\OperatorTok{::}\KeywordTok{HPDI}\NormalTok{(samples, }\DataTypeTok{prob =} \FloatTok{0.97}\NormalTok{)}
+
+\NormalTok{all\_HPDI \textless{}{-}}\StringTok{ }\KeywordTok{c}\NormalTok{(HPDI50, HPDI89, HPDI97)}
+\KeywordTok{names}\NormalTok{(all\_HPDI) \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{40}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ HPDI50, }\DataTypeTok{color=}\StringTok{"green"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ HPDI89, }\DataTypeTok{color=}\StringTok{"blue"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ HPDI97, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale\_x\_continuous}\NormalTok{(}\DataTypeTok{breaks =}\NormalTok{ all\_HPDI, }\DataTypeTok{labels =} \KeywordTok{round}\NormalTok{(all\_HPDI, }\DecValTok{3}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3H2-1.pdf}
+
+\hypertarget{h3-1}{%
+\subsubsection*{3H3}\label{h3-1}}
+\addcontentsline{toc}{subsubsection}{3H3}
+
+Use rbinom to simulate 10,000 replicates of 200 births. You should end up with 10,000 numbers, each one a count of boys out of 200 births. Compare the distribution of predicted numbers of boys to the actual count in the data (111 boys out of 200 births). There are many good ways to visualize the simulations, but the dens command (part of the rethinking package) is probably the easiest way in this case. Does it look like the model fits the data well? That is, does the distribution of predictions include the actual observation as a central, likely outcome?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sim\_boys \textless{}{-}}\StringTok{ }\KeywordTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, }\DecValTok{200}\NormalTok{, boyN }\OperatorTok{/}\StringTok{ }\NormalTok{birthN)}
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{sim\_boys)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_density}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ boyN, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3H3-1.pdf}
+
+\hypertarget{h4-1}{%
+\subsubsection*{3H4}\label{h4-1}}
+\addcontentsline{toc}{subsubsection}{3H4}
+
+Now compare 10,000 counts of boys from 100 simulated first borns only to the number of boys in the first births, birth1. How does the model look in this light?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sim\_boys \textless{}{-}}\StringTok{ }\KeywordTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, }\DecValTok{100}\NormalTok{, boyN }\OperatorTok{/}\StringTok{ }\NormalTok{birthN)}
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{sim\_boys)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_density}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =} \KeywordTok{sum}\NormalTok{(birth1), }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3H4-1.pdf}
+
+\hypertarget{h5}{%
+\subsubsection*{3H5}\label{h5}}
+\addcontentsline{toc}{subsubsection}{3H5}
+
+The model assumes that sex of first and second births are independent. To check this assumption, focus now on second births that followed female first borns. Compare 10,000 simulated counts of boys to only those second births that followed girls. To do this correctly, you need to count the number of first borns who were girls and simulate that many births, 10,000 times. Compare the counts of boys in your simulations to the actual observed count of boys following girls. How does the model look in this light? Any guesses what is going on in these data?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{birth\_after\_girl \textless{}{-}}\StringTok{ }\NormalTok{birth2[birth1 }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{]}
+\NormalTok{sim\_boys \textless{}{-}}\StringTok{ }\KeywordTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, }\KeywordTok{length}\NormalTok{(birth\_after\_girl), boyN }\OperatorTok{/}\StringTok{ }\NormalTok{birthN)}
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{sim\_boys)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_density}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =} \KeywordTok{sum}\NormalTok{(birth\_after\_girl), }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3H5-1.pdf}
 
   \bibliography{book.bib}
 

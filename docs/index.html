@@ -24,7 +24,7 @@
 <meta name="author" content="Alexander Pastukhov" />
 
 
-<meta name="date" content="2020-11-16" />
+<meta name="date" content="2020-11-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,7 +32,7 @@
   
   
 
-<link rel="next" href="small-worlds-and-large-worlds.html"/>
+<link rel="next" href="loss-functions.html"/>
 <script src="libs/header-attrs-2.5/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -137,14 +137,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Precis</a></li>
-<li class="chapter" data-level="2" data-path="small-worlds-and-large-worlds.html"><a href="small-worlds-and-large-worlds.html"><i class="fa fa-check"></i><b>2</b> Small Worlds and Large Worlds</a>
+<li class="chapter" data-level="2" data-path="loss-functions.html"><a href="loss-functions.html"><i class="fa fa-check"></i><b>2</b> Loss functions</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="small-worlds-and-large-worlds.html"><a href="small-worlds-and-large-worlds.html#solutions-to-exercises"><i class="fa fa-check"></i><b>2.1</b> Solutions to Exercises</a></li>
+<li class="chapter" data-level="2.1" data-path="loss-functions.html"><a href="loss-functions.html#loss-function-the-concept"><i class="fa fa-check"></i><b>2.1</b> Loss function, the concept</a></li>
+<li class="chapter" data-level="2.2" data-path="loss-functions.html"><a href="loss-functions.html#l0-mode"><i class="fa fa-check"></i><b>2.2</b> L0 (mode)</a></li>
+<li class="chapter" data-level="2.3" data-path="loss-functions.html"><a href="loss-functions.html#l1-median"><i class="fa fa-check"></i><b>2.3</b> L1 (median)</a></li>
+<li class="chapter" data-level="2.4" data-path="loss-functions.html"><a href="loss-functions.html#l2-mean"><i class="fa fa-check"></i><b>2.4</b> L2 (mean)</a></li>
+<li class="chapter" data-level="2.5" data-path="loss-functions.html"><a href="loss-functions.html#l1-median-vs.-l2-mean"><i class="fa fa-check"></i><b>2.5</b> L1 (median) vs. L2 (mean)</a></li>
+<li class="chapter" data-level="2.6" data-path="loss-functions.html"><a href="loss-functions.html#choosing-a-likelihood"><i class="fa fa-check"></i><b>2.6</b> Choosing a likelihood</a></li>
+<li class="chapter" data-level="2.7" data-path="loss-functions.html"><a href="loss-functions.html#gaussian-in-frenquentist-versus-bayesian-statistics"><i class="fa fa-check"></i><b>2.7</b> Gaussian in frenquentist versus Bayesian statistics</a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="sampling-the-imaginary.html"><a href="sampling-the-imaginary.html"><i class="fa fa-check"></i><b>3</b> Sampling the Imaginary</a>
-<ul>
-<li class="chapter" data-level="3.1" data-path="sampling-the-imaginary.html"><a href="sampling-the-imaginary.html#solutions-to-exercises-1"><i class="fa fa-check"></i><b>3.1</b> Solutions to Exercises</a></li>
-</ul></li>
+<li class="chapter" data-level="3" data-path="solutions-for-chapter-2.html"><a href="solutions-for-chapter-2.html"><i class="fa fa-check"></i><b>3</b> Solutions for Chapter 2</a></li>
+<li class="chapter" data-level="4" data-path="solutions-for-chapter-3.html"><a href="solutions-for-chapter-3.html"><i class="fa fa-check"></i><b>4</b> Solutions for Chapter 3</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -168,7 +172,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="header">
 <h1 class="title">Notes on and Solutions for Statistical Rethinking</h1>
 <p class="author"><em>Alexander Pastukhov</em></p>
-<p class="date"><em>2020-11-16</em></p>
+<p class="date"><em>2020-11-19</em></p>
 </div>
 <div id="precis" class="section level1" number="1">
 <h1><span class="header-section-number">Chapter 1</span> Precis</h1>
@@ -181,7 +185,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
         </div>
       </div>
 
-<a href="small-worlds-and-large-worlds.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="loss-functions.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

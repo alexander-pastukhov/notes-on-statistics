@@ -1,6 +1,12 @@
 precis
-small-worlds-and-large-worlds
-solutions-to-exercises
-sampling-the-imaginary
-solutions-to-exercises-1
+loss-functions
+loss-function-the-concept
+l0-mode
+l1-median
+l2-mean
+l1-median-vs.-l2-mean
+choosing-a-likelihood
+gaussian-in-frenquentist-versus-bayesian-statistics
+solutions-for-chapter-2
+solutions-for-chapter-3
 initialization-code-for-easy-exercises
