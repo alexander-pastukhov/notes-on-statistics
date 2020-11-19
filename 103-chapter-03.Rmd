@@ -1,11 +1,9 @@
-# Sampling the Imaginary
+# Solutions for Chapter 3
 
 ```{r, warning = FALSE, message = FALSE}
 library(tidyverse)
 library(rethinking)
 ```
-
-## Solutions to Exercises
 
 #### Initialization code for easy exercises
 ```{r easy}
@@ -221,7 +219,7 @@ ggplot(predicted_water6_9_remake, aes(x=N, y= p)) +
 #### 3M6 {-}
 Suppose you want to estimate the Earth’s proportion of water very precisely. Specifically, you want the 99% percentile interval of the posterior distribution of p to be only 0.05 wide. This means the distance between the upper and lower bound of the interval should be 0.05. How many times will you have to toss the globe to do this?
 
-```{r 3M6-qbinom}
+```{r 3M6-qbinom, cache=TRUE}
 true_proportion <- 0.5
 toss_quantiles <- 
   tibble(tossesN = seq(10, 3000, by=1)) %>%
@@ -245,7 +243,7 @@ ggplot(toss_quantiles, aes(x=tossesN, y=deltaP)) +
        subtitle = glue::glue("For proportion {true_proportion} you need {minimal_N} tosses to get 99% PI under 0.05"))
 ```
 
-```{r 3M6-simulation}
+```{r 3M6-simulation, cache=TRUE}
 simulate_and_compute_PI99 <- function(tossN, true_proportion){
   simulated_N <- rbinom(1e4, tossN, true_proportion)
   simulated_P <- simulated_N / tossN

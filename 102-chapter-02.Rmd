@@ -1,11 +1,9 @@
-# Small Worlds and Large Worlds
+# Solutions for Chapter 2
 
 ```{r, warning = FALSE, message = FALSE}
 library(tidyverse)
 library(rethinking)
 ```
-
-## Solutions to Exercises
 
 #### 2E1 {-}
 Which of the expressions below correspond to the statement: the probability of rain on Monday?
