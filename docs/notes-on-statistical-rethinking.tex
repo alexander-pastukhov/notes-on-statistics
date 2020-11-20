@@ -113,7 +113,7 @@
 
 \title{Notes on and Solutions for Statistical Rethinking}
 \author{Alexander Pastukhov}
-\date{2020-11-19}
+\date{2020-11-20}
 
 \begin{document}
 \maketitle
@@ -139,7 +139,7 @@ I am afraid that the easiest way to explain why an \emph{L2} loss results in \em
 
 Imagine that you are selling ice-cream on a beach, so we can assume it is a narrow strip of sand and, therefore, a one-dimensional problem. It is hot, so \emph{everyone} wants ice-cream (obviously) and you want to maximize the number of ice-creams you sell (obviously). People are distributed in some random (not necessarily uniform or symmetric) way along the beach, so the question is: Where do you put your \emph{single} ice-cream stand to maximize your profits? The answer depends on your choice of the \emph{loss function} that describes how distance between a particular person and your stand influences whether person will buy your ice-cream. In other words, it describes the \emph{cost} of getting to you stand, i.e.~walking all-the-way through the sand in that heat. This \emph{cost} clearly depends on the distance and in the simplest case, it is linearly proportional to the distance: If you need to walk twice the distance, your costs for getting an ice-cream are twice as high. However, the relationship between the distance and cost does not have to be so simple and linear and this is why we have many different \emph{loss} / \emph{cost} functions.
 
-We can write a loss/cost function more formally as \(L(stand, person_i)\) where \texttt{stand} is the location of your stand and \texttt{person\_i} is a location of a particular ith person. The cost can be either zero or positive, i.e., we assume there is no benefit in walking all the way, only no or some cost. So, where should you put you ice-cream stand?
+We can write a loss/cost function more formally as \(L(stand, person_i)\) where \texttt{stand} is the location of your stand and \texttt{person\_i} is a location of a particular ith person. The cost can be either zero or positive, i.e., we assume there is no benefit in walking all the way, only no or some cost. So, where should you put your ice-cream stand?
 
 \begin{center}\includegraphics[width=1\linewidth]{images/loss-functions-where-to} \end{center}
 
