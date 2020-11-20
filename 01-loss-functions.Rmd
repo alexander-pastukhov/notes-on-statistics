@@ -90,7 +90,7 @@ knitr::include_graphics("images/loss-functions-Gaussian.jpg")
 ```
 
 The Gaussian is special because it uses L2 distance, see $(x - \mu)^2$ inside the exponential:
-$$f(x) = \frac{1}{\sigma \sqrt(2 \pi)}\left(-\frac{1}{2}\frac{(x - \mu)^2}{\sigma^2}\right)$$
+$$f(x) = \frac{1}{\sigma \sqrt(2 \pi)}e^{\left(-\frac{1}{2}\frac{(x - \mu)^2}{\sigma^2}\right)}$$
 
 so using it is equivalent to fitting via ordinary least squares. However, as McElreath hinted, you can choose different priors that are different not only in the distance-to-loss formula (like _L1_ is different from _L2_) but also in symmetry. Both _L1_ and _L2_ (and Gaussian) ignore the sign of the distance. It does not matter whether customers are on the left or on the right. Other distributions, such as Beta, Gamma, or Log Normal are not symmetric, so the same distance will cost differently depending on the side the customer is at.
 ```{r echo=FALSE, out.width = "100%", fig.align = 'center'}
