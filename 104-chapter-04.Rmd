@@ -1,0 +1,12 @@
+# Solutions for Chapter 4
+
+#### 4E1{-}
+In the model definition below, which line is the likelihood?
+$$\rightarrow ~ y_i \sim Normal(\mu, \sigma) ~ \leftarrow\\
+\mu \sim Normal(0, 10) \\
+\sigma \sim Exponential(1)$$
+
+#### 4E2{-} 
+In the model definition just above, how many parameters are in the posterior distribution?
+**Two: $\mu$ and $\sigma$.
+
