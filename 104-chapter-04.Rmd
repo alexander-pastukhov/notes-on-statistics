@@ -13,11 +13,23 @@ In the model definition just above, how many parameters are in the posterior dis
 
 #### 4E3{-}
 Using the model definition above, write down the appropriate form of Bayes’ theorem that includes the proper likelihood and priors.
+
 $$Pr(\mu, \sigma | y) = \frac{\prod_i Normal(y_i| \mu, \sigma) \cdot Normal(mu | 0, 10) \cdot Exponential(\sigma | 1)}
-{\int \int \prod_i Normal(y_i| \mu, \sigma) \cdot Normal(mu | 0, 10) \cdot Exponential(\sigma | 1) \partial \mu \partial \sigma}
+{\int \int \prod_i Normal(y_i| \mu, \sigma) \cdot Normal(mu | 0, 10) \cdot Exponential(\sigma | 1) \partial \mu \partial \sigma}$$
 
-$$
 
+#### 4E4 {-}
+In the model definition below, which line is the linear model?
+$$y_i ∼ Normal(\mu, \sigma) \\
+\rightarrow ~\mu_i = \alpha + \beta x_i ~\leftarrow\\
+α ∼ Normal(0, 10) \\ 
+β ∼ Normal(0, 1) \\
+σ ∼ Exponential(2)$$
+
+#### 4E5 {-} 
+In the model definition just above, how many parameters are in the posterior distribution?
+
+Three, $α$, $β$ (used to compute $\mu$), and $\sigma$.
 
 #### 4M1{-}
 For the model definition below, simulate observed y values from the prior (not the posterior).
@@ -46,4 +58,30 @@ quap_formula <- alist(
   mu ~ dnorm(0,10),
   sigma ~ dexp(1))
 ```
+
+#### 4M3 {-}
+Translate the quap model formula below into a mathematical model definition.
+```
+y ~ dnorm( mu , sigma ),
+mu <- a + b*x,
+a ~ dnorm( 0 , 10 ),
+b ~ dunif( 0 , 1 ),
+sigma ~ dexp( 1 )
+```
+$$y_i ∼ Normal(\mu, \sigma) \\
+\mu_i = \alpha + \beta x_i \\
+α ∼ Normal(0, 10) \\ 
+β ∼ Uniform(0, 1) \\
+σ ∼ Exponential(1)$$
+
+#### 4M4{-} 
+A sample of students is measured for height each year for 3 years. After the third year, you want to fit a linear regression predicting height using year as a predictor. Write down the mathematical model definition for this regression, using any variable names and priors you choose. Be prepared to defend your choice of priors.
+
+I assume _students_ as in _college students_. Therefore, you would expect an adult height, may be slightly lower, hence `170` for the intercept. You don't expect them to grow much, hence conservative slope for the effect of the year.
+
+$$h_i ∼ Normal(\mu, \sigma) \\
+\mu_i = \alpha + \beta year_i \\
+α ∼ Normal(170, 10) \\ 
+β ∼ Normal(0, 1) \\
+σ ∼ Exponential(1)$$
 
