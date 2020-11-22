@@ -8,12 +8,42 @@ $$\rightarrow ~ y_i \sim Normal(\mu, \sigma) ~ \leftarrow\\
 
 #### 4E2{-} 
 In the model definition just above, how many parameters are in the posterior distribution?
+
 **Two: $\mu$ and $\sigma$.
 
-#### 4E3. Using the model definition above, write down the appropriate form of Bayes’ theorem that includes the proper likelihood and priors.
+#### 4E3{-}
+Using the model definition above, write down the appropriate form of Bayes’ theorem that includes the proper likelihood and priors.
 $$Pr(\mu, \sigma | y) = \frac{\prod_i Normal(y_i| \mu, \sigma) \cdot Normal(mu | 0, 10) \cdot Exponential(\sigma | 1)}
 {\int \int \prod_i Normal(y_i| \mu, \sigma) \cdot Normal(mu | 0, 10) \cdot Exponential(\sigma | 1) \partial \mu \partial \sigma}
 
 $$
 
+
+#### 4M1{-}
+For the model definition below, simulate observed y values from the prior (not the posterior).
+$$y_i \sim Normal(\mu,\sigma) \\
+\mu \sim Normal(0, 10) \\
+\sigma \sim Exponential(1)$$
+```{r 4M1}
+library(ggplot2)
+
+samples_N <- 1e4
+mu <- rnorm(samples_N, 0, 10)
+sigma <- rexp(samples_N, 1)
+y_sim <- rnorm(samples_N, mu, sigma)
+
+ggplot(data=NULL, aes(x=y_sim)) + 
+  geom_histogram(bins=50) + 
+  xlab("Simulated Y")
+```
+
+#### 4M2 {-}
+Translate the model just above into a quap formula.
+
+```{r 4M2}
+quap_formula <- alist(
+  y ~ dnorm(mu, sigma),
+  mu ~ dnorm(0,10),
+  sigma ~ dexp(1))
+```
 

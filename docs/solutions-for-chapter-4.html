@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Notes on and Solutions for Statistical Rethinking</title>
+  <title>Chapter 5 Solutions for Chapter 4 | Notes on and Solutions for Statistical Rethinking</title>
   <meta name="description" content="Notes and exercise solutions for Statistical Rethinking book." />
   <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Notes on and Solutions for Statistical Rethinking" />
+  <meta property="og:title" content="Chapter 5 Solutions for Chapter 4 | Notes on and Solutions for Statistical Rethinking" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Notes on and Solutions for Statistical Rethinking" />
+  <meta name="twitter:title" content="Chapter 5 Solutions for Chapter 4 | Notes on and Solutions for Statistical Rethinking" />
   
   <meta name="twitter:description" content="Notes and exercise solutions for Statistical Rethinking book." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
+<link rel="prev" href="solutions-for-chapter-3.html"/>
 
-<link rel="next" href="loss-functions.html"/>
 <script src="libs/header-attrs-2.5/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -169,23 +169,69 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">Notes on and Solutions for Statistical Rethinking</h1>
-<p class="author"><em>Alexander Pastukhov</em></p>
-<p class="date"><em>2020-11-22</em></p>
+<div id="solutions-for-chapter-4" class="section level1" number="5">
+<h1><span class="header-section-number">Chapter 5</span> Solutions for Chapter 4</h1>
+<div id="e1-2" class="section level4 unnumbered">
+<h4>4E1</h4>
+<p>In the model definition below, which line is the likelihood?
+<span class="math display">\[\rightarrow ~ y_i \sim Normal(\mu, \sigma) ~ \leftarrow\\
+\mu \sim Normal(0, 10) \\
+\sigma \sim Exponential(1)\]</span></p>
 </div>
-<div id="precis" class="section level1" number="1">
-<h1><span class="header-section-number">Chapter 1</span> Precis</h1>
-<p>This is a collection of solutions for exercises but also of notes that attempt to provide further details and intuition for some topics, such as information theory, information criteria, MCMC algorithms, etc.</p>
+<div id="e2-2" class="section level4 unnumbered">
+<h4>4E2</h4>
+<p>In the model definition just above, how many parameters are in the posterior distribution?</p>
+<p>**Two: <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>.</p>
+</div>
+<div id="e3-2" class="section level4 unnumbered">
+<h4>4E3</h4>
+<p>Using the model definition above, write down the appropriate form of Bayes’ theorem that includes the proper likelihood and priors.
+$$Pr(, | y) = 
+{_i Normal(y_i| , ) Normal(mu | 0, 10) Exponential(| 1) }</p>
+<p>$$</p>
+</div>
+<div id="m1-2" class="section level4 unnumbered">
+<h4>4M1</h4>
+<p>For the model definition below, simulate observed y values from the prior (not the posterior).
+<span class="math display">\[y_i \sim Normal(\mu,\sigma) \\
+\mu \sim Normal(0, 10) \\
+\sigma \sim Exponential(1)\]</span></p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="solutions-for-chapter-4.html#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb32-2"><a href="solutions-for-chapter-4.html#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="solutions-for-chapter-4.html#cb32-3" aria-hidden="true" tabindex="-1"></a>samples_N <span class="ot">&lt;-</span> <span class="fl">1e4</span></span>
+<span id="cb32-4"><a href="solutions-for-chapter-4.html#cb32-4" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(samples_N, <span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb32-5"><a href="solutions-for-chapter-4.html#cb32-5" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="fu">rexp</span>(samples_N, <span class="dv">1</span>)</span>
+<span id="cb32-6"><a href="solutions-for-chapter-4.html#cb32-6" aria-hidden="true" tabindex="-1"></a>y_sim <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(samples_N, mu, sigma)</span>
+<span id="cb32-7"><a href="solutions-for-chapter-4.html#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="solutions-for-chapter-4.html#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span><span class="cn">NULL</span>, <span class="fu">aes</span>(<span class="at">x=</span>y_sim)) <span class="sc">+</span> </span>
+<span id="cb32-9"><a href="solutions-for-chapter-4.html#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins=</span><span class="dv">50</span>) <span class="sc">+</span> </span>
+<span id="cb32-10"><a href="solutions-for-chapter-4.html#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Simulated Y&quot;</span>)</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/4M1-1.png" width="672" /></p>
+</div>
+<div id="m2-2" class="section level4 unnumbered">
+<h4>4M2</h4>
+<p>Translate the model just above into a quap formula.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="solutions-for-chapter-4.html#cb33-1" aria-hidden="true" tabindex="-1"></a>quap_formula <span class="ot">&lt;-</span> <span class="fu">alist</span>(</span>
+<span id="cb33-2"><a href="solutions-for-chapter-4.html#cb33-2" aria-hidden="true" tabindex="-1"></a>  y <span class="sc">~</span> <span class="fu">dnorm</span>(mu, sigma),</span>
+<span id="cb33-3"><a href="solutions-for-chapter-4.html#cb33-3" aria-hidden="true" tabindex="-1"></a>  mu <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>,<span class="dv">10</span>),</span>
+<span id="cb33-4"><a href="solutions-for-chapter-4.html#cb33-4" aria-hidden="true" tabindex="-1"></a>  sigma <span class="sc">~</span> <span class="fu">dexp</span>(<span class="dv">1</span>))</span></code></pre></div>
 
 </div>
+</div>
+
+
+
+
+
+
+
             </section>
 
           </div>
         </div>
       </div>
+<a href="solutions-for-chapter-3.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
-<a href="loss-functions.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
