@@ -106,3 +106,70 @@ ggplot(data=NULL, aes(x=x, y= dexp(x, 0.5))) +
 #### 4M7{-} 
 Refit model m4.3 from the chapter, but omit the mean weight xbar this time. Compare the new model’s posterior to that of the original model. In particular, look at the covariance among the parameters. What is different? Then compare the posterior predictions of both models.
 
+```{r 4M7-1}
+# load data again, since it's a long way back
+library(rethinking)
+data(Howell1); 
+d <- Howell1; 
+d2 <- d[d$age >= 18,]
+
+# define the average weight, x-bar
+xbar <- mean(d2$weight)
+# fit model
+
+m4_3c <- quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- a + b * (weight - xbar),
+    a ~ dnorm(178, 20) ,
+    b ~ dlnorm(0, 1) ,
+    sigma ~ dunif(0, 50)) , 
+  data=d2)
+
+m4_3 <- quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- a + b * weight,
+    a ~ dnorm(178, 20) ,
+    b ~ dlnorm(0, 1) ,
+    sigma ~ dunif(0, 50)) , 
+  data=d2)
+
+precis(m4_3)
+```
+
+```{r 4M7-2}
+precis(m4_3c)
+```
+```{r 4M7-3}
+round(vcov(m4_3), 3)
+```
+```{r 4M7-4}
+round(vcov(m4_3c), 3)
+```
+```{r 4M7-5}
+post <- extract.samples(m4_3)
+a_map <- mean(post$a)
+b_map <- mean(post$b)
+
+w <- d2$weight
+prediction <- a_map + b_map*w
+
+ggplot(data = d2, aes(x=weight, y=height)) + 
+  geom_point() +
+  geom_line(data = NULL, aes(x=w, y=prediction))
+```
+```{r}
+post <- extract.samples(m4_3c)
+a_map <- mean(post$a)
+b_map <- mean(post$b)
+
+w <- d2$weight
+prediction <- a_map + b_map*(w - xbar)
+
+ggplot(data = d2, aes(x=weight, y=height)) + 
+  geom_point() +
+  geom_line(data = NULL, aes(x=w, y=prediction))
+```
+#### 4M8{-} 
+In the chapter, we used 15 knots with the cherry blossom spline. Increase the number of knots and observe what happens to the resulting spline. Then adjust also the width of the prior on the weights—change the standard deviation of the prior and watch what happens. What do you think the combination of knot number and the prior on the weights controls?
