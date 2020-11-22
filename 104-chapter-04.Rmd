@@ -10,3 +10,10 @@ $$\rightarrow ~ y_i \sim Normal(\mu, \sigma) ~ \leftarrow\\
 In the model definition just above, how many parameters are in the posterior distribution?
 **Two: $\mu$ and $\sigma$.
 
+#### 4E3. Using the model definition above, write down the appropriate form of Bayes’ theorem that includes the proper likelihood and priors.
+$$Pr(\mu, \sigma | y) = \frac{\prod_i Normal(y_i| \mu, \sigma) \cdot Normal(mu | 0, 10) \cdot Exponential(\sigma | 1)}
+{\int \int \prod_i Normal(y_i| \mu, \sigma) \cdot Normal(mu | 0, 10) \cdot Exponential(\sigma | 1) \partial \mu \partial \sigma}
+
+$$
+
+
