@@ -77,11 +77,32 @@ $$y_i ∼ Normal(\mu, \sigma) \\
 #### 4M4{-} 
 A sample of students is measured for height each year for 3 years. After the third year, you want to fit a linear regression predicting height using year as a predictor. Write down the mathematical model definition for this regression, using any variable names and priors you choose. Be prepared to defend your choice of priors.
 
-I assume _students_ as in _college students_. Therefore, you would expect an adult height, may be slightly lower, hence `170` for the intercept. You don't expect them to grow much, hence conservative slope for the effect of the year.
+I assume _students_ as in _college students_. Therefore, you would expect an adult height, may be slightly lower, hence `170` for the intercept. You don't expect them to grow much, hence conservative slope for the effect of the year. I assume a fairly broad but strictly positive prior for $\sigma$.
 
 $$h_i ∼ Normal(\mu, \sigma) \\
 \mu_i = \alpha + \beta year_i \\
 α ∼ Normal(170, 10) \\ 
 β ∼ Normal(0, 1) \\
-σ ∼ Exponential(1)$$
+σ ∼ Exponential(0.1)$$
+
+#### 4M5{-}
+Now suppose I remind you that every student got taller each year. Does this information lead you to change your choice of priors? How?
+
+I would ensure that $\beta$ can be only positive, so $β ∼ Exponential(1)$.
+
+#### 4M6{-}
+Now suppose I tell you that the variance among heights for students of the same age is never more than 64cm. How does this lead you to revise your priors?
+
+
+Based on the density plot, I would pick a more conservative prior of $\sigma \sim Exponential(0.5)$ that drops off more rapidly and just barely includes $\sqrt(64)$.
+```{r}
+x <- seq(0, 10, length.out=100)
+ggplot(data=NULL, aes(x=x, y= dexp(x, 0.5))) + 
+  geom_line() +
+  scale_x_continuous(breaks = 0:10) +
+  ylab("Probability density")
+```
+
+#### 4M7{-} 
+Refit model m4.3 from the chapter, but omit the mean weight xbar this time. Compare the new model’s posterior to that of the original model. In particular, look at the covariance among the parameters. What is different? Then compare the posterior predictions of both models.
 
