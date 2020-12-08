@@ -130,6 +130,7 @@ ggplot(predicted_water8_15, aes(x=N, y= p)) +
     geom_point() + 
   labs(subtitle = glue::glue("The probability of observing 8 water in 15 tosses is {p8}"))
 ```
+
 #### 3M4 {-}
 Using the posterior distribution constructed from the new (8/15) data, now calculate the probability of observing 6 water in 9 tosses.
 ```{r 3M4}

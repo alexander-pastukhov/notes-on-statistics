@@ -67,13 +67,16 @@ $$<L2(stand, person)> = \frac{1}{N}\sum_{i=1}^{N}{(person_i - stand)^2}$$
 Conceptually, you find that minimum by walking along the beach in the direction that reduces the cost until you hit the point where it start going up again. This strategy is called _gradient descent_ and, generally speaking, this is how computer finds minima computationally: They make steps in different directions to see which way is down and keep going until things start going up. However, in one-dimensional well-behaving case we have here things are even simpler as you can use calculus to figure out the solution analytically. If you watched the videos I advertised above, you'll know that the _derivative_ of the function is zero at the extrema (minima or maxima), so we just need to differentiate our average _L2_ over position of the stand and find where it is zero^[I've nicked the derivations from [https://stats.stackexchange.com/a/312997]].
 
 $$\frac{\partial L2}{\partial stand} = -\frac{2}{N}\sum_{i=1}^{N}{(person_i - stand)}$$
-As we want $\frac{\partial L2}{\partial stand} = 0$, we state
-$$-\frac{2}{N}\sum_{i=1}^{N}{(person_i - stand)} = 0$$. 
+As we want 
+$$\frac{\partial L2}{\partial stand} = 0$$
+we state
+$$\frac{2}{N}\sum_{i=1}^{N}{(person_i - stand)} = 0.$$
+
 Opening up brackets and rearranging we get
-$$-\frac{2}{N}\sum_{i=1}^{N}{person_i} + \frac{2\cdot N}{N}\cdot stand = 0\\
-2\cdot stand = \frac{2}{N}\sum_{i=1}^{N}{person_i} \\
-stand = \frac{1}{N}\sum_{i=1}^{N}{person_i}
-$$
+
+$$- \frac{2}{N}\sum_{i=1}^{N}{person_i} + \frac{2 \cdot N}{N} \cdot stand = 0 \\
+2 \cdot stand = \frac{2}{N}\sum_{i=1}^{N}{person_i} \\
+stand = \frac{1}{N}\sum_{i=1}^{N}{person_i}$$
 
 So, the optimal location of your stand is the _mean_: an average location of all people on the beach.
 

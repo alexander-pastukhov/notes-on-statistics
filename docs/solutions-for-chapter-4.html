@@ -24,7 +24,7 @@
 <meta name="author" content="Alexander Pastukhov" />
 
 
-<meta name="date" content="2020-11-22" />
+<meta name="date" content="2020-12-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,6 +51,7 @@
 
 
 
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
 
@@ -171,50 +172,468 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="solutions-for-chapter-4" class="section level1" number="5">
 <h1><span class="header-section-number">Chapter 5</span> Solutions for Chapter 4</h1>
-<div id="e1-2" class="section level4 unnumbered">
+<div id="e1-2" class="section level4 unnumbered" number="">
 <h4>4E1</h4>
 <p>In the model definition below, which line is the likelihood?
 <span class="math display">\[\rightarrow ~ y_i \sim Normal(\mu, \sigma) ~ \leftarrow\\
 \mu \sim Normal(0, 10) \\
 \sigma \sim Exponential(1)\]</span></p>
 </div>
-<div id="e2-2" class="section level4 unnumbered">
+<div id="e2-2" class="section level4 unnumbered" number="">
 <h4>4E2</h4>
 <p>In the model definition just above, how many parameters are in the posterior distribution?</p>
 <p>**Two: <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>.</p>
 </div>
-<div id="e3-2" class="section level4 unnumbered">
+<div id="e3-2" class="section level4 unnumbered" number="">
 <h4>4E3</h4>
-<p>Using the model definition above, write down the appropriate form of Bayes’ theorem that includes the proper likelihood and priors.
-$$Pr(, | y) = 
-{_i Normal(y_i| , ) Normal(mu | 0, 10) Exponential(| 1) }</p>
-<p>$$</p>
+<p>Using the model definition above, write down the appropriate form of Bayes’ theorem that includes the proper likelihood and priors.</p>
+<p><span class="math display">\[
+Pr(\mu, \sigma | y) = \frac{\prod_i Normal(y_i| \mu, \sigma) \cdot Normal(mu | 0, 10) \cdot Exponential(\sigma | 1)}
+{\int \int \prod_i Normal(y_i| \mu, \sigma) \cdot Normal(mu | 0, 10) \cdot Exponential(\sigma | 1) \partial \mu \partial \sigma}
+\]</span></p>
 </div>
-<div id="m1-2" class="section level4 unnumbered">
+<div id="e4-2" class="section level4 unnumbered" number="">
+<h4>4E4</h4>
+<p>In the model definition below, which line is the linear model?</p>
+<p><span class="math display">\[y_i ∼ Normal(\mu, \sigma) \\
+\rightarrow ~\mu_i = \alpha + \beta x_i ~\leftarrow\\
+α ∼ Normal(0, 10) \\ 
+β ∼ Normal(0, 1) \\
+σ ∼ Exponential(2)\]</span></p>
+</div>
+<div id="e5-1" class="section level4 unnumbered" number="">
+<h4>4E5</h4>
+<p>In the model definition just above, how many parameters are in the posterior distribution?</p>
+<p>Three, <span class="math inline">\(α\)</span>, <span class="math inline">\(β\)</span> (used to compute <span class="math inline">\(\mu\)</span>), and <span class="math inline">\(\sigma\)</span>.</p>
+</div>
+<div id="m1-2" class="section level4 unnumbered" number="">
 <h4>4M1</h4>
-<p>For the model definition below, simulate observed y values from the prior (not the posterior).
-<span class="math display">\[y_i \sim Normal(\mu,\sigma) \\
+<p>For the model definition below, simulate observed y values from the prior (not the posterior).</p>
+<p><span class="math display">\[y_i \sim Normal(\mu,\sigma) \\
 \mu \sim Normal(0, 10) \\
 \sigma \sim Exponential(1)\]</span></p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="solutions-for-chapter-4.html#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb32-2"><a href="solutions-for-chapter-4.html#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-3"><a href="solutions-for-chapter-4.html#cb32-3" aria-hidden="true" tabindex="-1"></a>samples_N <span class="ot">&lt;-</span> <span class="fl">1e4</span></span>
-<span id="cb32-4"><a href="solutions-for-chapter-4.html#cb32-4" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(samples_N, <span class="dv">0</span>, <span class="dv">10</span>)</span>
-<span id="cb32-5"><a href="solutions-for-chapter-4.html#cb32-5" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="fu">rexp</span>(samples_N, <span class="dv">1</span>)</span>
-<span id="cb32-6"><a href="solutions-for-chapter-4.html#cb32-6" aria-hidden="true" tabindex="-1"></a>y_sim <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(samples_N, mu, sigma)</span>
-<span id="cb32-7"><a href="solutions-for-chapter-4.html#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-8"><a href="solutions-for-chapter-4.html#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span><span class="cn">NULL</span>, <span class="fu">aes</span>(<span class="at">x=</span>y_sim)) <span class="sc">+</span> </span>
-<span id="cb32-9"><a href="solutions-for-chapter-4.html#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins=</span><span class="dv">50</span>) <span class="sc">+</span> </span>
-<span id="cb32-10"><a href="solutions-for-chapter-4.html#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Simulated Y&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="solutions-for-chapter-4.html#cb32-1"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb32-2"><a href="solutions-for-chapter-4.html#cb32-2"></a></span>
+<span id="cb32-3"><a href="solutions-for-chapter-4.html#cb32-3"></a>samples_N &lt;-<span class="st"> </span><span class="fl">1e4</span></span>
+<span id="cb32-4"><a href="solutions-for-chapter-4.html#cb32-4"></a>mu &lt;-<span class="st"> </span><span class="kw">rnorm</span>(samples_N, <span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb32-5"><a href="solutions-for-chapter-4.html#cb32-5"></a>sigma &lt;-<span class="st"> </span><span class="kw">rexp</span>(samples_N, <span class="dv">1</span>)</span>
+<span id="cb32-6"><a href="solutions-for-chapter-4.html#cb32-6"></a>y_sim &lt;-<span class="st"> </span><span class="kw">rnorm</span>(samples_N, mu, sigma)</span>
+<span id="cb32-7"><a href="solutions-for-chapter-4.html#cb32-7"></a></span>
+<span id="cb32-8"><a href="solutions-for-chapter-4.html#cb32-8"></a><span class="kw">ggplot</span>(<span class="dt">data=</span><span class="ot">NULL</span>, <span class="kw">aes</span>(<span class="dt">x=</span>y_sim)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb32-9"><a href="solutions-for-chapter-4.html#cb32-9"></a><span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">bins=</span><span class="dv">50</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb32-10"><a href="solutions-for-chapter-4.html#cb32-10"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Simulated Y&quot;</span>)</span></code></pre></div>
 <p><img src="notes-on-statistical-rethinking_files/figure-html/4M1-1.png" width="672" /></p>
 </div>
-<div id="m2-2" class="section level4 unnumbered">
+<div id="m2-2" class="section level4 unnumbered" number="">
 <h4>4M2</h4>
 <p>Translate the model just above into a quap formula.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="solutions-for-chapter-4.html#cb33-1" aria-hidden="true" tabindex="-1"></a>quap_formula <span class="ot">&lt;-</span> <span class="fu">alist</span>(</span>
-<span id="cb33-2"><a href="solutions-for-chapter-4.html#cb33-2" aria-hidden="true" tabindex="-1"></a>  y <span class="sc">~</span> <span class="fu">dnorm</span>(mu, sigma),</span>
-<span id="cb33-3"><a href="solutions-for-chapter-4.html#cb33-3" aria-hidden="true" tabindex="-1"></a>  mu <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>,<span class="dv">10</span>),</span>
-<span id="cb33-4"><a href="solutions-for-chapter-4.html#cb33-4" aria-hidden="true" tabindex="-1"></a>  sigma <span class="sc">~</span> <span class="fu">dexp</span>(<span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="solutions-for-chapter-4.html#cb33-1"></a>quap_formula &lt;-<span class="st"> </span><span class="kw">alist</span>(</span>
+<span id="cb33-2"><a href="solutions-for-chapter-4.html#cb33-2"></a>  y <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(mu, sigma),</span>
+<span id="cb33-3"><a href="solutions-for-chapter-4.html#cb33-3"></a>  mu <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">0</span>,<span class="dv">10</span>),</span>
+<span id="cb33-4"><a href="solutions-for-chapter-4.html#cb33-4"></a>  sigma <span class="op">~</span><span class="st"> </span><span class="kw">dexp</span>(<span class="dv">1</span>))</span></code></pre></div>
+</div>
+<div id="m3-2" class="section level4 unnumbered" number="">
+<h4>4M3</h4>
+<p>Translate the quap model formula below into a mathematical model definition.</p>
+<pre><code>y ~ dnorm( mu , sigma ),
+mu &lt;- a + b*x,
+a ~ dnorm( 0 , 10 ),
+b ~ dunif( 0 , 1 ),
+sigma ~ dexp( 1 )</code></pre>
+<p><span class="math display">\[y_i ∼ Normal(\mu, \sigma) \\
+\mu_i = \alpha + \beta x_i \\
+α ∼ Normal(0, 10) \\ 
+β ∼ Uniform(0, 1) \\
+σ ∼ Exponential(1)\]</span></p>
+</div>
+<div id="m4-2" class="section level4 unnumbered" number="">
+<h4>4M4</h4>
+<p>A sample of students is measured for height each year for 3 years. After the third year, you want to fit a linear regression predicting height using year as a predictor. Write down the mathematical model definition for this regression, using any variable names and priors you choose. Be prepared to defend your choice of priors.</p>
+<p>I assume <em>students</em> as in <em>college students</em>. Therefore, you would expect an adult height, may be slightly lower, hence <code>170</code> for the intercept. You don’t expect them to grow much, hence conservative slope for the effect of the year. I assume a fairly broad but strictly positive prior for <span class="math inline">\(\sigma\)</span>.</p>
+<p><span class="math display">\[h_i ∼ Normal(\mu, \sigma) \\
+\mu_i = \alpha + \beta year_i \\
+α ∼ Normal(170, 10) \\ 
+β ∼ Normal(0, 1) \\
+σ ∼ Exponential(0.1)\]</span></p>
+</div>
+<div id="m5-2" class="section level4 unnumbered" number="">
+<h4>4M5</h4>
+<p>Now suppose I remind you that every student got taller each year. Does this information lead you to change your choice of priors? How?</p>
+<p>I would ensure that <span class="math inline">\(\beta\)</span> can be only positive, so <span class="math inline">\(β ∼ Exponential(1)\)</span>.</p>
+</div>
+<div id="m6-2" class="section level4 unnumbered" number="">
+<h4>4M6</h4>
+<p>Now suppose I tell you that the variance among heights for students of the same age is never more than 64cm. How does this lead you to revise your priors?</p>
+<p>Based on the density plot, I would pick a more conservative prior of <span class="math inline">\(\sigma \sim Exponential(0.5)\)</span> that drops off more rapidly and just barely includes <span class="math inline">\(\sqrt(64)\)</span>.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="solutions-for-chapter-4.html#cb35-1"></a>x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dt">length.out=</span><span class="dv">100</span>)</span>
+<span id="cb35-2"><a href="solutions-for-chapter-4.html#cb35-2"></a><span class="kw">ggplot</span>(<span class="dt">data=</span><span class="ot">NULL</span>, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span> <span class="kw">dexp</span>(x, <span class="fl">0.5</span>))) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb35-3"><a href="solutions-for-chapter-4.html#cb35-3"></a><span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span></span>
+<span id="cb35-4"><a href="solutions-for-chapter-4.html#cb35-4"></a><span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">breaks =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">10</span>) <span class="op">+</span></span>
+<span id="cb35-5"><a href="solutions-for-chapter-4.html#cb35-5"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Probability density&quot;</span>)</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+<div id="m7-1" class="section level4 unnumbered" number="">
+<h4>4M7</h4>
+<p>Refit model m4.3 from the chapter, but omit the mean weight xbar this time. Compare the new model’s posterior to that of the original model. In particular, look at the covariance among the parameters. What is different? Then compare the posterior predictions of both models.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="solutions-for-chapter-4.html#cb36-1"></a><span class="co"># load data again, since it&#39;s a long way back</span></span>
+<span id="cb36-2"><a href="solutions-for-chapter-4.html#cb36-2"></a><span class="kw">library</span>(rethinking)</span>
+<span id="cb36-3"><a href="solutions-for-chapter-4.html#cb36-3"></a><span class="kw">data</span>(Howell1); </span>
+<span id="cb36-4"><a href="solutions-for-chapter-4.html#cb36-4"></a>d &lt;-<span class="st"> </span>Howell1; </span>
+<span id="cb36-5"><a href="solutions-for-chapter-4.html#cb36-5"></a>d2 &lt;-<span class="st"> </span>d[d<span class="op">$</span>age <span class="op">&gt;=</span><span class="st"> </span><span class="dv">18</span>,]</span>
+<span id="cb36-6"><a href="solutions-for-chapter-4.html#cb36-6"></a></span>
+<span id="cb36-7"><a href="solutions-for-chapter-4.html#cb36-7"></a><span class="co"># define the average weight, x-bar</span></span>
+<span id="cb36-8"><a href="solutions-for-chapter-4.html#cb36-8"></a>xbar &lt;-<span class="st"> </span><span class="kw">mean</span>(d2<span class="op">$</span>weight)</span>
+<span id="cb36-9"><a href="solutions-for-chapter-4.html#cb36-9"></a><span class="co"># fit model</span></span>
+<span id="cb36-10"><a href="solutions-for-chapter-4.html#cb36-10"></a></span>
+<span id="cb36-11"><a href="solutions-for-chapter-4.html#cb36-11"></a>m4_3c &lt;-<span class="st"> </span><span class="kw">quap</span>(</span>
+<span id="cb36-12"><a href="solutions-for-chapter-4.html#cb36-12"></a>  <span class="kw">alist</span>(</span>
+<span id="cb36-13"><a href="solutions-for-chapter-4.html#cb36-13"></a>    height <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(mu, sigma),</span>
+<span id="cb36-14"><a href="solutions-for-chapter-4.html#cb36-14"></a>    mu &lt;-<span class="st"> </span>a <span class="op">+</span><span class="st"> </span>b <span class="op">*</span><span class="st"> </span>(weight <span class="op">-</span><span class="st"> </span>xbar),</span>
+<span id="cb36-15"><a href="solutions-for-chapter-4.html#cb36-15"></a>    a <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">178</span>, <span class="dv">20</span>) ,</span>
+<span id="cb36-16"><a href="solutions-for-chapter-4.html#cb36-16"></a>    b <span class="op">~</span><span class="st"> </span><span class="kw">dlnorm</span>(<span class="dv">0</span>, <span class="dv">1</span>) ,</span>
+<span id="cb36-17"><a href="solutions-for-chapter-4.html#cb36-17"></a>    sigma <span class="op">~</span><span class="st"> </span><span class="kw">dunif</span>(<span class="dv">0</span>, <span class="dv">50</span>)) , </span>
+<span id="cb36-18"><a href="solutions-for-chapter-4.html#cb36-18"></a>  <span class="dt">data=</span>d2)</span>
+<span id="cb36-19"><a href="solutions-for-chapter-4.html#cb36-19"></a></span>
+<span id="cb36-20"><a href="solutions-for-chapter-4.html#cb36-20"></a>m4_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">quap</span>(</span>
+<span id="cb36-21"><a href="solutions-for-chapter-4.html#cb36-21"></a>  <span class="kw">alist</span>(</span>
+<span id="cb36-22"><a href="solutions-for-chapter-4.html#cb36-22"></a>    height <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(mu, sigma),</span>
+<span id="cb36-23"><a href="solutions-for-chapter-4.html#cb36-23"></a>    mu &lt;-<span class="st"> </span>a <span class="op">+</span><span class="st"> </span>b <span class="op">*</span><span class="st"> </span>weight,</span>
+<span id="cb36-24"><a href="solutions-for-chapter-4.html#cb36-24"></a>    a <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">178</span>, <span class="dv">20</span>) ,</span>
+<span id="cb36-25"><a href="solutions-for-chapter-4.html#cb36-25"></a>    b <span class="op">~</span><span class="st"> </span><span class="kw">dlnorm</span>(<span class="dv">0</span>, <span class="dv">1</span>) ,</span>
+<span id="cb36-26"><a href="solutions-for-chapter-4.html#cb36-26"></a>    sigma <span class="op">~</span><span class="st"> </span><span class="kw">dunif</span>(<span class="dv">0</span>, <span class="dv">50</span>)) , </span>
+<span id="cb36-27"><a href="solutions-for-chapter-4.html#cb36-27"></a>  <span class="dt">data=</span>d2)</span>
+<span id="cb36-28"><a href="solutions-for-chapter-4.html#cb36-28"></a></span>
+<span id="cb36-29"><a href="solutions-for-chapter-4.html#cb36-29"></a><span class="kw">precis</span>(m4_<span class="dv">3</span>)</span></code></pre></div>
+<pre><code>##              mean         sd        5.5%       94.5%
+## a     114.5342008 1.89774719 111.5012343 117.5671674
+## b       0.8907326 0.04175799   0.8239952   0.9574699
+## sigma   5.0727190 0.19124895   4.7670662   5.3783718</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="solutions-for-chapter-4.html#cb38-1"></a><span class="kw">precis</span>(m4_3c)</span></code></pre></div>
+<pre><code>##              mean         sd        5.5%      94.5%
+## a     154.6013683 0.27030768 154.1693645 155.033372
+## b       0.9032809 0.04192363   0.8362788   0.970283
+## sigma   5.0718813 0.19115482   4.7663790   5.377384</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="solutions-for-chapter-4.html#cb40-1"></a><span class="kw">round</span>(<span class="kw">vcov</span>(m4_<span class="dv">3</span>), <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>##            a      b sigma
+## a      3.601 -0.078 0.009
+## b     -0.078  0.002 0.000
+## sigma  0.009  0.000 0.037</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="solutions-for-chapter-4.html#cb42-1"></a><span class="kw">round</span>(<span class="kw">vcov</span>(m4_3c), <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>##           a     b sigma
+## a     0.073 0.000 0.000
+## b     0.000 0.002 0.000
+## sigma 0.000 0.000 0.037</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="solutions-for-chapter-4.html#cb44-1"></a>post &lt;-<span class="st"> </span><span class="kw">extract.samples</span>(m4_<span class="dv">3</span>)</span>
+<span id="cb44-2"><a href="solutions-for-chapter-4.html#cb44-2"></a>a_map &lt;-<span class="st"> </span><span class="kw">mean</span>(post<span class="op">$</span>a)</span>
+<span id="cb44-3"><a href="solutions-for-chapter-4.html#cb44-3"></a>b_map &lt;-<span class="st"> </span><span class="kw">mean</span>(post<span class="op">$</span>b)</span>
+<span id="cb44-4"><a href="solutions-for-chapter-4.html#cb44-4"></a></span>
+<span id="cb44-5"><a href="solutions-for-chapter-4.html#cb44-5"></a>w &lt;-<span class="st"> </span>d2<span class="op">$</span>weight</span>
+<span id="cb44-6"><a href="solutions-for-chapter-4.html#cb44-6"></a>prediction &lt;-<span class="st"> </span>a_map <span class="op">+</span><span class="st"> </span>b_map<span class="op">*</span>w</span>
+<span id="cb44-7"><a href="solutions-for-chapter-4.html#cb44-7"></a></span>
+<span id="cb44-8"><a href="solutions-for-chapter-4.html#cb44-8"></a><span class="kw">ggplot</span>(<span class="dt">data =</span> d2, <span class="kw">aes</span>(<span class="dt">x=</span>weight, <span class="dt">y=</span>height)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb44-9"><a href="solutions-for-chapter-4.html#cb44-9"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></span>
+<span id="cb44-10"><a href="solutions-for-chapter-4.html#cb44-10"></a><span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">data =</span> <span class="ot">NULL</span>, <span class="kw">aes</span>(<span class="dt">x=</span>w, <span class="dt">y=</span>prediction))</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/4M7-5-1.png" width="672" /></p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="solutions-for-chapter-4.html#cb45-1"></a>post &lt;-<span class="st"> </span><span class="kw">extract.samples</span>(m4_3c)</span>
+<span id="cb45-2"><a href="solutions-for-chapter-4.html#cb45-2"></a>a_map &lt;-<span class="st"> </span><span class="kw">mean</span>(post<span class="op">$</span>a)</span>
+<span id="cb45-3"><a href="solutions-for-chapter-4.html#cb45-3"></a>b_map &lt;-<span class="st"> </span><span class="kw">mean</span>(post<span class="op">$</span>b)</span>
+<span id="cb45-4"><a href="solutions-for-chapter-4.html#cb45-4"></a></span>
+<span id="cb45-5"><a href="solutions-for-chapter-4.html#cb45-5"></a>w &lt;-<span class="st"> </span>d2<span class="op">$</span>weight</span>
+<span id="cb45-6"><a href="solutions-for-chapter-4.html#cb45-6"></a>prediction &lt;-<span class="st"> </span>a_map <span class="op">+</span><span class="st"> </span>b_map<span class="op">*</span>(w <span class="op">-</span><span class="st"> </span>xbar)</span>
+<span id="cb45-7"><a href="solutions-for-chapter-4.html#cb45-7"></a></span>
+<span id="cb45-8"><a href="solutions-for-chapter-4.html#cb45-8"></a><span class="kw">ggplot</span>(<span class="dt">data =</span> d2, <span class="kw">aes</span>(<span class="dt">x=</span>weight, <span class="dt">y=</span>height)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb45-9"><a href="solutions-for-chapter-4.html#cb45-9"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></span>
+<span id="cb45-10"><a href="solutions-for-chapter-4.html#cb45-10"></a><span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">data =</span> <span class="ot">NULL</span>, <span class="kw">aes</span>(<span class="dt">x=</span>w, <span class="dt">y=</span>prediction))</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+<div id="m8" class="section level4 unnumbered" number="">
+<h4>4M8</h4>
+<p>In the chapter, we used 15 knots with the cherry blossom spline. Increase the number of knots and observe what happens to the resulting spline. Then adjust also the width of the prior on the weights—change the standard deviation of the prior and watch what happens. What do you think the combination of knot number and the prior on the weights controls?</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="solutions-for-chapter-4.html#cb46-1"></a><span class="kw">data</span>(cherry_blossoms)</span>
+<span id="cb46-2"><a href="solutions-for-chapter-4.html#cb46-2"></a>d &lt;-<span class="st"> </span>cherry_blossoms</span>
+<span id="cb46-3"><a href="solutions-for-chapter-4.html#cb46-3"></a>d2 &lt;-<span class="st"> </span>d[ <span class="kw">complete.cases</span>(d<span class="op">$</span>doy) , ] <span class="co"># complete cases on doy</span></span>
+<span id="cb46-4"><a href="solutions-for-chapter-4.html#cb46-4"></a>num_knots &lt;-<span class="st"> </span><span class="dv">30</span></span>
+<span id="cb46-5"><a href="solutions-for-chapter-4.html#cb46-5"></a>knot_list &lt;-<span class="st"> </span><span class="kw">quantile</span>( d2<span class="op">$</span>year , <span class="dt">probs=</span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dt">length.out=</span>num_knots) )</span>
+<span id="cb46-6"><a href="solutions-for-chapter-4.html#cb46-6"></a>B &lt;-<span class="st"> </span><span class="kw">bs</span>(d2<span class="op">$</span>year,</span>
+<span id="cb46-7"><a href="solutions-for-chapter-4.html#cb46-7"></a>        <span class="dt">knots=</span>knot_list[<span class="op">-</span><span class="kw">c</span>(<span class="dv">1</span>,num_knots)],</span>
+<span id="cb46-8"><a href="solutions-for-chapter-4.html#cb46-8"></a>        <span class="dt">degree=</span><span class="dv">3</span> , <span class="dt">intercept=</span><span class="ot">TRUE</span>)</span>
+<span id="cb46-9"><a href="solutions-for-chapter-4.html#cb46-9"></a></span>
+<span id="cb46-10"><a href="solutions-for-chapter-4.html#cb46-10"></a>m4<span class="fl">.7</span>_<span class="dv">30</span> &lt;-<span class="st"> </span><span class="kw">quap</span>(</span>
+<span id="cb46-11"><a href="solutions-for-chapter-4.html#cb46-11"></a>  <span class="kw">alist</span>(</span>
+<span id="cb46-12"><a href="solutions-for-chapter-4.html#cb46-12"></a>    D <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>( mu , sigma ) ,</span>
+<span id="cb46-13"><a href="solutions-for-chapter-4.html#cb46-13"></a>    mu &lt;-<span class="st"> </span>a <span class="op">+</span><span class="st"> </span>B <span class="op">%*%</span><span class="st"> </span>w ,</span>
+<span id="cb46-14"><a href="solutions-for-chapter-4.html#cb46-14"></a>    a <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">100</span>,<span class="dv">10</span>),</span>
+<span id="cb46-15"><a href="solutions-for-chapter-4.html#cb46-15"></a>    w <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">0</span>,<span class="dv">10</span>),</span>
+<span id="cb46-16"><a href="solutions-for-chapter-4.html#cb46-16"></a>    sigma <span class="op">~</span><span class="st"> </span><span class="kw">dexp</span>(<span class="dv">1</span>)), </span>
+<span id="cb46-17"><a href="solutions-for-chapter-4.html#cb46-17"></a>  <span class="dt">data=</span><span class="kw">list</span>(<span class="dt">D=</span>d2<span class="op">$</span>doy, <span class="dt">B=</span>B) ,</span>
+<span id="cb46-18"><a href="solutions-for-chapter-4.html#cb46-18"></a>  <span class="dt">start=</span><span class="kw">list</span>(<span class="dt">w=</span><span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">ncol</span>(B))))</span>
+<span id="cb46-19"><a href="solutions-for-chapter-4.html#cb46-19"></a></span>
+<span id="cb46-20"><a href="solutions-for-chapter-4.html#cb46-20"></a>mu &lt;-<span class="st"> </span><span class="kw">link</span>( m4<span class="fl">.7</span>_<span class="dv">30</span> )</span>
+<span id="cb46-21"><a href="solutions-for-chapter-4.html#cb46-21"></a>mu_PI &lt;-<span class="st"> </span><span class="kw">apply</span>(mu,<span class="dv">2</span>, PI, <span class="fl">0.97</span>)</span>
+<span id="cb46-22"><a href="solutions-for-chapter-4.html#cb46-22"></a><span class="kw">plot</span>( d2<span class="op">$</span>year , d2<span class="op">$</span>doy , <span class="dt">col=</span><span class="kw">col.alpha</span>(rangi2,<span class="fl">0.3</span>) , <span class="dt">pch=</span><span class="dv">16</span> )</span>
+<span id="cb46-23"><a href="solutions-for-chapter-4.html#cb46-23"></a><span class="kw">shade</span>( mu_PI , d2<span class="op">$</span>year , <span class="dt">col=</span><span class="kw">col.alpha</span>(<span class="st">&quot;black&quot;</span>,<span class="fl">0.5</span>) )</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/4M8-1.png" width="672" />
+<strong>Together, they control just how wiggly vs. smooth the resultant curve is.</strong></p>
+</div>
+<div id="h1-2" class="section level4 unnumbered" number="">
+<h4>4H1</h4>
+<p>The weights listed below were recorded in the !Kung census, but heights were not recorded for these individuals. Provide predicted heights and 89% intervals for each of these individuals. That is, fill in the table below, using model-based predictions.</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="solutions-for-chapter-4.html#cb47-1"></a>predicted_weight &lt;-<span class="st"> </span></span>
+<span id="cb47-2"><a href="solutions-for-chapter-4.html#cb47-2"></a><span class="st">  </span><span class="kw">tibble</span>(<span class="dt">Individual =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,</span>
+<span id="cb47-3"><a href="solutions-for-chapter-4.html#cb47-3"></a>         <span class="dt">weight =</span> <span class="kw">c</span>(<span class="fl">46.95</span>, <span class="fl">43.72</span>, <span class="fl">64.78</span>, <span class="fl">32.59</span>, <span class="fl">54.63</span>))</span>
+<span id="cb47-4"><a href="solutions-for-chapter-4.html#cb47-4"></a></span>
+<span id="cb47-5"><a href="solutions-for-chapter-4.html#cb47-5"></a><span class="co"># getting sampled means</span></span>
+<span id="cb47-6"><a href="solutions-for-chapter-4.html#cb47-6"></a>posterior_mu &lt;-<span class="st"> </span><span class="kw">link</span>(m4_3c, <span class="dt">data=</span>predicted_weight)</span>
+<span id="cb47-7"><a href="solutions-for-chapter-4.html#cb47-7"></a></span>
+<span id="cb47-8"><a href="solutions-for-chapter-4.html#cb47-8"></a>predicted_weight &lt;-<span class="st"> </span>predicted_weight <span class="op">%&gt;%</span></span>
+<span id="cb47-9"><a href="solutions-for-chapter-4.html#cb47-9"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="st">`</span><span class="dt">expected height</span><span class="st">`</span> =<span class="st"> </span><span class="kw">apply</span>(posterior_mu, <span class="dv">2</span>, mean), </span>
+<span id="cb47-10"><a href="solutions-for-chapter-4.html#cb47-10"></a>         <span class="dt">LowerCI =</span> <span class="kw">round</span>(<span class="kw">apply</span>(posterior_mu, <span class="dv">2</span>, quantile, <span class="dt">probs=</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>), <span class="dv">2</span>),</span>
+<span id="cb47-11"><a href="solutions-for-chapter-4.html#cb47-11"></a>         <span class="dt">UpperCI =</span> <span class="kw">round</span>(<span class="kw">apply</span>(posterior_mu, <span class="dv">2</span>, quantile, <span class="dt">probs=</span><span class="dv">1</span><span class="op">-</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>), <span class="dv">2</span>),</span>
+<span id="cb47-12"><a href="solutions-for-chapter-4.html#cb47-12"></a>         <span class="st">`</span><span class="dt">89% interval</span><span class="st">`</span> =<span class="st"> </span>glue<span class="op">::</span><span class="kw">glue</span>(<span class="st">&quot;{LowerCI}..{UpperCI}&quot;</span>))  <span class="op">%&gt;%</span></span>
+<span id="cb47-13"><a href="solutions-for-chapter-4.html#cb47-13"></a><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>LowerCI, <span class="op">-</span>UpperCI)</span>
+<span id="cb47-14"><a href="solutions-for-chapter-4.html#cb47-14"></a></span>
+<span id="cb47-15"><a href="solutions-for-chapter-4.html#cb47-15"></a>knitr<span class="op">::</span><span class="kw">kable</span>(predicted_weight)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Individual</th>
+<th align="right">weight</th>
+<th align="right">expected height</th>
+<th align="left">89% interval</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">46.95</td>
+<td align="right">156.3876</td>
+<td align="left">155.97..156.83</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">43.72</td>
+<td align="right">153.4682</td>
+<td align="left">153.05..153.89</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">64.78</td>
+<td align="right">172.5032</td>
+<td align="left">171.1..173.91</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">32.59</td>
+<td align="right">143.4083</td>
+<td align="left">142.5..144.37</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">54.63</td>
+<td align="right">163.3292</td>
+<td align="left">162.57..164.07</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="h2-2" class="section level4 unnumbered" number="">
+<h4>4H2</h4>
+<p>Select out all the rows in the Howell1 data with ages below 18 years of age. If you do it right, you should end up with a new data frame with 192 rows in it.</p>
+<ol style="list-style-type: lower-alpha">
+<li>Fit a linear regression to these data, using quap. Present and interpret the estimates. For
+every 10 units of increase in weight, how much taller does the model predict a child gets?</li>
+</ol>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="solutions-for-chapter-4.html#cb48-1"></a>kung_kids &lt;-<span class="st"> </span><span class="kw">filter</span>(Howell1, age <span class="op">&lt;</span><span class="st"> </span><span class="dv">18</span>)</span>
+<span id="cb48-2"><a href="solutions-for-chapter-4.html#cb48-2"></a></span>
+<span id="cb48-3"><a href="solutions-for-chapter-4.html#cb48-3"></a><span class="co"># define the average weight, x-bar</span></span>
+<span id="cb48-4"><a href="solutions-for-chapter-4.html#cb48-4"></a>avg_kid_weight &lt;-<span class="st"> </span><span class="kw">mean</span>(kung_kids<span class="op">$</span>weight)</span>
+<span id="cb48-5"><a href="solutions-for-chapter-4.html#cb48-5"></a></span>
+<span id="cb48-6"><a href="solutions-for-chapter-4.html#cb48-6"></a><span class="co"># fit model</span></span>
+<span id="cb48-7"><a href="solutions-for-chapter-4.html#cb48-7"></a>kung_kids_fit &lt;-<span class="st"> </span><span class="kw">quap</span>(</span>
+<span id="cb48-8"><a href="solutions-for-chapter-4.html#cb48-8"></a>  <span class="kw">alist</span>(</span>
+<span id="cb48-9"><a href="solutions-for-chapter-4.html#cb48-9"></a>    height <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(mu, sigma),</span>
+<span id="cb48-10"><a href="solutions-for-chapter-4.html#cb48-10"></a>    mu &lt;-<span class="st"> </span>a <span class="op">+</span><span class="st"> </span>b <span class="op">*</span><span class="st"> </span>(weight <span class="op">-</span><span class="st"> </span>avg_kid_weight),</span>
+<span id="cb48-11"><a href="solutions-for-chapter-4.html#cb48-11"></a>    a <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">140</span>, <span class="dv">20</span>) ,</span>
+<span id="cb48-12"><a href="solutions-for-chapter-4.html#cb48-12"></a>    b <span class="op">~</span><span class="st"> </span><span class="kw">dlnorm</span>(<span class="dv">0</span>, <span class="dv">1</span>) ,</span>
+<span id="cb48-13"><a href="solutions-for-chapter-4.html#cb48-13"></a>    sigma <span class="op">~</span><span class="st"> </span><span class="kw">dunif</span>(<span class="dv">0</span>, <span class="dv">50</span>)) , </span>
+<span id="cb48-14"><a href="solutions-for-chapter-4.html#cb48-14"></a>  <span class="dt">data=</span>kung_kids)</span>
+<span id="cb48-15"><a href="solutions-for-chapter-4.html#cb48-15"></a></span>
+<span id="cb48-16"><a href="solutions-for-chapter-4.html#cb48-16"></a><span class="kw">precis</span>(kung_kids_fit)</span></code></pre></div>
+<pre><code>##             mean         sd       5.5%      94.5%
+## a     108.348193 0.60862837 107.375488 109.320899
+## b       2.716657 0.06831574   2.607475   2.825839
+## sigma   8.437208 0.43057023   7.749073   9.125342</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="solutions-for-chapter-4.html#cb50-1"></a>b_mean &lt;-<span class="st"> </span><span class="kw">precis</span>(kung_kids_fit)[<span class="st">&#39;b&#39;</span>, <span class="st">&#39;mean&#39;</span>]</span></code></pre></div>
+<p><strong>For every 10 units of increase in weight, the model predict a child will get 27.2 cm taller.</strong></p>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>Plot the raw data, with height on the vertical axis and weight on the horizontal axis. Superimpose the MAP regression line and 89% interval for the mean. Also superimpose the 89% interval for predicted heights.</li>
+</ol>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="solutions-for-chapter-4.html#cb51-1"></a>mean_estimates &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">weight =</span> <span class="kw">seq</span>(<span class="kw">min</span>(kung_kids<span class="op">$</span>weight), <span class="kw">max</span>(kung_kids<span class="op">$</span>weight), <span class="dt">length.out =</span> <span class="dv">100</span>))</span>
+<span id="cb51-2"><a href="solutions-for-chapter-4.html#cb51-2"></a>sample_means &lt;-<span class="st"> </span><span class="kw">link</span>(kung_kids_fit, mean_estimates)</span>
+<span id="cb51-3"><a href="solutions-for-chapter-4.html#cb51-3"></a>mean_estimates &lt;-</span>
+<span id="cb51-4"><a href="solutions-for-chapter-4.html#cb51-4"></a><span class="st">  </span>mean_estimates <span class="op">%&gt;%</span></span>
+<span id="cb51-5"><a href="solutions-for-chapter-4.html#cb51-5"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">mu =</span> <span class="kw">apply</span>(sample_means, <span class="dv">2</span>, mean),</span>
+<span id="cb51-6"><a href="solutions-for-chapter-4.html#cb51-6"></a>         <span class="dt">lowerCI =</span> <span class="kw">apply</span>(sample_means, <span class="dv">2</span>, quantile, <span class="dt">probs=</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>),</span>
+<span id="cb51-7"><a href="solutions-for-chapter-4.html#cb51-7"></a>         <span class="dt">upperCI =</span> <span class="kw">apply</span>(sample_means, <span class="dv">2</span>, quantile, <span class="dt">probs=</span><span class="dv">1</span><span class="op">-</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>))</span>
+<span id="cb51-8"><a href="solutions-for-chapter-4.html#cb51-8"></a></span>
+<span id="cb51-9"><a href="solutions-for-chapter-4.html#cb51-9"></a>simulated_height_samples &lt;-<span class="st"> </span><span class="kw">sim</span>(kung_kids_fit, mean_estimates)</span>
+<span id="cb51-10"><a href="solutions-for-chapter-4.html#cb51-10"></a>simulated_height &lt;-</span>
+<span id="cb51-11"><a href="solutions-for-chapter-4.html#cb51-11"></a><span class="st">  </span>mean_estimates <span class="op">%&gt;%</span></span>
+<span id="cb51-12"><a href="solutions-for-chapter-4.html#cb51-12"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">lowerCI =</span> <span class="kw">apply</span>(simulated_height_samples, <span class="dv">2</span>, quantile, <span class="dt">probs=</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>),</span>
+<span id="cb51-13"><a href="solutions-for-chapter-4.html#cb51-13"></a>         <span class="dt">upperCI =</span> <span class="kw">apply</span>(simulated_height_samples, <span class="dv">2</span>, quantile, <span class="dt">probs=</span><span class="dv">1</span><span class="op">-</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>))</span>
+<span id="cb51-14"><a href="solutions-for-chapter-4.html#cb51-14"></a></span>
+<span id="cb51-15"><a href="solutions-for-chapter-4.html#cb51-15"></a></span>
+<span id="cb51-16"><a href="solutions-for-chapter-4.html#cb51-16"></a><span class="kw">ggplot</span>(<span class="dt">data =</span> kung_kids, <span class="kw">aes</span>(<span class="dt">x =</span> weight, <span class="dt">y=</span>height)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb51-17"><a href="solutions-for-chapter-4.html#cb51-17"></a><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="dt">data=</span>simulated_height, <span class="kw">aes</span>(<span class="dt">y=</span>lowerCI, <span class="dt">ymin=</span>lowerCI, <span class="dt">ymax=</span>upperCI), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.5</span>)<span class="op">+</span></span>
+<span id="cb51-18"><a href="solutions-for-chapter-4.html#cb51-18"></a><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="dt">data=</span>mean_estimates, <span class="kw">aes</span>(<span class="dt">y=</span>mu, <span class="dt">ymin=</span>lowerCI, <span class="dt">ymax=</span>upperCI), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>)<span class="op">+</span></span>
+<span id="cb51-19"><a href="solutions-for-chapter-4.html#cb51-19"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb51-20"><a href="solutions-for-chapter-4.html#cb51-20"></a><span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">data=</span>mean_estimates, <span class="kw">aes</span>(<span class="dt">y=</span>mu))</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/4H2b-1.png" width="672" /></p>
+<ol start="3" style="list-style-type: lower-alpha">
+<li>What aspects of the model fit concern you? Describe the kinds of assumptions you would
+change, if any, to improve the model. You don’t have to write any new code. Just explain what the
+model appears to be doing a bad job of, and what you hypothesize would be a better model.</li>
+</ol>
+<p><strong>The relationship is clearly no linear with rapid growth for smaller children turning into a more slow one for older ones.</strong></p>
+</div>
+<div id="h3-2" class="section level4 unnumbered" number="">
+<h4>4H3</h4>
+<p>Suppose a colleague of yours, who works on allometry, glances at the practice problems just above. Your colleague exclaims, “That’s silly. Everyone knows that it’s only the logarithm of body weight that scales with height!” Let’s take your colleague’s advice and see what happens.</p>
+<ol style="list-style-type: lower-alpha">
+<li>Model the relationship between height (cm) and the natural logarithm of weight (log-kg). Use the entire Howell1 data frame, all 544 rows, adults and non-adults. Can you interpret the resulting estimates?</li>
+</ol>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="solutions-for-chapter-4.html#cb52-1"></a>kung &lt;-<span class="st"> </span></span>
+<span id="cb52-2"><a href="solutions-for-chapter-4.html#cb52-2"></a><span class="st">  </span>Howell1 <span class="op">%&gt;%</span></span>
+<span id="cb52-3"><a href="solutions-for-chapter-4.html#cb52-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">logWeight =</span> <span class="kw">log</span>(weight))</span>
+<span id="cb52-4"><a href="solutions-for-chapter-4.html#cb52-4"></a></span>
+<span id="cb52-5"><a href="solutions-for-chapter-4.html#cb52-5"></a><span class="co"># define the average weight, x-bar</span></span>
+<span id="cb52-6"><a href="solutions-for-chapter-4.html#cb52-6"></a>avg_log_weight &lt;-<span class="st"> </span><span class="kw">mean</span>(kung<span class="op">$</span>logWeight)</span>
+<span id="cb52-7"><a href="solutions-for-chapter-4.html#cb52-7"></a></span>
+<span id="cb52-8"><a href="solutions-for-chapter-4.html#cb52-8"></a><span class="co"># fit model</span></span>
+<span id="cb52-9"><a href="solutions-for-chapter-4.html#cb52-9"></a>kung_fit &lt;-<span class="st"> </span><span class="kw">quap</span>(</span>
+<span id="cb52-10"><a href="solutions-for-chapter-4.html#cb52-10"></a>  <span class="kw">alist</span>(</span>
+<span id="cb52-11"><a href="solutions-for-chapter-4.html#cb52-11"></a>    height <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(mu, sigma),</span>
+<span id="cb52-12"><a href="solutions-for-chapter-4.html#cb52-12"></a>    mu &lt;-<span class="st"> </span>a <span class="op">+</span><span class="st"> </span>b <span class="op">*</span><span class="st"> </span>(logWeight <span class="op">-</span><span class="st"> </span>avg_log_weight),</span>
+<span id="cb52-13"><a href="solutions-for-chapter-4.html#cb52-13"></a>    a <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">140</span>, <span class="dv">20</span>) ,</span>
+<span id="cb52-14"><a href="solutions-for-chapter-4.html#cb52-14"></a>    b <span class="op">~</span><span class="st"> </span><span class="kw">dlnorm</span>(<span class="dv">0</span>, <span class="dv">1</span>) ,</span>
+<span id="cb52-15"><a href="solutions-for-chapter-4.html#cb52-15"></a>    sigma <span class="op">~</span><span class="st"> </span><span class="kw">dunif</span>(<span class="dv">0</span>, <span class="dv">50</span>)) , </span>
+<span id="cb52-16"><a href="solutions-for-chapter-4.html#cb52-16"></a>  <span class="dt">data=</span>kung)</span>
+<span id="cb52-17"><a href="solutions-for-chapter-4.html#cb52-17"></a></span>
+<span id="cb52-18"><a href="solutions-for-chapter-4.html#cb52-18"></a><span class="kw">precis</span>(kung_fit)</span></code></pre></div>
+<pre><code>##             mean        sd       5.5%      94.5%
+## a     138.263717 0.2201177 137.911927 138.615508
+## b      47.072415 0.3826000  46.460947  47.683884
+## sigma   5.134294 0.1556374   4.885555   5.383032</code></pre>
+<p><strong>Not really, as <code>b</code> now refers to change in height in response to 1 log-Kg of weight.</strong></p>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>Begin with this plot: plot( height ~ weight , data=Howell1 ). Then use samples from the quadratic approximate posterior of the model in (a) to superimpose on the plot:
+<ol style="list-style-type: decimal">
+<li>the predicted mean height as a function of weight,</li>
+<li>the 97% interval for the mean, and</li>
+<li>the 97% interval for predicted heights.</li>
+</ol></li>
+</ol>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="solutions-for-chapter-4.html#cb54-1"></a>mean_estimates &lt;-<span class="st"> </span></span>
+<span id="cb54-2"><a href="solutions-for-chapter-4.html#cb54-2"></a><span class="st">  </span><span class="kw">tibble</span>(<span class="dt">weight =</span> <span class="kw">seq</span>(<span class="kw">min</span>(kung<span class="op">$</span>weight), <span class="kw">max</span>(kung<span class="op">$</span>weight), <span class="dt">length.out =</span> <span class="dv">100</span>)) <span class="op">%&gt;%</span></span>
+<span id="cb54-3"><a href="solutions-for-chapter-4.html#cb54-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">logWeight =</span> <span class="kw">log</span>(weight))</span>
+<span id="cb54-4"><a href="solutions-for-chapter-4.html#cb54-4"></a></span>
+<span id="cb54-5"><a href="solutions-for-chapter-4.html#cb54-5"></a>sample_means &lt;-<span class="st"> </span><span class="kw">link</span>(kung_fit, mean_estimates)</span>
+<span id="cb54-6"><a href="solutions-for-chapter-4.html#cb54-6"></a>mean_estimates &lt;-</span>
+<span id="cb54-7"><a href="solutions-for-chapter-4.html#cb54-7"></a><span class="st">  </span>mean_estimates <span class="op">%&gt;%</span></span>
+<span id="cb54-8"><a href="solutions-for-chapter-4.html#cb54-8"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">mu =</span> <span class="kw">apply</span>(sample_means, <span class="dv">2</span>, mean),</span>
+<span id="cb54-9"><a href="solutions-for-chapter-4.html#cb54-9"></a>         <span class="dt">lowerCI =</span> <span class="kw">apply</span>(sample_means, <span class="dv">2</span>, quantile, <span class="dt">probs=</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>),</span>
+<span id="cb54-10"><a href="solutions-for-chapter-4.html#cb54-10"></a>         <span class="dt">upperCI =</span> <span class="kw">apply</span>(sample_means, <span class="dv">2</span>, quantile, <span class="dt">probs=</span><span class="dv">1</span><span class="op">-</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>))</span>
+<span id="cb54-11"><a href="solutions-for-chapter-4.html#cb54-11"></a></span>
+<span id="cb54-12"><a href="solutions-for-chapter-4.html#cb54-12"></a>simulated_height_samples &lt;-<span class="st"> </span><span class="kw">sim</span>(kung_fit, mean_estimates)</span>
+<span id="cb54-13"><a href="solutions-for-chapter-4.html#cb54-13"></a>simulated_height &lt;-</span>
+<span id="cb54-14"><a href="solutions-for-chapter-4.html#cb54-14"></a><span class="st">  </span>mean_estimates <span class="op">%&gt;%</span></span>
+<span id="cb54-15"><a href="solutions-for-chapter-4.html#cb54-15"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">lowerCI =</span> <span class="kw">apply</span>(simulated_height_samples, <span class="dv">2</span>, quantile, <span class="dt">probs=</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>),</span>
+<span id="cb54-16"><a href="solutions-for-chapter-4.html#cb54-16"></a>         <span class="dt">upperCI =</span> <span class="kw">apply</span>(simulated_height_samples, <span class="dv">2</span>, quantile, <span class="dt">probs=</span><span class="dv">1</span><span class="op">-</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>))</span>
+<span id="cb54-17"><a href="solutions-for-chapter-4.html#cb54-17"></a></span>
+<span id="cb54-18"><a href="solutions-for-chapter-4.html#cb54-18"></a></span>
+<span id="cb54-19"><a href="solutions-for-chapter-4.html#cb54-19"></a><span class="kw">ggplot</span>(<span class="dt">data =</span> kung, <span class="kw">aes</span>(<span class="dt">x =</span> weight, <span class="dt">y=</span>height)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb54-20"><a href="solutions-for-chapter-4.html#cb54-20"></a><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="dt">data=</span>simulated_height, <span class="kw">aes</span>(<span class="dt">y=</span>lowerCI, <span class="dt">ymin=</span>lowerCI, <span class="dt">ymax=</span>upperCI), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.5</span>)<span class="op">+</span></span>
+<span id="cb54-21"><a href="solutions-for-chapter-4.html#cb54-21"></a><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="dt">data=</span>mean_estimates, <span class="kw">aes</span>(<span class="dt">y=</span>mu, <span class="dt">ymin=</span>lowerCI, <span class="dt">ymax=</span>upperCI), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>)<span class="op">+</span></span>
+<span id="cb54-22"><a href="solutions-for-chapter-4.html#cb54-22"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb54-23"><a href="solutions-for-chapter-4.html#cb54-23"></a><span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">data=</span>mean_estimates, <span class="kw">aes</span>(<span class="dt">y=</span>mu))</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/4H3b-1.png" width="672" /></p>
+</div>
+<div id="h4-2" class="section level4 unnumbered" number="">
+<h4>4H4</h4>
+<p>Plot the prior predictive distribution for the parabolic polynomial regression model in the chapter. You can modify the code that plots the linear regression prior predictive distribution. Can you modify the prior distributions of α, β1, and β2 so that the prior predictions stay within the biologically reasonable outcome space? That is to say: Do not try to fit the data by hand. But do try to keep the curves consistent with what you know about height and weight, before seeing these exact data.</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="solutions-for-chapter-4.html#cb55-1"></a>zWeight &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">scale</span>(kung<span class="op">$</span>weight))</span>
+<span id="cb55-2"><a href="solutions-for-chapter-4.html#cb55-2"></a></span>
+<span id="cb55-3"><a href="solutions-for-chapter-4.html#cb55-3"></a>N &lt;-<span class="st"> </span><span class="dv">100</span></span>
+<span id="cb55-4"><a href="solutions-for-chapter-4.html#cb55-4"></a>a &lt;-<span class="st"> </span><span class="kw">rnorm</span>(N, <span class="dv">100</span>, <span class="dv">20</span>)</span>
+<span id="cb55-5"><a href="solutions-for-chapter-4.html#cb55-5"></a>b1 &lt;-<span class="st"> </span><span class="kw">rlnorm</span>(N, <span class="fl">2.5</span>, <span class="fl">0.5</span>)</span>
+<span id="cb55-6"><a href="solutions-for-chapter-4.html#cb55-6"></a>b2 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(N, <span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb55-7"><a href="solutions-for-chapter-4.html#cb55-7"></a>x &lt;-<span class="st"> </span>zWeight</span>
+<span id="cb55-8"><a href="solutions-for-chapter-4.html#cb55-8"></a>x2 &lt;-<span class="st"> </span>zWeight<span class="op">^</span><span class="dv">2</span></span>
+<span id="cb55-9"><a href="solutions-for-chapter-4.html#cb55-9"></a><span class="kw">plot</span>(<span class="ot">NULL</span>, <span class="dt">xlim=</span><span class="kw">range</span>(zWeight), <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">300</span>),</span>
+<span id="cb55-10"><a href="solutions-for-chapter-4.html#cb55-10"></a>    <span class="dt">xlab=</span><span class="st">&quot;zWeight&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;height&quot;</span>)</span>
+<span id="cb55-11"><a href="solutions-for-chapter-4.html#cb55-11"></a></span>
+<span id="cb55-12"><a href="solutions-for-chapter-4.html#cb55-12"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>N){</span>
+<span id="cb55-13"><a href="solutions-for-chapter-4.html#cb55-13"></a>  <span class="kw">curve</span>( a[i] <span class="op">+</span><span class="st"> </span>b1[i]<span class="op">*</span>x <span class="op">+</span><span class="st"> </span>b2[i]<span class="op">*</span>(x<span class="op">*</span>x),</span>
+<span id="cb55-14"><a href="solutions-for-chapter-4.html#cb55-14"></a>  <span class="dt">from=</span><span class="kw">min</span>(zWeight), <span class="dt">to=</span><span class="kw">max</span>(zWeight), </span>
+<span id="cb55-15"><a href="solutions-for-chapter-4.html#cb55-15"></a>  <span class="dt">add=</span><span class="ot">TRUE</span>,</span>
+<span id="cb55-16"><a href="solutions-for-chapter-4.html#cb55-16"></a>  <span class="dt">col=</span><span class="kw">col.alpha</span>(<span class="st">&quot;black&quot;</span>,<span class="fl">0.2</span>))</span>
+<span id="cb55-17"><a href="solutions-for-chapter-4.html#cb55-17"></a>} </span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/4H4-1.png" width="672" /></p>
+</div>
+<div id="h5-1" class="section level4 unnumbered" number="">
+<h4>4H5</h4>
+<p>Return to data(cherry_blossoms) and model the association between blossom date (doy) and March temperature (temp). Note that there are many missing values in both variables. You may consider a linear model, a polynomial, or a spline on temperature. How well does temperature trend predict the blossom trend?</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="solutions-for-chapter-4.html#cb56-1"></a>sakura &lt;-<span class="st"> </span></span>
+<span id="cb56-2"><a href="solutions-for-chapter-4.html#cb56-2"></a><span class="st">  </span>cherry_blossoms <span class="op">%&gt;%</span></span>
+<span id="cb56-3"><a href="solutions-for-chapter-4.html#cb56-3"></a><span class="st">  </span><span class="kw">drop_na</span>(doy, temp)</span>
+<span id="cb56-4"><a href="solutions-for-chapter-4.html#cb56-4"></a></span>
+<span id="cb56-5"><a href="solutions-for-chapter-4.html#cb56-5"></a>avg_temp &lt;-<span class="st"> </span><span class="kw">mean</span>(sakura<span class="op">$</span>temp)</span>
+<span id="cb56-6"><a href="solutions-for-chapter-4.html#cb56-6"></a></span>
+<span id="cb56-7"><a href="solutions-for-chapter-4.html#cb56-7"></a>sakura_fit &lt;-<span class="st"> </span><span class="kw">quap</span>(</span>
+<span id="cb56-8"><a href="solutions-for-chapter-4.html#cb56-8"></a>  <span class="kw">alist</span>(</span>
+<span id="cb56-9"><a href="solutions-for-chapter-4.html#cb56-9"></a>    doy <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(mu, sigma),</span>
+<span id="cb56-10"><a href="solutions-for-chapter-4.html#cb56-10"></a>    mu &lt;-<span class="st"> </span>a <span class="op">+</span><span class="st"> </span>b <span class="op">*</span><span class="st"> </span>(temp <span class="op">-</span><span class="st"> </span>avg_temp),</span>
+<span id="cb56-11"><a href="solutions-for-chapter-4.html#cb56-11"></a>    a <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">75</span>, <span class="dv">30</span>), <span class="co"># jan-may is about 150 days, so 75±60 is very conservative spring estimate</span></span>
+<span id="cb56-12"><a href="solutions-for-chapter-4.html#cb56-12"></a>    b <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="co"># we would assume the relationship to be negative, so higher tempratures leading to sooner blooming</span></span>
+<span id="cb56-13"><a href="solutions-for-chapter-4.html#cb56-13"></a>    sigma <span class="op">~</span><span class="st"> </span><span class="kw">dunif</span>(<span class="dv">0</span>, <span class="dv">15</span>)), <span class="co"># ±30 gives us a month</span></span>
+<span id="cb56-14"><a href="solutions-for-chapter-4.html#cb56-14"></a>  <span class="dt">data=</span>sakura)</span>
+<span id="cb56-15"><a href="solutions-for-chapter-4.html#cb56-15"></a></span>
+<span id="cb56-16"><a href="solutions-for-chapter-4.html#cb56-16"></a><span class="kw">precis</span>(sakura_fit)</span></code></pre></div>
+<pre><code>##             mean        sd       5.5%      94.5%
+## a     104.919743 0.2107589 104.582909 105.256576
+## b      -2.733661 0.2951189  -3.205318  -2.262004
+## sigma   5.912675 0.1491559   5.674295   6.151055</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="solutions-for-chapter-4.html#cb58-1"></a>mean_estimates &lt;-<span class="st"> </span></span>
+<span id="cb58-2"><a href="solutions-for-chapter-4.html#cb58-2"></a><span class="st">  </span><span class="kw">tibble</span>(<span class="dt">temp =</span> <span class="kw">seq</span>(<span class="kw">min</span>(sakura<span class="op">$</span>temp), <span class="kw">max</span>(sakura<span class="op">$</span>temp), <span class="dt">length.out =</span> <span class="dv">100</span>))</span>
+<span id="cb58-3"><a href="solutions-for-chapter-4.html#cb58-3"></a></span>
+<span id="cb58-4"><a href="solutions-for-chapter-4.html#cb58-4"></a>sample_means &lt;-<span class="st"> </span><span class="kw">link</span>(sakura_fit, mean_estimates)</span>
+<span id="cb58-5"><a href="solutions-for-chapter-4.html#cb58-5"></a>mean_estimates &lt;-</span>
+<span id="cb58-6"><a href="solutions-for-chapter-4.html#cb58-6"></a><span class="st">  </span>mean_estimates <span class="op">%&gt;%</span></span>
+<span id="cb58-7"><a href="solutions-for-chapter-4.html#cb58-7"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">mu =</span> <span class="kw">apply</span>(sample_means, <span class="dv">2</span>, mean),</span>
+<span id="cb58-8"><a href="solutions-for-chapter-4.html#cb58-8"></a>         <span class="dt">lowerCI =</span> <span class="kw">apply</span>(sample_means, <span class="dv">2</span>, quantile, <span class="dt">probs=</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>),</span>
+<span id="cb58-9"><a href="solutions-for-chapter-4.html#cb58-9"></a>         <span class="dt">upperCI =</span> <span class="kw">apply</span>(sample_means, <span class="dv">2</span>, quantile, <span class="dt">probs=</span><span class="dv">1</span><span class="op">-</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>))</span>
+<span id="cb58-10"><a href="solutions-for-chapter-4.html#cb58-10"></a></span>
+<span id="cb58-11"><a href="solutions-for-chapter-4.html#cb58-11"></a>simulated_doy_samples &lt;-<span class="st"> </span><span class="kw">sim</span>(sakura_fit, mean_estimates)</span>
+<span id="cb58-12"><a href="solutions-for-chapter-4.html#cb58-12"></a>simulated_doy &lt;-</span>
+<span id="cb58-13"><a href="solutions-for-chapter-4.html#cb58-13"></a><span class="st">  </span>mean_estimates <span class="op">%&gt;%</span></span>
+<span id="cb58-14"><a href="solutions-for-chapter-4.html#cb58-14"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">lowerCI =</span> <span class="kw">apply</span>(simulated_doy_samples, <span class="dv">2</span>, quantile, <span class="dt">probs=</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>),</span>
+<span id="cb58-15"><a href="solutions-for-chapter-4.html#cb58-15"></a>         <span class="dt">upperCI =</span> <span class="kw">apply</span>(simulated_doy_samples, <span class="dv">2</span>, quantile, <span class="dt">probs=</span><span class="dv">1</span><span class="op">-</span>(<span class="dv">1</span><span class="fl">-0.89</span>)<span class="op">/</span><span class="dv">2</span>))</span>
+<span id="cb58-16"><a href="solutions-for-chapter-4.html#cb58-16"></a></span>
+<span id="cb58-17"><a href="solutions-for-chapter-4.html#cb58-17"></a><span class="kw">ggplot</span>(sakura, <span class="kw">aes</span>(<span class="dt">x =</span> temp, <span class="dt">y=</span>doy)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb58-18"><a href="solutions-for-chapter-4.html#cb58-18"></a><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="dt">data=</span>simulated_doy, <span class="kw">aes</span>(<span class="dt">y=</span>lowerCI, <span class="dt">ymin=</span>lowerCI, <span class="dt">ymax=</span>upperCI), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.5</span>)<span class="op">+</span></span>
+<span id="cb58-19"><a href="solutions-for-chapter-4.html#cb58-19"></a><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="dt">data=</span>mean_estimates, <span class="kw">aes</span>(<span class="dt">y=</span>mu, <span class="dt">ymin=</span>lowerCI, <span class="dt">ymax=</span>upperCI), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>)<span class="op">+</span></span>
+<span id="cb58-20"><a href="solutions-for-chapter-4.html#cb58-20"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb58-21"><a href="solutions-for-chapter-4.html#cb58-21"></a><span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">data=</span>mean_estimates, <span class="kw">aes</span>(<span class="dt">y=</span>mu))</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/4H5-1.png" width="672" />
+<strong>Reasonably well, but you can see a lot of spread in the middle, so other factors are clearly at play.</strong></p>
+</div>
+<div id="h6" class="section level4 unnumbered" number="">
+<h4>4H6</h4>
+<p>Simulate the prior predictive distribution for the cherry blossom spline in the chapter. Adjust the prior on the weights and observe what happens. What do you think the prior on the weights is doing?</p>
+</div>
+<div id="h8" class="section level4 unnumbered" number="">
+<h4>4H8</h4>
+<p>The cherry blossom spline in the chapter used an intercept α, but technically it doesn’t require one. The first basis functions could substitute for the intercept. Try refitting the cherry blossom spline without the intercept. What else about the model do you need to change to make this work?</p>
 
 </div>
 </div>

@@ -10,3 +10,4 @@ gaussian-in-frenquentist-versus-bayesian-statistics
 solutions-for-chapter-2
 solutions-for-chapter-3
 initialization-code-for-easy-exercises
+solutions-for-chapter-4

@@ -105,7 +105,8 @@ $$uPr(Earth | land) = 0.3 \cdot 0.5 = 0.15\\
 uPr(Mars | land) = 1 \cdot 0.5 = 0.5$$
   where $uPr()$ is unstandardized plausibility. Normalizing it, we get
 $$Pr(Earth | land) = \frac{0.15}{0.15 + 0.5} = 0.2308$$
-  
+
+
 #### 2M4 {-} 
 Suppose you have a deck with only three cards. Each card has two sides, and each side is either black or white. One card has two black sides. The second card has one black and one white side. The third card has two white sides. Now suppose all three cards are placed in a bag and shuffled. Someone reaches into the bag and pulls out a card and places it flat on a table. A black side is shown facing up, but you don’t know the color of the side facing down. Show that the probability that the other side is also black is 2/3. Use the counting method (Section 2 of the chapter) to approach this problem. This means counting up the ways that each card could produce the observed data (a black side facing up on the table).
 
@@ -243,5 +244,3 @@ Given the singleton, this becomes
 $$uPr(A | test, twins, singleton) = Pr(A | test, twins) * (1 - Pr(twins | A)) = 0.533 * 0.9 = 0.48\\
 uPr(B | test, twins, singleton) = Pr(B | test, twins) * (1 - Pr(twins | B)) = 0.467 * 0.8 = 0.3736$$
 After normalization $Pr(A | test, twins, singleton) \approx 0.5625$ and $Pr(B | test, twins, singleton) \approx 0.4375$.
-
-

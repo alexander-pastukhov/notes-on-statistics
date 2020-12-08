@@ -24,7 +24,7 @@
 <meta name="author" content="Alexander Pastukhov" />
 
 
-<meta name="date" content="2020-11-22" />
+<meta name="date" content="2020-12-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,6 +51,7 @@
 
 
 
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
 
@@ -213,13 +214,14 @@ Here, every next step becomes progressively harder for our customers. The cost o
 <span class="math display">\[&lt;L2(stand, person)&gt; = \frac{1}{N}\sum_{i=1}^{N}{(person_i - stand)^2}\]</span></p>
 <p>Conceptually, you find that minimum by walking along the beach in the direction that reduces the cost until you hit the point where it start going up again. This strategy is called <em>gradient descent</em> and, generally speaking, this is how computer finds minima computationally: They make steps in different directions to see which way is down and keep going until things start going up. However, in one-dimensional well-behaving case we have here things are even simpler as you can use calculus to figure out the solution analytically. If you watched the videos I advertised above, you’ll know that the <em>derivative</em> of the function is zero at the extrema (minima or maxima), so we just need to differentiate our average <em>L2</em> over position of the stand and find where it is zero<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>.</p>
 <p><span class="math display">\[\frac{\partial L2}{\partial stand} = -\frac{2}{N}\sum_{i=1}^{N}{(person_i - stand)}\]</span>
-As we want <span class="math inline">\(\frac{\partial L2}{\partial stand} = 0\)</span>, we state
-<span class="math display">\[-\frac{2}{N}\sum_{i=1}^{N}{(person_i - stand)} = 0\]</span>.
-Opening up brackets and rearranging we get
-<span class="math display">\[-\frac{2}{N}\sum_{i=1}^{N}{person_i} + \frac{2\cdot N}{N}\cdot stand = 0\\
-2\cdot stand = \frac{2}{N}\sum_{i=1}^{N}{person_i} \\
-stand = \frac{1}{N}\sum_{i=1}^{N}{person_i}
-\]</span></p>
+As we want
+<span class="math display">\[\frac{\partial L2}{\partial stand} = 0\]</span>
+we state
+<span class="math display">\[\frac{2}{N}\sum_{i=1}^{N}{(person_i - stand)} = 0.\]</span></p>
+<p>Opening up brackets and rearranging we get</p>
+<p><span class="math display">\[- \frac{2}{N}\sum_{i=1}^{N}{person_i} + \frac{2 \cdot N}{N} \cdot stand = 0 \\
+2 \cdot stand = \frac{2}{N}\sum_{i=1}^{N}{person_i} \\
+stand = \frac{1}{N}\sum_{i=1}^{N}{person_i}\]</span></p>
 <p>So, the optimal location of your stand is the <em>mean</em>: an average location of all people on the beach.</p>
 </div>
 <div id="l1-median-vs.-l2-mean" class="section level2" number="2.5">
@@ -235,12 +237,13 @@ stand = \frac{1}{N}\sum_{i=1}^{N}{person_i}
 <span class="math display">\[f(x) = \frac{1}{\sigma \sqrt(2 \pi)}e^{\left(-\frac{1}{2}\frac{(x - \mu)^2}{\sigma^2}\right)}\]</span></p>
 <p>so using it is equivalent to fitting via ordinary least squares. However, as McElreath hinted, you can choose different priors that are different not only in the distance-to-loss formula (like <em>L1</em> is different from <em>L2</em>) but also in symmetry. Both <em>L1</em> and <em>L2</em> (and Gaussian) ignore the sign of the distance. It does not matter whether customers are on the left or on the right. Other distributions, such as Beta, Gamma, or Log Normal are not symmetric, so the same distance will cost differently depending on the side the customer is at.
 <img src="images/loss-functions-Gamma.jpg" width="100%" style="display: block; margin: auto;" /></p>
-<p>This allows you to think about the choice of your likelihood distribution in terms of choosing a loss function. For example, a t-distribution has heavier tails than a Gaussian (if you want to sound like a real mathematician, you say “leptokurtic”), so its losses for outliers (penalty for larger residuals) are lower. Using it instead of a Gaussian would be similar to changing the loss function from L2 to be more like L1 (e.g. <span class="math inline">\(|person_i - stand|^{1.5}\)</span>). Conversely, you can pick a symmetric distribution that is narrower than a Gaussian to make residuals penalty even higher (e.g. using <span class="math inline">\((person_i - stand)^{4}\)</span>). You can also consider other properties: Should it be symmetric? Should it operate only within certain range (1..7 for a Likert scale, 0..1 for proportions, positive values for Gamma)? Should it weight all points equally? As you saw in the examples above, picking a different function moves your cart (regression line), so you should keep in mind that using a different likelihood will move the regression line and produce different estimates and predictions.</p>
+<p>This allows you to think about the choice of your likelihood distribution in terms of choosing a loss function. Both describe how tolerant you are for points to be off the point estimate (regression line). For example, a t-distribution has heavier tails than a Gaussian (if you want to sound like a real mathematician, you say “leptokurtic”), so its losses for outliers (penalty for larger residuals) are lower. Using it instead of a Gaussian would be similar to changing the loss function from L2 to be more like L1 (e.g. <span class="math inline">\(|person_i - stand|^{1.5}\)</span>). Conversely, you can pick a symmetric distribution that is narrower than a Gaussian to make residuals penalty even higher (e.g. using <span class="math inline">\((person_i - stand)^{4}\)</span>). You can also consider other properties: Should it be symmetric? Should it operate only within certain range (1..7 for a Likert scale, 0..1 for proportions, positive values for Gamma)? Should it weight all points equally? As you saw in the examples above, picking a different function moves your cart (regression line), so you should keep in mind that using a different likelihood will move the regression line and produce different estimates and predictions.</p>
 <p>How do you pick a likelihood/loss function? It depends on the kind of data you have, on your knowledge about the process that generated the data, robustness of inferences in the presence of outliers, etc. However, most real-life cases you are likely to encounter will be covered by the distributions described in the book (Gaussian, exponential, binomial, Poisson, Gamma, etc.). After finishing the book, you will have a basic understanding of which are most appropiate in typical cases. The atypical cases you’ll have to research yourself!</p>
 </div>
 <div id="gaussian-in-frenquentist-versus-bayesian-statistics" class="section level2" number="2.7">
 <h2><span class="header-section-number">2.7</span> Gaussian in frenquentist versus Bayesian statistics</h2>
-<p>Later on in the book McElreath will note that erroneously assuming normal distribution for residuals ruins your inferences in frequentist statistics but not in Bayesian. This is because of parametric nature of inferences in frequentist statistics. By assuming that residuals are normal, you can approximate significance by using t- or F-distribution with appropriate degrees of freedom. However, if your initial assumption is wrong, your inferences will be based on idealized not real residuals. If you residuals tend to be asymmetric, as in any proportion data, the numbers you see are about <em>symmetric</em> residuals with the observed variance, not your real <em>asymmetric</em> residuals. Numbers will be off and it won’t be easy (although probably possible) to say by how much. In contrast, Bayesian statistics does not use approximations and builds the posterior distribution directly. Thus it treats Gaussian (or any other distribution) as a loss function and the asymmetry or abnormality of residuals is less critical (merely not optimal).</p>
+<p>Later on in the book McElreath will note that erroneously assuming normal distribution for residuals ruins your inferences in frequentist statistics but not in Bayesian. This is because picking a distribution means different things in frequentist and Bayesian. As I wrote above, in the Bayesian case, likelihood is merely a loss function that translate distance from a data point to a regression line (residual) into a penalty (again, it determines just how tolerant you are for points off the line). Thus, you are using penalties for <em>observed residuals</em> and having a bad loss function will make your posterior distribution suboptimal but you still can make inferences because it still is based on your actual residuals.</p>
+<p>In contrast, in frequentist statistics, when you are stating that your observed residuals are a sample from a particular distribution, your actual residuals are used to determine parameters of this distribution. Then, however, you make your inferences using <em>that distribution</em> not the residuals themselves. This is a very strong conjecture and probably the biggest leap of faith in frequentist statistics saying “I know the true distribution”. Problem is, if you got your likelihood function / distribution wrong, your inferences are based on a model that describes <em>something else</em> not your data. For example, you have a proportion data but you assume Gaussian distribution for residuals and build a model as if your residuals are always symmetrically distributed (not squashed on one side by floor or celing). That model will not be about your data, it will be about normally distributed <em>something else</em>. The numbers for that <em>something else</em> may look good (or bad) but they are not the numbers you are interested in. This is a mistake that is remarkably easy to do because computers won’t stop you from making it. Think back to Chapter 1: Golems don’t care! You can abuse any statistical model/test and they will simply spit out the numbers, even if tests are completely unsuitable for your data. Making sure that distribution is correct and that you are doing the right thing is on you, not the Golem!</p>
 
 </div>
 </div>
