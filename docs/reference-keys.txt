@@ -7,6 +7,13 @@ l2-mean
 l1-median-vs.-l2-mean
 choosing-a-likelihood
 gaussian-in-frenquentist-versus-bayesian-statistics
+multiple-regression-and-causal-reasoning
+peering-into-a-black-box
+turning-unconditional-dependence-into-conditional-independence
+magic-of-multiple-regression
+multicollinearity
+back-to-spurious-association
+warning
 solutions-for-chapter-2
 solutions-for-chapter-3
 initialization-code-for-easy-exercises

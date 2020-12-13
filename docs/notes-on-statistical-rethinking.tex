@@ -5,12 +5,13 @@
 \documentclass[
 ]{book}
 \usepackage{lmodern}
-\usepackage{amssymb,amsmath}
+\usepackage{amsmath}
 \usepackage{ifxetex,ifluatex}
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
+  \usepackage{amssymb}
 \else % if luatex or xetex
   \usepackage{unicode-math}
   \defaultfontfeatures{Scale=MatchLowercase}
@@ -108,12 +109,15 @@
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{5}
 \usepackage{booktabs}
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
 \usepackage[]{natbib}
 \bibliographystyle{apalike}
 
 \title{Notes on and Solutions for Statistical Rethinking}
 \author{Alexander Pastukhov}
-\date{2020-12-08}
+\date{2020-12-13}
 
 \begin{document}
 \maketitle
@@ -240,13 +244,271 @@ Later on in the book McElreath will note that erroneously assuming normal distri
 
 In contrast, in frequentist statistics, when you are stating that your observed residuals are a sample from a particular distribution, your actual residuals are used to determine parameters of this distribution. Then, however, you make your inferences using \emph{that distribution} not the residuals themselves. This is a very strong conjecture and probably the biggest leap of faith in frequentist statistics saying ``I know the true distribution''. Problem is, if you got your likelihood function / distribution wrong, your inferences are based on a model that describes \emph{something else} not your data. For example, you have a proportion data but you assume Gaussian distribution for residuals and build a model as if your residuals are always symmetrically distributed (not squashed on one side by floor or celing). That model will not be about your data, it will be about normally distributed \emph{something else}. The numbers for that \emph{something else} may look good (or bad) but they are not the numbers you are interested in. This is a mistake that is remarkably easy to do because computers won't stop you from making it. Think back to Chapter 1: Golems don't care! You can abuse any statistical model/test and they will simply spit out the numbers, even if tests are completely unsuitable for your data. Making sure that distribution is correct and that you are doing the right thing is on you, not the Golem!
 
+\hypertarget{multiple-regression-and-causal-reasoning}{%
+\chapter{Multiple Regression and Causal Reasoning}\label{multiple-regression-and-causal-reasoning}}
+
+This notes are on Chapter 5 ``The Many Variables \& The Spurious Waffles'', specifically, on section 5.1 ``Spurious association''. If you are to remember one thing from that chapter, it should be ``doing multiple regression is easy, understanding and interpreting it is hard''.
+
+\hypertarget{peering-into-a-black-box}{%
+\section{Peering into a black box}\label{peering-into-a-black-box}}
+
+To better understand the relationship between data and statistical analysis on the one hand and DAGs (directed acyclic graphs) on the other hand, I came up with an electric engineering metaphor\footnote{Dear electric engineers, yes, I know that's not quite how it works but it is still a good metaphor!}. Imagine that you have an electric device that you cannot take apart. However, there are certain points where you can connect your multimeter and check whether current flows between these two points. You also have a schematics for the device but you have no idea whether it is accurate. The names of the connector nodes match but \emph{the connectivity} between them is anybody's guess. So, what do you do? You look at the schematics and identify two nodes where current should \emph{definitely flow} and you measure whether that is the case. Do you have signal? Good, that means that \emph{at least with respect to the connectivity between these two nodes} you schematics is not completely wrong. No signal? Sorry, your schematics is no good, find a different one or try making one yourself. Conversely, you can identify two nodes, so that \emph{no current} should flow between them and measure it \emph{empirically}. No current? Good! Current? Bad, your schematics is wrong.
+
+The relationship between the device and the schematics is that of the large (device) and small (schematics) world. Your job is to iteratively adjust the latter, so that it matches the former. You need to keep prodding the black box until predictions from your schematics start matching the actual readings. Only then you can say that you understand how device works and you can make predictions about what it will do under different conditions. Although testing based on schematics can be automated, generating such schematics is a creating process. It depends on our knowledge about devices of that kind and about individual exposed nodes.
+
+Hopefully, you can see how it maps on our observational or experimental data (large world, readings from the device) and DAGs (small world, presumed schematics). As a scientist, you \emph{guess}\footnote{If you feel that science is not about guessing, you are wrong and I have Richard Feynman on my side! You always start by guessing a particular law or rule and then use empirical data to check whether your guess was correct. If you made an \emph{educated} guess, your chances of it being correct are higher, so your job is to study the field and prior work to make your guess as educated as possible. But, at the end, it is still a guess and it can be wrong. Good news, at least in my experience, is that guesses that turn out to be spectacularly wrong are the most informative ones, as they reveal something unexpected and, thus, hitherto unknown about the process.} the causal relationships between individual variables and you draw a schematics for that (a DAG). Using this DAG, you identify pairs of variables that must be dependent or independent \emph{assuming your DAG is correct} and check the data on whether this is indeed the case. It is? Good, your DAG is not (entirely) wrong! They are not? Bad news, their causal relationship is different from what you (or others in prior work) came up with. You need to modify DAG or draw a completely different one, just like a engineer must modify the schematics.
+
+Note that this process is the opposite to that in a typical multivariate analysis approach using, say, ANOVA. In the latter case, you throw \emph{everything} together, including some/all interactions between the terms, and try figuring out causal relationship between individual independent and the dependent variable based on magnitude and significance of individual terms. So, \emph{first} you run the statistical analysis and \emph{then} you make your inferences about causal relationships. In causal reasoning using DAG, you \emph{first} formulate causal relationships and \emph{then} you use statistical analysis to check whether these relationship are correct. The second approach is much more powerful, because you can run ANOVA only once but you can formulate many DAGs that describe your data and test them iteratively, refining your understanding step-by-step. Moreover, ANOVA (or any other regression model like that) is about identifying relationships between invididual independent and the signle dependent variable (individual coefficients tell you how independent variables can be used to predict the dependent). DAG-based analysis allows you to predict and test relationship between pairs of \emph{dependent} variables as well, decomposing your complex model into \emph{testable} and \emph{verifyable} chunks. It is a more involved and time-consuming approach but it gives you much deeper understanding of the process you are styding compared to ``throw everything into ANOVA and hope it will magically figure it out''.
+
+Moreover, causal calculus via DAGs has another trick up its sleeve. You can use \emph{conditional probabilities} (see below) to flip the relationship between variables. If two variables are independent, they may be dependent when conditioned on some third variable. Or vice versa, depedent variables can become \emph{conditionally independent}. This means that your predictions about connectivity between pairs of variables can be both more specific (e.g., they are related via a third variable or they both independently cause that third variable) and more testable, as you now have two \emph{opposite} predictions for the same pair of variables! You can check that current flows when it should (unconditional probability) and \emph{does not flow} once you condition it on the third variable. Both tests match? DAG is not that bad! One or none match? Back to the drawing board!
+
+\hypertarget{turning-unconditional-dependence-into-conditional-independence}{%
+\section{Turning unconditional dependence into conditional independence}\label{turning-unconditional-dependence-into-conditional-independence}}
+
+Below, you will see how multiple regression can show conditional independence of two variable in case of the fork DAG in divorce data. However, there is another more general way to understand this concept it terms of conditional probabilities \(Pr(M|A)\) and \(Pr(D|A)\). For this, it helps to understand condition probabilities as \emph{filtering} operation. When we compute conditional probability for a \emph{specific} value of \(A\), this means that we slice the data, keeping only whose values of \(M\) and \(D\) that correspond to that chosen level of \(A\). It is easier to understand, if we visualize that conditional-probability-as-filtering in synthetic data. For illustration purposes, I will synthesize divorce data, keeping the relationships but I will space marriage age linearly and generate the data so that there are 20 data points for each age (makes it easier to see and understand).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{84321169}\NormalTok{)}
+\NormalTok{N }\OtherTok{\textless{}{-}} \DecValTok{180}
+\NormalTok{sigma\_noise }\OtherTok{\textless{}{-}} \FloatTok{0.5}
+\CommentTok{\# we repeat each value of age 10 times to make filtering operation easier to see}
+\NormalTok{sim\_waffles }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{MedianAgeMarriage =} \FunctionTok{rep}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{9}\NormalTok{), }\DecValTok{20}\NormalTok{), }
+                      \AttributeTok{Divorce =} \FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise),}
+                      \AttributeTok{Marriage =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise))}
+
+\NormalTok{MD\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+  
+\NormalTok{AD\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+  
+\NormalTok{AM\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Marriage)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
+
+\NormalTok{MD\_plot }\SpecialCharTok{|}\NormalTok{ AD\_plot }\SpecialCharTok{|}\NormalTok{ AM\_plot}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=1\linewidth]{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-11-1} \end{center}
+
+As you can see, all variables being dependent on each other, as in case of the original data. However, let us pick an arbitrary value, say \(A=1\)\footnote{The data is ``standardized'', therefore, age of 1 is one standard deviation away from the mean marriage rate.} and see which dots on the left plot will be selected via \emph{filtering} on that value.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{MD\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x, }\AttributeTok{alpha=}\FloatTok{0.1}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{==} \DecValTok{1}\NormalTok{), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{), }\AttributeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{) }
+\NormalTok{AD\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{==} \DecValTok{1}\NormalTok{), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{), }\AttributeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+  
+\NormalTok{AM\_plot }\OtherTok{\textless{}{-}}
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{MedianAgeMarriage)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{==} \DecValTok{1}\NormalTok{), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{), }\AttributeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }
+
+\NormalTok{MD\_A1\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{==} \DecValTok{1}\NormalTok{), }
+         \FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =} \StringTok{"Pr( |Mariage Age = 1)"}\NormalTok{)}
+
+\NormalTok{(AD\_plot }\SpecialCharTok{|}\NormalTok{ MD\_plot) }\SpecialCharTok{/}
+\NormalTok{(MD\_A1\_plot }\SpecialCharTok{|}\NormalTok{AM\_plot)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=1\linewidth]{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-12-1} \end{center}
+
+First, take at top-left and bottom-right plots that plot, correspondingly, divorce and marriage rate versus marriage age. Note that I've flipped axes on the bottom-right plot, so that marriage rate is always mapped on x-axis. The \emph{red} dots in each plot correspond to divorce and marriage rates \emph{given that} (filtered on) marriage age is 1. The same dots are marked in red in the top-right plot and are plotted separately at the bottom-right. As you can see, the two variables \emph{conditional on A=1} are uncorrelated. Why? Because both were fully determined by marriage age and any variation (the spread of red dots vertically or horizontally in the top-left and bottom-right plots) was due to noise. Therefore, the plot on the bottom-left effectively plots noise in marriage rate versus noise in divorce rate and, by our synthetic data design, the noise in two variable was independent, hence, lack of correlation.
+
+This opportunity to turn dependence into independence by conditioning two variables on the third is at the heart of causal reasoning\footnote{As you will learn later, the opposite is also true, so you can turn independence into conditional dependence.}. You draw a DAG and if it has a fork in it, you know that \emph{given your educated guess about causal relationship is correct} (small world!), your data (large world!) should show dependence \emph{and} conditional independence of the two variables (divorce and marriage rates). What if it does not? E.g., the two variables are always dependent or always independent, conditional or not? As we already discussed above, that just means that your educated guess was wrong and that relationship of the variables is different from how you thought it is. Thus, you need to go back to the drawing board, come up with another DAG, repeat the analysis and see if that new DAG is supported by data. If you have more variables, your DAGs will be more complex but the beauty of such causal reasoning is that you can concentrate on \emph{parts} of it, picking three variables and seeing whether your guess about these three variables was correct. This way, you can tinker with your causal model part-by-part, instead of hoping that you got \emph{everything} right on the very first attempt.
+
+\hypertarget{magic-of-multiple-regression}{%
+\section{Magic of multiple regression}\label{magic-of-multiple-regression}}
+
+When reading section 5.1 ``Spurious association'', I found relationships between the \emph{marriage age}, \emph{marriage rate}, and \emph{divorce rate} to be both clear and mysterious. On the one hand, everything is correlated with everything.
+
+\begin{center}\includegraphics[width=1\linewidth]{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-13-1} \end{center}
+
+On the other hand, once we fit linear model to predict divorce rate based on both median age marriage and marriage rate, the latter is \emph{clearly} irrelevant (output of code 5.11 shows that its coefficient is effectively zero, meaning that it is ignored) and, therefore, it has no causal influence on divorce rate.
+
+If you are like me\footnote{Don't be like me, be better!}, you said ``Huh! But how does the model know that?''. And, at least for me, explanations in the chapter did not help much. The key figure is 5.4, that shows that (omitting intercept and slope symbols) \texttt{median\ age\ marriage\ =\ marriage\ rate\ +\ *extra\ information*} but \texttt{marriage\ rate\ =\ median\ age\ marriage}. In a nutshell, both variables code the same information but there is \emph{more} of it in median age than in marriage rate, so the latter is ignored. Unfortunately, the answer ``but how?'' still stands. The figure 5.4, which shows fits on residuals is illustrative, but we do not fit residuals, we fit both variables at the same time \emph{without} fitting them on each other! Nowhere in the model 5.1.4 do we find
+\[\mu^{M}_{i} = \alpha_{AM} + \beta_{AM} * A_i\]
+
+So, what's going on? \emph{How does it know?} To understand this, let us start with an issue of \emph{multicollinearity}.
+
+\hypertarget{multicollinearity}{%
+\section{Multicollinearity}\label{multicollinearity}}
+
+To make things easier to understand, let us use simulated data. Imagine that both marriage and divorce rate are almost perfectly linearly dependent on marriage rate, so that \(D_i = \beta_A^{true} \cdot A_i\) and \(M_i = -A_i\). For the sake of simplicity \(\beta_A^{true} = 1\). We pretend our variables are already standardized, so the plots would look something like this.
+
+\begin{center}\includegraphics[width=1\linewidth]{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-14-1} \end{center}
+
+The relationship is the same as in the plots above but, as we assumed an almost perfect correlation, there is not much spread around the line. Still, by definition of how we constructed the data, both marriage and divorce rate are \emph{caused} (computed from) median age and marriage rate is never used to compute the divorce rate. What happens if we analyze this simulated data using the same model 5.1.3, will it be able to figure ``marriage rate does not matter'' again?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sim\_waffles }\OtherTok{\textless{}{-}}
+\NormalTok{  sim\_waffles }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{A =}\NormalTok{ MedianAgeMarriage,}
+         \AttributeTok{M =}\NormalTok{ Marriage,}
+         \AttributeTok{D =}\NormalTok{ Divorce)}
+
+\NormalTok{sim\_waffles\_fit }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
+  \FunctionTok{alist}\NormalTok{(}
+\NormalTok{    D }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu , sigma) ,}
+\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ bM}\SpecialCharTok{*}\NormalTok{M }\SpecialCharTok{+}\NormalTok{ bA}\SpecialCharTok{*}\NormalTok{A,}
+\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.2}\NormalTok{),}
+\NormalTok{    bA }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
+\NormalTok{    bM }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
+\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\NormalTok{  ), }
+  \AttributeTok{data =}\NormalTok{ sim\_waffles,}
+\NormalTok{)}
+
+\FunctionTok{precis}\NormalTok{(sim\_waffles\_fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##               mean          sd        5.5%      94.5%
+## a     -0.002040905 0.012914885 -0.02268138 0.01859958
+## bA    -0.271365691 1.189014206 -2.17164004 1.62890866
+## bM    -1.249741284 1.187251535 -3.14719854 0.64771597
+## sigma  0.090132561 0.008997396  0.07575298 0.10451214
+\end{verbatim}
+
+Oh no, we broke it! \(\beta_M\) is now about \texttt{-1.25} rather than zero and \(\beta_A\) is around \texttt{-0.27} rather than one, as it should. Also note the uncertainty associated with both values, as they both totally overlap with zero\footnote{I've made priors for both betas broad, so that they are not pushed towards zero too aggressively and their uncertainty is more evident}. So, the data generation process is the same (\texttt{Divorce\ rate\ ←\ Age\ →\ Marriage\ rate}) and the model is the same (prior changes have no particular impact in this case) but the ``magic'' of inferring the lack of \texttt{Divorce\ rate\ \ →\ Marriage\ rate} is gone! The \emph{only} difference between the two data sets is extra variance (noise) in marriage rate variable, so let us see how the absence of that extra noise in simulated data breaks the magic.
+
+When two variables, marriage age and rate in our case, are (almost) perfectly correlated, that means that you can substitute one for another. Thus, when we write\footnote{I've dropped likelihood and variance only to compress formulas and shed unimportant details. Adding them does not change the essence.}
+\[D = \beta_A \cdot A + \beta_M \cdot M\]
+because \texttt{M\ =\ -A} (that's how we generated the data!), we can substitute \texttt{-A} for \texttt{M}
+\[D = \beta_A \cdot A - \beta_M \cdot A \\
+D = (\beta_A - \beta_M) \cdot A
+D = \beta_A^{true} \cdot A
+\]
+where
+\[ \beta_A^{true} = (\beta_A - \beta_M)
+\]
+
+That last bit is the curse of multicollinearity, because if two variable have \emph{the same} information, you are, effectively, fitting their \emph{sum}! This is equivalent to fitting the sum\footnote{in our case, the difference, because we defined that \texttt{M\ =\ -A}} of coefficients times one of the variables (does not matter which one, since they are identical, we used \texttt{A} but could have used \texttt{M}). If you look at the precis output above, you will see exactly that! \texttt{bA\ =\ -0.27} and \texttt{bM\ =\ -1.25}, so plugging them in gives us
+\[ \beta_A^{true} = (\beta_A - \beta_M) = (-0.27 - (-1.25)) = 0.98\]
+
+Hey, that is the slope that we used to construct divorce rate, so fitting does work! But what about uncertainty for \emph{individual} slopes? It stems directly from the fact that \(\beta_A^{true} = (\beta_A - \beta_M) = 1\) (it is \texttt{1} just in our case, of course), as there are infinite number of pairs of numbers whose difference would give 1: \texttt{2-1}, \texttt{3-2}, \texttt{(-200)-(-201)}, \texttt{1000.41-999.41}, etc. All of them add up (subtract to) one, so the fitting procedure cannot settle on any specific region for each parameter and any specific pair of values. Any number will do, as long as the \emph{other one} differs by one. This phenomenon of \emph{masked relationship} is the focus of section 5.2, so you will learn more about it soon.
+
+\hypertarget{back-to-spurious-association}{%
+\section{Back to spurious association}\label{back-to-spurious-association}}
+
+Above, you have learned that if two variable have the same information, you can only fit \emph{both} of them but cannot get individual slopes. But wasn't that the case for real data we started with? Marriage age and rate \emph{are} correlated, so why fitting used one (age) and not their sum? The answer is \emph{extra noise} in marriage rate. In the real data marriage rate is age \emph{plus some noise}: \(M = -(A + \epsilon)\), where \(\epsilon\) is traditionally used to denote ``some noise''. How does that change our linear model for divorce rate?
+\[
+D = \beta_A \cdot A - \beta_M \cdot A \\
+D = \beta_A \cdot A - \beta_M (A + \epsilon) \\
+D = (\beta_A  - \beta_M ) \cdot A - \beta_M \cdot \epsilon
+\]
+
+By definition, \(\epsilon\) is \emph{pure noise} and has zero predictive value with respect to divorce rate. This, if we would fit it \emph{alone}, we would expect to get a slope near zero (that is your ``no significant relationship'').
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1231455}\NormalTok{)}
+\NormalTok{sim\_waffles }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{MedianAgeMarriage =} \FunctionTok{rnorm}\NormalTok{(N),}
+                      \AttributeTok{Divorce =} \FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
+                      \AttributeTok{Marriage =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.01}\NormalTok{),}
+                      \AttributeTok{epsilon =} \FunctionTok{rnorm}\NormalTok{(N))}
+
+\FunctionTok{ggplot}\NormalTok{(sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{epsilon, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\FunctionTok{expression}\NormalTok{(epsilon)) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-16-1.pdf}
+
+But we are not fitting it alone, as the coefficient \(\beta_M\) appears at \emph{twice}:
+\[D = (\beta_A  - \beta_M) \cdot A - \beta_M \cdot \epsilon\]
+The latter part, \(\beta_M \cdot \epsilon\), pushes \(\beta_M\) towards zero (model ignores pure noise by assigning slope of zero). But the former part, \((\beta_A - \beta_M)\) only needs to add up to \(\beta_A^{true}\), so however we fix \(\beta_M\), \(\beta_A\) can accommodate. Thus the closer \(\beta_M\) to zero, the closer is \(\beta_A\) to \(\beta_A^{true}\). And that's how the magic works! If one variable is other variable plus noise, that \emph{plus noise} induces extra penalty and the only way to reduce residuals is to ignore the noise by setting the slope to zero. Therefore, you ignore the variable as well, because it is merely a noisy twin of a better variable. You can see how added noise ``disambiguates'' the causal relationship\footnote{I've used ordinary least squares just to make simulations faster. You will get the same result using Bayesian fittings procedures.}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{simulate\_waffles }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(sigma\_noise)\{}
+  \CommentTok{\# generate same data but for noise in Marraige from Age relationship}
+  \FunctionTok{set.seed}\NormalTok{(}\DecValTok{169084}\NormalTok{)}
+\NormalTok{  sim\_df }\OtherTok{\textless{}{-}}\NormalTok{ sim\_waffles }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{MedianAgeMarriage =} \FunctionTok{rnorm}\NormalTok{(N),}
+                                  \AttributeTok{Divorce =} \FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
+                                  \AttributeTok{Marriage =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise))}
+  
+  \CommentTok{\# fit data using OLS and pulling out two slope coefficients}
+  \FunctionTok{lm}\NormalTok{(Divorce }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Marriage }\SpecialCharTok{+}\NormalTok{ MedianAgeMarriage, }\AttributeTok{data=}\NormalTok{sim\_df) }\SpecialCharTok{\%\textgreater{}\%} 
+    \FunctionTok{summary}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{    .}\SpecialCharTok{$}\NormalTok{coefficients }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{data.frame}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{rownames\_to\_column}\NormalTok{(}\StringTok{"Variable"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{slice}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{LowerCI =}\NormalTok{ Estimate }\SpecialCharTok{{-}}\NormalTok{ Std..Error,}
+           \AttributeTok{UpperCI =}\NormalTok{ Estimate }\SpecialCharTok{+}\NormalTok{ Std..Error) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{select}\NormalTok{(Variable, Estimate, LowerCI, UpperCI)}
+\NormalTok{\}}
+
+\NormalTok{simulated\_noise }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{epsilon =}\FunctionTok{exp}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\FunctionTok{log}\NormalTok{(}\FloatTok{0.001}\NormalTok{), }\FunctionTok{log}\NormalTok{(}\FloatTok{0.3}\NormalTok{), }\AttributeTok{length.out =} \DecValTok{100}\NormalTok{))) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(epsilon) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{do}\NormalTok{(}\FunctionTok{simulate\_waffles}\NormalTok{(.}\SpecialCharTok{$}\NormalTok{epsilon))}
+
+\FunctionTok{ggplot}\NormalTok{(simulated\_noise, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{epsilon, }\AttributeTok{y=}\NormalTok{Estimate)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{ymin=}\NormalTok{LowerCI, }\AttributeTok{ymax=}\NormalTok{UpperCI, }\AttributeTok{fill=}\NormalTok{Variable), }\AttributeTok{alpha=} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{color=}\NormalTok{Variable)) }\SpecialCharTok{+} 
+  \FunctionTok{scale\_x\_log10}\NormalTok{(}\AttributeTok{name=}\FunctionTok{expression}\NormalTok{(epsilon)) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Slope estimate  ± standard error"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =} \FunctionTok{expression}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Marriage = MedianAgeMarriage + Normal(0, "}\NormalTok{, epsilon, }\StringTok{")"}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-17-1.pdf}
+
+The stripes show uncertainty (estimate ± standard error) and you can appreciate how quickly it is reduced as marriage rate becomes noisier and just how little noise is required for ``magic'' to start working and converge on the true causal relationships.
+
+\hypertarget{warning}{%
+\section{Warning}\label{warning}}
+
+So, a bit of noise will fix everything? Not necessarily! If \emph{both} marriage age and rate depend on some \emph{third latent variable}, it will depend, for example, on which variable is noisier. The book will continue with this theme, so you will learn more but, in the meantime, the key take-home message is still ``doing multiple regression is easy, understanding and interpreting it is hard''.
+
 \hypertarget{solutions-for-chapter-2}{%
 \chapter{Solutions for Chapter 2}\label{solutions-for-chapter-2}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(tidyverse)}
-\KeywordTok{library}\NormalTok{(rethinking)}
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\FunctionTok{library}\NormalTok{(rethinking)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -336,13 +598,13 @@ Recall the globe tossing model from the chapter. Compute and plot the grid appro
 \CommentTok{\#\textquotesingle{}}
 \CommentTok{\#\textquotesingle{} @examples}
 \CommentTok{\#\textquotesingle{} probability\_of\_water(c("W", "W", "W"), rep(1, 100))}
-\NormalTok{probability\_of\_water \textless{}{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(observations, prior)\{}
-\NormalTok{  p\_grid \textless{}{-}}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DataTypeTok{from=}\DecValTok{0}\NormalTok{, }\DataTypeTok{to=}\DecValTok{1}\NormalTok{, }\DataTypeTok{length.out=}\KeywordTok{length}\NormalTok{(prior))}
-\NormalTok{  likelihood \textless{}{-}}\StringTok{ }\KeywordTok{dbinom}\NormalTok{(}\KeywordTok{sum}\NormalTok{(observations }\OperatorTok{==}\StringTok{ "W"}\NormalTok{), }\DataTypeTok{size=}\KeywordTok{length}\NormalTok{(observations), }\DataTypeTok{prob=}\NormalTok{p\_grid)}
-\NormalTok{  unstandardized\_posterior \textless{}{-}}\StringTok{ }\NormalTok{likelihood }\OperatorTok{*}\StringTok{ }\NormalTok{prior}
-  \KeywordTok{tibble}\NormalTok{(}\DataTypeTok{Pwater =}\NormalTok{ p\_grid,}
-         \DataTypeTok{Posterior =}\NormalTok{ unstandardized\_posterior }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(unstandardized\_posterior),}
-         \DataTypeTok{Prior =}\NormalTok{ prior)}
+\NormalTok{probability\_of\_water }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(observations, prior)\{}
+\NormalTok{  p\_grid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\DecValTok{0}\NormalTok{, }\AttributeTok{to=}\DecValTok{1}\NormalTok{, }\AttributeTok{length.out=}\FunctionTok{length}\NormalTok{(prior))}
+\NormalTok{  likelihood }\OtherTok{\textless{}{-}} \FunctionTok{dbinom}\NormalTok{(}\FunctionTok{sum}\NormalTok{(observations }\SpecialCharTok{==} \StringTok{"W"}\NormalTok{), }\AttributeTok{size=}\FunctionTok{length}\NormalTok{(observations), }\AttributeTok{prob=}\NormalTok{p\_grid)}
+\NormalTok{  unstandardized\_posterior }\OtherTok{\textless{}{-}}\NormalTok{ likelihood }\SpecialCharTok{*}\NormalTok{ prior}
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{Pwater =}\NormalTok{ p\_grid,}
+         \AttributeTok{Posterior =}\NormalTok{ unstandardized\_posterior }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(unstandardized\_posterior),}
+         \AttributeTok{Prior =}\NormalTok{ prior)}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
@@ -351,9 +613,9 @@ Recall the globe tossing model from the chapter. Compute and plot the grid appro
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{posterior2M1 \textless{}{-}}\StringTok{ }\KeywordTok{probability\_of\_water}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{), }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{100}\NormalTok{))}
-\KeywordTok{ggplot}\NormalTok{(posterior2M1, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Pwater, }\DataTypeTok{y=}\NormalTok{Posterior)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{()}
+\NormalTok{posterior2M1 }\OtherTok{\textless{}{-}} \FunctionTok{probability\_of\_water}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{100}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(posterior2M1, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Pwater, }\AttributeTok{y=}\NormalTok{Posterior)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
@@ -363,9 +625,9 @@ Recall the globe tossing model from the chapter. Compute and plot the grid appro
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{posterior2M2 \textless{}{-}}\StringTok{ }\KeywordTok{probability\_of\_water}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"L"}\NormalTok{), }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{100}\NormalTok{))}
-\KeywordTok{ggplot}\NormalTok{(posterior2M2, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Pwater, }\DataTypeTok{y=}\NormalTok{Posterior)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{()}
+\NormalTok{posterior2M2 }\OtherTok{\textless{}{-}} \FunctionTok{probability\_of\_water}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"L"}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{100}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(posterior2M2, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Pwater, }\AttributeTok{y=}\NormalTok{Posterior)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
@@ -375,9 +637,9 @@ Recall the globe tossing model from the chapter. Compute and plot the grid appro
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{posterior2M3 \textless{}{-}}\StringTok{ }\KeywordTok{probability\_of\_water}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"L"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"L"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{), }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{100}\NormalTok{))}
-\KeywordTok{ggplot}\NormalTok{(posterior2M3, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Pwater, }\DataTypeTok{y=}\NormalTok{Posterior)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{()}
+\NormalTok{posterior2M3 }\OtherTok{\textless{}{-}} \FunctionTok{probability\_of\_water}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"L"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"L"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{100}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(posterior2M3, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Pwater, }\AttributeTok{y=}\NormalTok{Posterior)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
@@ -391,12 +653,12 @@ Now assume a prior for p that is equal to zero when p\textless0.5 and is a posit
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{p\_grid \textless{}{-}}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DataTypeTok{from=}\DecValTok{0}\NormalTok{, }\DataTypeTok{to=}\DecValTok{1}\NormalTok{, }\DataTypeTok{length.out =} \DecValTok{100}\NormalTok{)}
-\NormalTok{priorM2 \textless{}{-}}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(p\_grid }\OperatorTok{\textgreater{}=}\StringTok{ }\FloatTok{0.5}\NormalTok{)}
+\NormalTok{p\_grid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\DecValTok{0}\NormalTok{, }\AttributeTok{to=}\DecValTok{1}\NormalTok{, }\AttributeTok{length.out =} \DecValTok{100}\NormalTok{)}
+\NormalTok{priorM2 }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(p\_grid }\SpecialCharTok{\textgreater{}=} \FloatTok{0.5}\NormalTok{)}
 
-\NormalTok{posterior2M3 \textless{}{-}}\StringTok{ }\KeywordTok{probability\_of\_water}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"L"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"L"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{), priorM2)}
-\KeywordTok{ggplot}\NormalTok{(posterior2M3, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Pwater, }\DataTypeTok{y=}\NormalTok{Posterior)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{() }
+\NormalTok{posterior2M3 }\OtherTok{\textless{}{-}} \FunctionTok{probability\_of\_water}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"L"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"L"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{), priorM2)}
+\FunctionTok{ggplot}\NormalTok{(posterior2M3, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Pwater, }\AttributeTok{y=}\NormalTok{Posterior)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{() }
 \end{Highlighting}
 \end{Shaded}
 
@@ -633,8 +895,8 @@ After normalization \(Pr(A | test, twins, singleton) \approx 0.5625\) and \(Pr(B
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(tidyverse)}
-\KeywordTok{library}\NormalTok{(rethinking)}
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\FunctionTok{library}\NormalTok{(rethinking)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -643,13 +905,13 @@ After normalization \(Pr(A | test, twins, singleton) \approx 0.5625\) and \(Pr(B
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{p\_grid \textless{}{-}}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DataTypeTok{from=}\DecValTok{0}\NormalTok{, }\DataTypeTok{to=}\DecValTok{1}\NormalTok{, }\DataTypeTok{length.out=}\DecValTok{1000}\NormalTok{)}
-\NormalTok{prior \textless{}{-}}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
-\NormalTok{likelihood \textless{}{-}}\StringTok{ }\KeywordTok{dbinom}\NormalTok{(}\DecValTok{6}\NormalTok{, }\DataTypeTok{size=}\DecValTok{9}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{p\_grid)}
-\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{likelihood }\OperatorTok{*}\StringTok{ }\NormalTok{prior}
-\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{posterior }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(posterior)}
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
-\NormalTok{samples \textless{}{-}}\StringTok{ }\KeywordTok{sample}\NormalTok{(p\_grid, }\DataTypeTok{prob=}\NormalTok{posterior, }\DataTypeTok{size=}\FloatTok{1e4}\NormalTok{, }\DataTypeTok{replace=}\OtherTok{TRUE}\NormalTok{)}
+\NormalTok{p\_grid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\DecValTok{0}\NormalTok{, }\AttributeTok{to=}\DecValTok{1}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{1000}\NormalTok{)}
+\NormalTok{prior }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
+\NormalTok{likelihood }\OtherTok{\textless{}{-}} \FunctionTok{dbinom}\NormalTok{(}\DecValTok{6}\NormalTok{, }\AttributeTok{size=}\DecValTok{9}\NormalTok{, }\AttributeTok{prob=}\NormalTok{p\_grid)}
+\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ likelihood }\SpecialCharTok{*}\NormalTok{ prior}
+\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ posterior }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(posterior)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\NormalTok{samples }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(p\_grid, }\AttributeTok{prob=}\NormalTok{posterior, }\AttributeTok{size=}\FloatTok{1e4}\NormalTok{, }\AttributeTok{replace=}\ConstantTok{TRUE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -661,10 +923,10 @@ How much posterior probability lies below p = 0.2?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =} \FloatTok{0.2}\NormalTok{, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"p below 0.2: \{mean(samples \textless{} 0.2)\}"}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.2}\NormalTok{, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"p below 0.2: \{mean(samples \textless{} 0.2)\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -678,10 +940,10 @@ How much posterior probability lies below p = 0.8?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =} \FloatTok{0.8}\NormalTok{, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"p below 0.8: \{mean(samples \textless{} 0.8)\}"}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.8}\NormalTok{, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"p below 0.8: \{mean(samples \textless{} 0.8)\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -695,10 +957,10 @@ How much posterior probability lies between p = 0.2 and p = 0.8?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.2}\NormalTok{, }\FloatTok{0.8}\NormalTok{), }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"p between 0.2 and 0.8: \{mean(samples \textless{} 0.8 \& samples \textgreater{} 0.2)\}"}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.2}\NormalTok{, }\FloatTok{0.8}\NormalTok{), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"p between 0.2 and 0.8: \{mean(samples \textless{} 0.8 \& samples \textgreater{} 0.2)\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -712,11 +974,11 @@ How much posterior probability lies between p = 0.2 and p = 0.8?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{q20 \textless{}{-}}\StringTok{ }\KeywordTok{quantile}\NormalTok{(samples, }\FloatTok{0.2}\NormalTok{)}
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ q20, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"20\% of the posterior probability lies below \{round(q20, 2)\}"}\NormalTok{))}
+\NormalTok{q20 }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(samples, }\FloatTok{0.2}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ q20, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"20\% of the posterior probability lies below \{round(q20, 2)\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -730,11 +992,11 @@ How much posterior probability lies between p = 0.2 and p = 0.8?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{q80 \textless{}{-}}\StringTok{ }\KeywordTok{quantile}\NormalTok{(samples, }\FloatTok{0.8}\NormalTok{)}
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ q80, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"20\% of the posterior probability lies above \{round(q80, 2)\}"}\NormalTok{))}
+\NormalTok{q80 }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(samples, }\FloatTok{0.8}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ q80, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"20\% of the posterior probability lies above \{round(q80, 2)\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -748,11 +1010,11 @@ Which values of p contain the narrowest interval equal to 66\% of the posterior 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{hpdi66 \textless{}{-}}\StringTok{ }\KeywordTok{HPDI}\NormalTok{(samples, }\FloatTok{0.66}\NormalTok{)}
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ hpdi66, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"Narrowest interval equal to 66\% of the posterior probability is \{round(hpdi66[1], 3)\}..\{round(hpdi66[2], 3)\}"}\NormalTok{))}
+\NormalTok{hpdi66 }\OtherTok{\textless{}{-}} \FunctionTok{HPDI}\NormalTok{(samples, }\FloatTok{0.66}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ hpdi66, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"Narrowest interval equal to 66\% of the posterior probability is \{round(hpdi66[1], 3)\}..\{round(hpdi66[2], 3)\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -766,11 +1028,11 @@ Which values of p contain 66\% of the posterior probability, assuming equal post
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{pi66 \textless{}{-}}\StringTok{ }\KeywordTok{PI}\NormalTok{(samples, }\FloatTok{0.66}\NormalTok{)}
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ pi66, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"66\% of the posterior probability, assuming equal posterior probability are between \{round(pi66[1], 3)\}..\{round(pi66[2], 3)\}"}\NormalTok{))}
+\NormalTok{pi66 }\OtherTok{\textless{}{-}} \FunctionTok{PI}\NormalTok{(samples, }\FloatTok{0.66}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ pi66, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"66\% of the posterior probability, assuming equal posterior probability are between \{round(pi66[1], 3)\}..\{round(pi66[2], 3)\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -784,15 +1046,15 @@ Suppose the globe tossing data had turned out to be 8 water in 15 tosses. Constr
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{p\_grid \textless{}{-}}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DataTypeTok{from=}\DecValTok{0}\NormalTok{, }\DataTypeTok{to=}\DecValTok{1}\NormalTok{, }\DataTypeTok{length.out=}\DecValTok{1000}\NormalTok{)}
-\NormalTok{prior \textless{}{-}}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
-\NormalTok{likelihood \textless{}{-}}\StringTok{ }\KeywordTok{dbinom}\NormalTok{(}\DecValTok{8}\NormalTok{, }\DataTypeTok{size=}\DecValTok{15}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{p\_grid)}
-\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{likelihood }\OperatorTok{*}\StringTok{ }\NormalTok{prior}
-\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{posterior }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(posterior)}
+\NormalTok{p\_grid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\DecValTok{0}\NormalTok{, }\AttributeTok{to=}\DecValTok{1}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{1000}\NormalTok{)}
+\NormalTok{prior }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
+\NormalTok{likelihood }\OtherTok{\textless{}{-}} \FunctionTok{dbinom}\NormalTok{(}\DecValTok{8}\NormalTok{, }\AttributeTok{size=}\DecValTok{15}\NormalTok{, }\AttributeTok{prob=}\NormalTok{p\_grid)}
+\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ likelihood }\SpecialCharTok{*}\NormalTok{ prior}
+\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ posterior }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(posterior)}
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{p\_grid, }\DataTypeTok{y=}\NormalTok{posterior)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{() }\OperatorTok{+}
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle=}\StringTok{"8 water in 15 tosses"}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{p\_grid, }\AttributeTok{y=}\NormalTok{posterior)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle=}\StringTok{"8 water in 15 tosses"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -806,14 +1068,14 @@ Draw 10,000 samples from the grid approximation from above. Then use the samples
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
-\NormalTok{samples \textless{}{-}}\StringTok{ }\KeywordTok{sample}\NormalTok{(p\_grid, }\DataTypeTok{prob=}\NormalTok{posterior, }\DataTypeTok{size=}\FloatTok{1e4}\NormalTok{, }\DataTypeTok{replace=}\OtherTok{TRUE}\NormalTok{)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\NormalTok{samples }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(p\_grid, }\AttributeTok{prob=}\NormalTok{posterior, }\AttributeTok{size=}\FloatTok{1e4}\NormalTok{, }\AttributeTok{replace=}\ConstantTok{TRUE}\NormalTok{)}
 
-\NormalTok{hpdi90 \textless{}{-}}\StringTok{ }\KeywordTok{HPDI}\NormalTok{(samples, }\FloatTok{0.9}\NormalTok{)}
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ hpdi90, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"HPDI 90\% is \{round(hpdi66[1], 3)\}..\{round(hpdi66[2], 3)\}"}\NormalTok{))}
+\NormalTok{hpdi90 }\OtherTok{\textless{}{-}} \FunctionTok{HPDI}\NormalTok{(samples, }\FloatTok{0.9}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ hpdi90, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"HPDI 90\% is \{round(hpdi66[1], 3)\}..\{round(hpdi66[2], 3)\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -827,21 +1089,21 @@ Construct a posterior predictive check for this model and data. This means simul
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{predicted\_water8\_}\DecValTok{15}\NormalTok{ \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{N =} \KeywordTok{rbinom}\NormalTok{(}\KeywordTok{length}\NormalTok{(samples), }\DataTypeTok{size=}\DecValTok{15}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{samples)) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{group\_by}\NormalTok{(N) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{count =} \KeywordTok{n}\NormalTok{(), }\DataTypeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{p =}\NormalTok{ count }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(count))}
+\NormalTok{predicted\_water8\_15 }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{N =} \FunctionTok{rbinom}\NormalTok{(}\FunctionTok{length}\NormalTok{(samples), }\AttributeTok{size=}\DecValTok{15}\NormalTok{, }\AttributeTok{prob=}\NormalTok{samples)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(N) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarize}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{p =}\NormalTok{ count }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(count))}
   
-\NormalTok{p8 \textless{}{-}}\StringTok{ }
-\StringTok{  }\NormalTok{predicted\_water8\_}\DecValTok{15} \OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{filter}\NormalTok{(N }\OperatorTok{==}\StringTok{ }\DecValTok{8}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{pull}\NormalTok{(p)}
+\NormalTok{p8 }\OtherTok{\textless{}{-}} 
+\NormalTok{  predicted\_water8\_15 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(N }\SpecialCharTok{==} \DecValTok{8}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pull}\NormalTok{(p)}
 
-\KeywordTok{ggplot}\NormalTok{(predicted\_water8\_}\DecValTok{15}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{N, }\DataTypeTok{y=}\NormalTok{ p)) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"The probability of observing 8 water in 15 tosses is \{p8\}"}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(predicted\_water8\_15, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{N, }\AttributeTok{y=}\NormalTok{ p)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"The probability of observing 8 water in 15 tosses is \{p8\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -855,21 +1117,21 @@ Using the posterior distribution constructed from the new (8/15) data, now calcu
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{predicted\_water6\_}\DecValTok{9}\NormalTok{ \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{N =} \KeywordTok{rbinom}\NormalTok{(}\KeywordTok{length}\NormalTok{(samples), }\DataTypeTok{size=}\DecValTok{9}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{samples)) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{group\_by}\NormalTok{(N) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{count =} \KeywordTok{n}\NormalTok{(), }\DataTypeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{p =}\NormalTok{ count }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(count))}
+\NormalTok{predicted\_water6\_9 }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{N =} \FunctionTok{rbinom}\NormalTok{(}\FunctionTok{length}\NormalTok{(samples), }\AttributeTok{size=}\DecValTok{9}\NormalTok{, }\AttributeTok{prob=}\NormalTok{samples)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(N) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarize}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{p =}\NormalTok{ count }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(count))}
   
-\NormalTok{p6 \textless{}{-}}\StringTok{ }
-\StringTok{  }\NormalTok{predicted\_water6\_}\DecValTok{9} \OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{filter}\NormalTok{(N }\OperatorTok{==}\StringTok{ }\DecValTok{6}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{pull}\NormalTok{(p)}
+\NormalTok{p6 }\OtherTok{\textless{}{-}} 
+\NormalTok{  predicted\_water6\_9 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(N }\SpecialCharTok{==} \DecValTok{6}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pull}\NormalTok{(p)}
 
-\KeywordTok{ggplot}\NormalTok{(predicted\_water6\_}\DecValTok{9}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{N, }\DataTypeTok{y=}\NormalTok{ p)) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"The probability of observing 6 water in 9 tosses is \{p6\}"}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(predicted\_water6\_9, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{N, }\AttributeTok{y=}\NormalTok{ p)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"The probability of observing 6 water in 9 tosses is \{p6\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -883,15 +1145,15 @@ Start over at 3M1 , but now use a prior that is zero below p = 0.5 and a constan
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{p\_grid \textless{}{-}}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DataTypeTok{from=}\DecValTok{0}\NormalTok{, }\DataTypeTok{to=}\DecValTok{1}\NormalTok{, }\DataTypeTok{length.out=}\DecValTok{1000}\NormalTok{)}
-\NormalTok{prior \textless{}{-}}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(p\_grid }\OperatorTok{\textgreater{}=}\StringTok{ }\FloatTok{0.5}\NormalTok{)}
-\NormalTok{likelihood \textless{}{-}}\StringTok{ }\KeywordTok{dbinom}\NormalTok{(}\DecValTok{8}\NormalTok{, }\DataTypeTok{size=}\DecValTok{15}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{p\_grid)}
-\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{likelihood }\OperatorTok{*}\StringTok{ }\NormalTok{prior}
-\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{posterior }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(posterior)}
+\NormalTok{p\_grid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\DecValTok{0}\NormalTok{, }\AttributeTok{to=}\DecValTok{1}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{1000}\NormalTok{)}
+\NormalTok{prior }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(p\_grid }\SpecialCharTok{\textgreater{}=} \FloatTok{0.5}\NormalTok{)}
+\NormalTok{likelihood }\OtherTok{\textless{}{-}} \FunctionTok{dbinom}\NormalTok{(}\DecValTok{8}\NormalTok{, }\AttributeTok{size=}\DecValTok{15}\NormalTok{, }\AttributeTok{prob=}\NormalTok{p\_grid)}
+\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ likelihood }\SpecialCharTok{*}\NormalTok{ prior}
+\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ posterior }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(posterior)}
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{p\_grid, }\DataTypeTok{y=}\NormalTok{posterior)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{() }\OperatorTok{+}
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle=}\StringTok{"8 water in 15 tosses"}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{p\_grid, }\AttributeTok{y=}\NormalTok{posterior)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle=}\StringTok{"8 water in 15 tosses"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -899,15 +1161,15 @@ Start over at 3M1 , but now use a prior that is zero below p = 0.5 and a constan
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
-\NormalTok{samples \textless{}{-}}\StringTok{ }\KeywordTok{sample}\NormalTok{(p\_grid, }\DataTypeTok{prob=}\NormalTok{posterior, }\DataTypeTok{size=}\FloatTok{1e4}\NormalTok{, }\DataTypeTok{replace=}\OtherTok{TRUE}\NormalTok{)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\NormalTok{samples }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(p\_grid, }\AttributeTok{prob=}\NormalTok{posterior, }\AttributeTok{size=}\FloatTok{1e4}\NormalTok{, }\AttributeTok{replace=}\ConstantTok{TRUE}\NormalTok{)}
 
-\NormalTok{hpdi90 \textless{}{-}}\StringTok{ }\KeywordTok{HPDI}\NormalTok{(samples, }\FloatTok{0.9}\NormalTok{)}
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ hpdi90, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"Remake of 3M2"}\NormalTok{,}
-       \DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"HPDI 90\% is \{round(hpdi66[1], 3)\}..\{round(hpdi66[2], 3)\}"}\NormalTok{))}
+\NormalTok{hpdi90 }\OtherTok{\textless{}{-}} \FunctionTok{HPDI}\NormalTok{(samples, }\FloatTok{0.9}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ hpdi90, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Remake of 3M2"}\NormalTok{,}
+       \AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"HPDI 90\% is \{round(hpdi66[1], 3)\}..\{round(hpdi66[2], 3)\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -915,23 +1177,23 @@ Start over at 3M1 , but now use a prior that is zero below p = 0.5 and a constan
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{predicted\_water8\_}\DecValTok{15}\NormalTok{\_remake \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{N =} \KeywordTok{rbinom}\NormalTok{(}\KeywordTok{length}\NormalTok{(samples), }\DataTypeTok{size=}\DecValTok{15}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{samples)) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{group\_by}\NormalTok{(N) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{count =} \KeywordTok{n}\NormalTok{(), }\DataTypeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{p =}\NormalTok{ count }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(count))}
+\NormalTok{predicted\_water8\_15\_remake }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{N =} \FunctionTok{rbinom}\NormalTok{(}\FunctionTok{length}\NormalTok{(samples), }\AttributeTok{size=}\DecValTok{15}\NormalTok{, }\AttributeTok{prob=}\NormalTok{samples)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(N) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarize}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{p =}\NormalTok{ count }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(count))}
   
-\NormalTok{p8 \textless{}{-}}\StringTok{ }
-\StringTok{  }\NormalTok{predicted\_water8\_}\DecValTok{15}\NormalTok{\_remake }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{filter}\NormalTok{(N }\OperatorTok{==}\StringTok{ }\DecValTok{8}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{pull}\NormalTok{(p)}
+\NormalTok{p8 }\OtherTok{\textless{}{-}} 
+\NormalTok{  predicted\_water8\_15\_remake }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(N }\SpecialCharTok{==} \DecValTok{8}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pull}\NormalTok{(p)}
 
-\KeywordTok{ggplot}\NormalTok{(predicted\_water8\_}\DecValTok{15}\NormalTok{\_remake, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{N, }\DataTypeTok{y=}\NormalTok{ p)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{(}\DataTypeTok{data=}\NormalTok{predicted\_water8\_}\DecValTok{15}\NormalTok{, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"Remake of 3M3"}\NormalTok{,}
-       \DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"The probability of observing 8 water in 15 tosses is \{p8\}"}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(predicted\_water8\_15\_remake, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{N, }\AttributeTok{y=}\NormalTok{ p)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{predicted\_water8\_15, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Remake of 3M3"}\NormalTok{,}
+       \AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"The probability of observing 8 water in 15 tosses is \{p8\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -939,22 +1201,22 @@ Start over at 3M1 , but now use a prior that is zero below p = 0.5 and a constan
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{predicted\_water6\_}\DecValTok{9}\NormalTok{\_remake \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{N =} \KeywordTok{rbinom}\NormalTok{(}\KeywordTok{length}\NormalTok{(samples), }\DataTypeTok{size=}\DecValTok{9}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{samples)) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{group\_by}\NormalTok{(N) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{count =} \KeywordTok{n}\NormalTok{(), }\DataTypeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{p =}\NormalTok{ count }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(count))}
+\NormalTok{predicted\_water6\_9\_remake }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{N =} \FunctionTok{rbinom}\NormalTok{(}\FunctionTok{length}\NormalTok{(samples), }\AttributeTok{size=}\DecValTok{9}\NormalTok{, }\AttributeTok{prob=}\NormalTok{samples)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(N) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarize}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{p =}\NormalTok{ count }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(count))}
   
-\NormalTok{p6 \textless{}{-}}\StringTok{ }
-\StringTok{  }\NormalTok{predicted\_water6\_}\DecValTok{9}\NormalTok{\_remake }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{filter}\NormalTok{(N }\OperatorTok{==}\StringTok{ }\DecValTok{6}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{pull}\NormalTok{(p)}
+\NormalTok{p6 }\OtherTok{\textless{}{-}} 
+\NormalTok{  predicted\_water6\_9\_remake }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(N }\SpecialCharTok{==} \DecValTok{6}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pull}\NormalTok{(p)}
 
-\KeywordTok{ggplot}\NormalTok{(predicted\_water6\_}\DecValTok{9}\NormalTok{\_remake, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{N, }\DataTypeTok{y=}\NormalTok{ p)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{(}\DataTypeTok{data=}\NormalTok{predicted\_water6\_}\DecValTok{9}\NormalTok{, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"The probability of observing 6 water in 9 tosses is \{p6\}"}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(predicted\_water6\_9\_remake, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{N, }\AttributeTok{y=}\NormalTok{ p)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{predicted\_water6\_9, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"The probability of observing 6 water in 9 tosses is \{p6\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -968,27 +1230,27 @@ Suppose you want to estimate the Earth's proportion of water very precisely. Spe
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{true\_proportion \textless{}{-}}\StringTok{ }\FloatTok{0.5}
-\NormalTok{toss\_quantiles \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{tossesN =} \KeywordTok{seq}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{3000}\NormalTok{, }\DataTypeTok{by=}\DecValTok{1}\NormalTok{)) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{lowerN =} \KeywordTok{qbinom}\NormalTok{(}\FloatTok{0.005}\NormalTok{, tossesN, true\_proportion),}
-         \DataTypeTok{upperN =} \KeywordTok{qbinom}\NormalTok{(}\FloatTok{0.995}\NormalTok{, tossesN, true\_proportion),}
-         \DataTypeTok{lowerP =}\NormalTok{ lowerN }\OperatorTok{/}\StringTok{ }\NormalTok{tossesN,}
-         \DataTypeTok{upperP =}\NormalTok{ upperN }\OperatorTok{/}\StringTok{ }\NormalTok{tossesN,}
-         \DataTypeTok{deltaP =}\NormalTok{ upperP }\OperatorTok{{-}}\StringTok{ }\NormalTok{lowerP)}
+\NormalTok{true\_proportion }\OtherTok{\textless{}{-}} \FloatTok{0.5}
+\NormalTok{toss\_quantiles }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{tossesN =} \FunctionTok{seq}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{3000}\NormalTok{, }\AttributeTok{by=}\DecValTok{1}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{lowerN =} \FunctionTok{qbinom}\NormalTok{(}\FloatTok{0.005}\NormalTok{, tossesN, true\_proportion),}
+         \AttributeTok{upperN =} \FunctionTok{qbinom}\NormalTok{(}\FloatTok{0.995}\NormalTok{, tossesN, true\_proportion),}
+         \AttributeTok{lowerP =}\NormalTok{ lowerN }\SpecialCharTok{/}\NormalTok{ tossesN,}
+         \AttributeTok{upperP =}\NormalTok{ upperN }\SpecialCharTok{/}\NormalTok{ tossesN,}
+         \AttributeTok{deltaP =}\NormalTok{ upperP }\SpecialCharTok{{-}}\NormalTok{ lowerP)}
 
-\NormalTok{minimal\_N \textless{}{-}}\StringTok{ }
-\StringTok{  }\NormalTok{toss\_quantiles }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{filter}\NormalTok{(deltaP }\OperatorTok{\textless{}}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{pull}\NormalTok{(tossesN)}
+\NormalTok{minimal\_N }\OtherTok{\textless{}{-}} 
+\NormalTok{  toss\_quantiles }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(deltaP }\SpecialCharTok{\textless{}} \FloatTok{0.05}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pull}\NormalTok{(tossesN)}
 
-\KeywordTok{ggplot}\NormalTok{(toss\_quantiles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{tossesN, }\DataTypeTok{y=}\NormalTok{deltaP)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_hline}\NormalTok{(}\DataTypeTok{yintercept =} \FloatTok{0.05}\NormalTok{, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{scale\_y\_log10}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"Via qbinom"}\NormalTok{,}
-       \DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"For proportion \{true\_proportion\} you need \{minimal\_N\} tosses to get 99\% PI under 0.05"}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(toss\_quantiles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{tossesN, }\AttributeTok{y=}\NormalTok{deltaP)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \FloatTok{0.05}\NormalTok{, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{scale\_y\_log10}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Via qbinom"}\NormalTok{,}
+       \AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"For proportion \{true\_proportion\} you need \{minimal\_N\} tosses to get 99\% PI under 0.05"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -996,30 +1258,30 @@ Suppose you want to estimate the Earth's proportion of water very precisely. Spe
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{simulate\_and\_compute\_PI99 \textless{}{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(tossN, true\_proportion)\{}
-\NormalTok{  simulated\_N \textless{}{-}}\StringTok{ }\KeywordTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, tossN, true\_proportion)}
-\NormalTok{  simulated\_P \textless{}{-}}\StringTok{ }\NormalTok{simulated\_N }\OperatorTok{/}\StringTok{ }\NormalTok{tossN}
-  \KeywordTok{diff}\NormalTok{(rethinking}\OperatorTok{::}\KeywordTok{PI}\NormalTok{(simulated\_P, }\DataTypeTok{prob=}\FloatTok{0.99}\NormalTok{))}
+\NormalTok{simulate\_and\_compute\_PI99 }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(tossN, true\_proportion)\{}
+\NormalTok{  simulated\_N }\OtherTok{\textless{}{-}} \FunctionTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, tossN, true\_proportion)}
+\NormalTok{  simulated\_P }\OtherTok{\textless{}{-}}\NormalTok{ simulated\_N }\SpecialCharTok{/}\NormalTok{ tossN}
+  \FunctionTok{diff}\NormalTok{(rethinking}\SpecialCharTok{::}\FunctionTok{PI}\NormalTok{(simulated\_P, }\AttributeTok{prob=}\FloatTok{0.99}\NormalTok{))}
 \NormalTok{\}}
 
-\NormalTok{true\_proportion \textless{}{-}}\StringTok{ }\FloatTok{0.5}
-\NormalTok{toss\_sims \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{tossesN =} \KeywordTok{seq}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{3000}\NormalTok{, }\DataTypeTok{by=}\DecValTok{1}\NormalTok{)) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{rowwise}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{deltaP =}\KeywordTok{simulate\_and\_compute\_PI99}\NormalTok{(tossesN, true\_proportion))}
+\NormalTok{true\_proportion }\OtherTok{\textless{}{-}} \FloatTok{0.5}
+\NormalTok{toss\_sims }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{tossesN =} \FunctionTok{seq}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{3000}\NormalTok{, }\AttributeTok{by=}\DecValTok{1}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rowwise}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{deltaP =}\FunctionTok{simulate\_and\_compute\_PI99}\NormalTok{(tossesN, true\_proportion))}
 
-\NormalTok{minimal\_N \textless{}{-}}\StringTok{ }
-\StringTok{  }\NormalTok{toss\_sims }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{filter}\NormalTok{(deltaP }\OperatorTok{\textless{}}\StringTok{ }\FloatTok{0.05}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{pull}\NormalTok{(tossesN)}
+\NormalTok{minimal\_N }\OtherTok{\textless{}{-}} 
+\NormalTok{  toss\_sims }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(deltaP }\SpecialCharTok{\textless{}} \FloatTok{0.05}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pull}\NormalTok{(tossesN)}
 
-\KeywordTok{ggplot}\NormalTok{(toss\_sims, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{tossesN, }\DataTypeTok{y=}\NormalTok{deltaP)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_hline}\NormalTok{(}\DataTypeTok{yintercept =} \FloatTok{0.05}\NormalTok{, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{scale\_y\_log10}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"Via rbinom simulations"}\NormalTok{,}
-       \DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"For proportion \{true\_proportion\} you need \{minimal\_N\} tosses to get 99\% PI under 0.05"}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(toss\_sims, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{tossesN, }\AttributeTok{y=}\NormalTok{deltaP)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \FloatTok{0.05}\NormalTok{, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{scale\_y\_log10}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Via rbinom simulations"}\NormalTok{,}
+       \AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"For proportion \{true\_proportion\} you need \{minimal\_N\} tosses to get 99\% PI under 0.05"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1031,7 +1293,7 @@ Suppose you want to estimate the Earth's proportion of water very precisely. Spe
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{data}\NormalTok{(homeworkch3)}
+\FunctionTok{data}\NormalTok{(homeworkch3)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1043,22 +1305,22 @@ Using grid approximation, compute the posterior distribution for the probability
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{birth \textless{}{-}}\StringTok{ }\KeywordTok{c}\NormalTok{(birth1, birth2)}
-\NormalTok{birthN \textless{}{-}}\StringTok{ }\KeywordTok{length}\NormalTok{(birth)}
-\NormalTok{boyN \textless{}{-}}\StringTok{ }\KeywordTok{sum}\NormalTok{(birth)}
+\NormalTok{birth }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(birth1, birth2)}
+\NormalTok{birthN }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(birth)}
+\NormalTok{boyN }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(birth)}
 
-\NormalTok{p\_grid \textless{}{-}}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DataTypeTok{from=}\DecValTok{0}\NormalTok{, }\DataTypeTok{to=}\DecValTok{1}\NormalTok{, }\DataTypeTok{length.out=}\DecValTok{1000}\NormalTok{)}
-\NormalTok{prior \textless{}{-}}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
-\NormalTok{likelihood \textless{}{-}}\StringTok{ }\KeywordTok{dbinom}\NormalTok{(boyN, }\DataTypeTok{size=}\NormalTok{birthN, }\DataTypeTok{prob=}\NormalTok{p\_grid)}
-\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{likelihood }\OperatorTok{*}\StringTok{ }\NormalTok{prior}
-\NormalTok{posterior \textless{}{-}}\StringTok{ }\NormalTok{posterior }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(posterior)}
+\NormalTok{p\_grid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\DecValTok{0}\NormalTok{, }\AttributeTok{to=}\DecValTok{1}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{1000}\NormalTok{)}
+\NormalTok{prior }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
+\NormalTok{likelihood }\OtherTok{\textless{}{-}} \FunctionTok{dbinom}\NormalTok{(boyN, }\AttributeTok{size=}\NormalTok{birthN, }\AttributeTok{prob=}\NormalTok{p\_grid)}
+\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ likelihood }\SpecialCharTok{*}\NormalTok{ prior}
+\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ posterior }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(posterior)}
 
-\NormalTok{boyP \textless{}{-}}\StringTok{ }\NormalTok{p\_grid[}\KeywordTok{which.max}\NormalTok{(posterior)]}
+\NormalTok{boyP }\OtherTok{\textless{}{-}}\NormalTok{ p\_grid[}\FunctionTok{which.max}\NormalTok{(posterior)]}
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{p\_grid, }\DataTypeTok{y=}\NormalTok{posterior)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{()}\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ boyP, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =}\NormalTok{ glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"Mode: \{round(boyP, 3)\}"}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{p\_grid, }\AttributeTok{y=}\NormalTok{posterior)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{()}\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ boyP, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"Mode: \{round(boyP, 3)\}"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1072,23 +1334,23 @@ Using the sample function, draw 10,000 random parameter values from the posterio
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
-\NormalTok{samples \textless{}{-}}\StringTok{ }\KeywordTok{sample}\NormalTok{(p\_grid, }\DataTypeTok{prob=}\NormalTok{posterior, }\DataTypeTok{size=}\FloatTok{1e4}\NormalTok{, }\DataTypeTok{replace=}\OtherTok{TRUE}\NormalTok{)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\NormalTok{samples }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(p\_grid, }\AttributeTok{prob=}\NormalTok{posterior, }\AttributeTok{size=}\FloatTok{1e4}\NormalTok{, }\AttributeTok{replace=}\ConstantTok{TRUE}\NormalTok{)}
 
-\NormalTok{HPDI50 \textless{}{-}}\StringTok{ }\NormalTok{rethinking}\OperatorTok{::}\KeywordTok{HPDI}\NormalTok{(samples, }\DataTypeTok{prob =} \FloatTok{0.5}\NormalTok{)}
-\NormalTok{HPDI89 \textless{}{-}}\StringTok{ }\NormalTok{rethinking}\OperatorTok{::}\KeywordTok{HPDI}\NormalTok{(samples, }\DataTypeTok{prob =} \FloatTok{0.89}\NormalTok{)}
-\NormalTok{HPDI97 \textless{}{-}}\StringTok{ }\NormalTok{rethinking}\OperatorTok{::}\KeywordTok{HPDI}\NormalTok{(samples, }\DataTypeTok{prob =} \FloatTok{0.97}\NormalTok{)}
+\NormalTok{HPDI50 }\OtherTok{\textless{}{-}}\NormalTok{ rethinking}\SpecialCharTok{::}\FunctionTok{HPDI}\NormalTok{(samples, }\AttributeTok{prob =} \FloatTok{0.5}\NormalTok{)}
+\NormalTok{HPDI89 }\OtherTok{\textless{}{-}}\NormalTok{ rethinking}\SpecialCharTok{::}\FunctionTok{HPDI}\NormalTok{(samples, }\AttributeTok{prob =} \FloatTok{0.89}\NormalTok{)}
+\NormalTok{HPDI97 }\OtherTok{\textless{}{-}}\NormalTok{ rethinking}\SpecialCharTok{::}\FunctionTok{HPDI}\NormalTok{(samples, }\AttributeTok{prob =} \FloatTok{0.97}\NormalTok{)}
 
-\NormalTok{all\_HPDI \textless{}{-}}\StringTok{ }\KeywordTok{c}\NormalTok{(HPDI50, HPDI89, HPDI97)}
-\KeywordTok{names}\NormalTok{(all\_HPDI) \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\NormalTok{all\_HPDI }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(HPDI50, HPDI89, HPDI97)}
+\FunctionTok{names}\NormalTok{(all\_HPDI) }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
 
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{40}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ HPDI50, }\DataTypeTok{color=}\StringTok{"green"}\NormalTok{) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ HPDI89, }\DataTypeTok{color=}\StringTok{"blue"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ HPDI97, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{scale\_x\_continuous}\NormalTok{(}\DataTypeTok{breaks =}\NormalTok{ all\_HPDI, }\DataTypeTok{labels =} \KeywordTok{round}\NormalTok{(all\_HPDI, }\DecValTok{3}\NormalTok{))}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{40}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ HPDI50, }\AttributeTok{color=}\StringTok{"green"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ HPDI89, }\AttributeTok{color=}\StringTok{"blue"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ HPDI97, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{breaks =}\NormalTok{ all\_HPDI, }\AttributeTok{labels =} \FunctionTok{round}\NormalTok{(all\_HPDI, }\DecValTok{3}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1102,11 +1364,11 @@ Use rbinom to simulate 10,000 replicates of 200 births. You should end up with 1
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sim\_boys \textless{}{-}}\StringTok{ }\KeywordTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, }\DecValTok{200}\NormalTok{, boyN }\OperatorTok{/}\StringTok{ }\NormalTok{birthN)}
+\NormalTok{sim\_boys }\OtherTok{\textless{}{-}} \FunctionTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, }\DecValTok{200}\NormalTok{, boyN }\SpecialCharTok{/}\NormalTok{ birthN)}
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{sim\_boys)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_density}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ boyN, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{sim\_boys)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_density}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ boyN, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1120,11 +1382,11 @@ Now compare 10,000 counts of boys from 100 simulated first borns only to the num
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sim\_boys \textless{}{-}}\StringTok{ }\KeywordTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, }\DecValTok{100}\NormalTok{, boyN }\OperatorTok{/}\StringTok{ }\NormalTok{birthN)}
+\NormalTok{sim\_boys }\OtherTok{\textless{}{-}} \FunctionTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, }\DecValTok{100}\NormalTok{, boyN }\SpecialCharTok{/}\NormalTok{ birthN)}
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{sim\_boys)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_density}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =} \KeywordTok{sum}\NormalTok{(birth1), }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{sim\_boys)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_density}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FunctionTok{sum}\NormalTok{(birth1), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1138,12 +1400,12 @@ The model assumes that sex of first and second births are independent. To check 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{birth\_after\_girl \textless{}{-}}\StringTok{ }\NormalTok{birth2[birth1 }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{]}
-\NormalTok{sim\_boys \textless{}{-}}\StringTok{ }\KeywordTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, }\KeywordTok{length}\NormalTok{(birth\_after\_girl), boyN }\OperatorTok{/}\StringTok{ }\NormalTok{birthN)}
+\NormalTok{birth\_after\_girl }\OtherTok{\textless{}{-}}\NormalTok{ birth2[birth1 }\SpecialCharTok{==} \DecValTok{0}\NormalTok{]}
+\NormalTok{sim\_boys }\OtherTok{\textless{}{-}} \FunctionTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, }\FunctionTok{length}\NormalTok{(birth\_after\_girl), boyN }\SpecialCharTok{/}\NormalTok{ birthN)}
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{sim\_boys)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_density}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_vline}\NormalTok{(}\DataTypeTok{xintercept =} \KeywordTok{sum}\NormalTok{(birth\_after\_girl), }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{sim\_boys)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_density}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FunctionTok{sum}\NormalTok{(birth\_after\_girl), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1212,16 +1474,16 @@ For the model definition below, simulate observed y values from the prior (not t
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(ggplot2)}
 
-\NormalTok{samples\_N \textless{}{-}}\StringTok{ }\FloatTok{1e4}
-\NormalTok{mu \textless{}{-}}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(samples\_N, }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{)}
-\NormalTok{sigma \textless{}{-}}\StringTok{ }\KeywordTok{rexp}\NormalTok{(samples\_N, }\DecValTok{1}\NormalTok{)}
-\NormalTok{y\_sim \textless{}{-}}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(samples\_N, mu, sigma)}
+\NormalTok{samples\_N }\OtherTok{\textless{}{-}} \FloatTok{1e4}
+\NormalTok{mu }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(samples\_N, }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{)}
+\NormalTok{sigma }\OtherTok{\textless{}{-}} \FunctionTok{rexp}\NormalTok{(samples\_N, }\DecValTok{1}\NormalTok{)}
+\NormalTok{y\_sim }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(samples\_N, mu, sigma)}
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{y\_sim)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{50}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Simulated Y"}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{y\_sim)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Simulated Y"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1235,10 +1497,10 @@ Translate the model just above into a quap formula.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{quap\_formula \textless{}{-}}\StringTok{ }\KeywordTok{alist}\NormalTok{(}
-\NormalTok{  y }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(mu, sigma),}
-\NormalTok{  mu }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{10}\NormalTok{),}
-\NormalTok{  sigma }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{))}
+\NormalTok{quap\_formula }\OtherTok{\textless{}{-}} \FunctionTok{alist}\NormalTok{(}
+\NormalTok{  y }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu, sigma),}
+\NormalTok{  mu }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{10}\NormalTok{),}
+\NormalTok{  sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1294,15 +1556,15 @@ Based on the density plot, I would pick a more conservative prior of \(\sigma \s
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{x \textless{}{-}}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DataTypeTok{length.out=}\DecValTok{100}\NormalTok{)}
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{x, }\DataTypeTok{y=} \KeywordTok{dexp}\NormalTok{(x, }\FloatTok{0.5}\NormalTok{))) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{() }\OperatorTok{+}
-\StringTok{  }\KeywordTok{scale\_x\_continuous}\NormalTok{(}\DataTypeTok{breaks =} \DecValTok{0}\OperatorTok{:}\DecValTok{10}\NormalTok{) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Probability density"}\NormalTok{)}
+\NormalTok{x }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{100}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{x, }\AttributeTok{y=} \FunctionTok{dexp}\NormalTok{(x, }\FloatTok{0.5}\NormalTok{))) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{breaks =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Probability density"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-13-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-21-1.pdf}
 
 \hypertarget{m7-1}{%
 \subsubsection*{4M7}\label{m7-1}}
@@ -1313,34 +1575,34 @@ Refit model m4.3 from the chapter, but omit the mean weight xbar this time. Comp
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# load data again, since it\textquotesingle{}s a long way back}
-\KeywordTok{library}\NormalTok{(rethinking)}
-\KeywordTok{data}\NormalTok{(Howell1); }
-\NormalTok{d \textless{}{-}}\StringTok{ }\NormalTok{Howell1; }
-\NormalTok{d2 \textless{}{-}}\StringTok{ }\NormalTok{d[d}\OperatorTok{$}\NormalTok{age }\OperatorTok{\textgreater{}=}\StringTok{ }\DecValTok{18}\NormalTok{,]}
+\FunctionTok{library}\NormalTok{(rethinking)}
+\FunctionTok{data}\NormalTok{(Howell1); }
+\NormalTok{d }\OtherTok{\textless{}{-}}\NormalTok{ Howell1; }
+\NormalTok{d2 }\OtherTok{\textless{}{-}}\NormalTok{ d[d}\SpecialCharTok{$}\NormalTok{age }\SpecialCharTok{\textgreater{}=} \DecValTok{18}\NormalTok{,]}
 
 \CommentTok{\# define the average weight, x{-}bar}
-\NormalTok{xbar \textless{}{-}}\StringTok{ }\KeywordTok{mean}\NormalTok{(d2}\OperatorTok{$}\NormalTok{weight)}
+\NormalTok{xbar }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(d2}\SpecialCharTok{$}\NormalTok{weight)}
 \CommentTok{\# fit model}
 
-\NormalTok{m4\_3c \textless{}{-}}\StringTok{ }\KeywordTok{quap}\NormalTok{(}
-  \KeywordTok{alist}\NormalTok{(}
-\NormalTok{    height }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(mu, sigma),}
-\NormalTok{    mu \textless{}{-}}\StringTok{ }\NormalTok{a }\OperatorTok{+}\StringTok{ }\NormalTok{b }\OperatorTok{*}\StringTok{ }\NormalTok{(weight }\OperatorTok{{-}}\StringTok{ }\NormalTok{xbar),}
-\NormalTok{    a }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{178}\NormalTok{, }\DecValTok{20}\NormalTok{) ,}
-\NormalTok{    b }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dlnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{) ,}
-\NormalTok{    sigma }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) , }
-  \DataTypeTok{data=}\NormalTok{d2)}
+\NormalTok{m4\_3c }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
+  \FunctionTok{alist}\NormalTok{(}
+\NormalTok{    height }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu, sigma),}
+\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ b }\SpecialCharTok{*}\NormalTok{ (weight }\SpecialCharTok{{-}}\NormalTok{ xbar),}
+\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{178}\NormalTok{, }\DecValTok{20}\NormalTok{) ,}
+\NormalTok{    b }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dlnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{) ,}
+\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) , }
+  \AttributeTok{data=}\NormalTok{d2)}
 
-\NormalTok{m4\_}\DecValTok{3}\NormalTok{ \textless{}{-}}\StringTok{ }\KeywordTok{quap}\NormalTok{(}
-  \KeywordTok{alist}\NormalTok{(}
-\NormalTok{    height }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(mu, sigma),}
-\NormalTok{    mu \textless{}{-}}\StringTok{ }\NormalTok{a }\OperatorTok{+}\StringTok{ }\NormalTok{b }\OperatorTok{*}\StringTok{ }\NormalTok{weight,}
-\NormalTok{    a }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{178}\NormalTok{, }\DecValTok{20}\NormalTok{) ,}
-\NormalTok{    b }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dlnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{) ,}
-\NormalTok{    sigma }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) , }
-  \DataTypeTok{data=}\NormalTok{d2)}
+\NormalTok{m4\_3 }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
+  \FunctionTok{alist}\NormalTok{(}
+\NormalTok{    height }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu, sigma),}
+\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ b }\SpecialCharTok{*}\NormalTok{ weight,}
+\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{178}\NormalTok{, }\DecValTok{20}\NormalTok{) ,}
+\NormalTok{    b }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dlnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{) ,}
+\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) , }
+  \AttributeTok{data=}\NormalTok{d2)}
 
-\KeywordTok{precis}\NormalTok{(m4\_}\DecValTok{3}\NormalTok{)}
+\FunctionTok{precis}\NormalTok{(m4\_3)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1353,7 +1615,7 @@ Refit model m4.3 from the chapter, but omit the mean weight xbar this time. Comp
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{precis}\NormalTok{(m4\_3c)}
+\FunctionTok{precis}\NormalTok{(m4\_3c)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1366,7 +1628,7 @@ Refit model m4.3 from the chapter, but omit the mean weight xbar this time. Comp
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{round}\NormalTok{(}\KeywordTok{vcov}\NormalTok{(m4\_}\DecValTok{3}\NormalTok{), }\DecValTok{3}\NormalTok{)}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{vcov}\NormalTok{(m4\_3), }\DecValTok{3}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1379,7 +1641,7 @@ Refit model m4.3 from the chapter, but omit the mean weight xbar this time. Comp
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{round}\NormalTok{(}\KeywordTok{vcov}\NormalTok{(m4\_3c), }\DecValTok{3}\NormalTok{)}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{vcov}\NormalTok{(m4\_3c), }\DecValTok{3}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1392,16 +1654,16 @@ Refit model m4.3 from the chapter, but omit the mean weight xbar this time. Comp
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{post \textless{}{-}}\StringTok{ }\KeywordTok{extract.samples}\NormalTok{(m4\_}\DecValTok{3}\NormalTok{)}
-\NormalTok{a\_map \textless{}{-}}\StringTok{ }\KeywordTok{mean}\NormalTok{(post}\OperatorTok{$}\NormalTok{a)}
-\NormalTok{b\_map \textless{}{-}}\StringTok{ }\KeywordTok{mean}\NormalTok{(post}\OperatorTok{$}\NormalTok{b)}
+\NormalTok{post }\OtherTok{\textless{}{-}} \FunctionTok{extract.samples}\NormalTok{(m4\_3)}
+\NormalTok{a\_map }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(post}\SpecialCharTok{$}\NormalTok{a)}
+\NormalTok{b\_map }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(post}\SpecialCharTok{$}\NormalTok{b)}
 
-\NormalTok{w \textless{}{-}}\StringTok{ }\NormalTok{d2}\OperatorTok{$}\NormalTok{weight}
-\NormalTok{prediction \textless{}{-}}\StringTok{ }\NormalTok{a\_map }\OperatorTok{+}\StringTok{ }\NormalTok{b\_map}\OperatorTok{*}\NormalTok{w}
+\NormalTok{w }\OtherTok{\textless{}{-}}\NormalTok{ d2}\SpecialCharTok{$}\NormalTok{weight}
+\NormalTok{prediction }\OtherTok{\textless{}{-}}\NormalTok{ a\_map }\SpecialCharTok{+}\NormalTok{ b\_map}\SpecialCharTok{*}\NormalTok{w}
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ d2, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{weight, }\DataTypeTok{y=}\NormalTok{height)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{(}\DataTypeTok{data =} \OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{w, }\DataTypeTok{y=}\NormalTok{prediction))}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ d2, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{weight, }\AttributeTok{y=}\NormalTok{height)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data =} \ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{w, }\AttributeTok{y=}\NormalTok{prediction))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1409,20 +1671,20 @@ Refit model m4.3 from the chapter, but omit the mean weight xbar this time. Comp
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{post \textless{}{-}}\StringTok{ }\KeywordTok{extract.samples}\NormalTok{(m4\_3c)}
-\NormalTok{a\_map \textless{}{-}}\StringTok{ }\KeywordTok{mean}\NormalTok{(post}\OperatorTok{$}\NormalTok{a)}
-\NormalTok{b\_map \textless{}{-}}\StringTok{ }\KeywordTok{mean}\NormalTok{(post}\OperatorTok{$}\NormalTok{b)}
+\NormalTok{post }\OtherTok{\textless{}{-}} \FunctionTok{extract.samples}\NormalTok{(m4\_3c)}
+\NormalTok{a\_map }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(post}\SpecialCharTok{$}\NormalTok{a)}
+\NormalTok{b\_map }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(post}\SpecialCharTok{$}\NormalTok{b)}
 
-\NormalTok{w \textless{}{-}}\StringTok{ }\NormalTok{d2}\OperatorTok{$}\NormalTok{weight}
-\NormalTok{prediction \textless{}{-}}\StringTok{ }\NormalTok{a\_map }\OperatorTok{+}\StringTok{ }\NormalTok{b\_map}\OperatorTok{*}\NormalTok{(w }\OperatorTok{{-}}\StringTok{ }\NormalTok{xbar)}
+\NormalTok{w }\OtherTok{\textless{}{-}}\NormalTok{ d2}\SpecialCharTok{$}\NormalTok{weight}
+\NormalTok{prediction }\OtherTok{\textless{}{-}}\NormalTok{ a\_map }\SpecialCharTok{+}\NormalTok{ b\_map}\SpecialCharTok{*}\NormalTok{(w }\SpecialCharTok{{-}}\NormalTok{ xbar)}
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ d2, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{weight, }\DataTypeTok{y=}\NormalTok{height)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{(}\DataTypeTok{data =} \OtherTok{NULL}\NormalTok{, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{w, }\DataTypeTok{y=}\NormalTok{prediction))}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ d2, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{weight, }\AttributeTok{y=}\NormalTok{height)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data =} \ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{w, }\AttributeTok{y=}\NormalTok{prediction))}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-14-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-22-1.pdf}
 
 \hypertarget{m8}{%
 \subsubsection*{4M8}\label{m8}}
@@ -1432,29 +1694,29 @@ In the chapter, we used 15 knots with the cherry blossom spline. Increase the nu
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{data}\NormalTok{(cherry\_blossoms)}
-\NormalTok{d \textless{}{-}}\StringTok{ }\NormalTok{cherry\_blossoms}
-\NormalTok{d2 \textless{}{-}}\StringTok{ }\NormalTok{d[ }\KeywordTok{complete.cases}\NormalTok{(d}\OperatorTok{$}\NormalTok{doy) , ] }\CommentTok{\# complete cases on doy}
-\NormalTok{num\_knots \textless{}{-}}\StringTok{ }\DecValTok{30}
-\NormalTok{knot\_list \textless{}{-}}\StringTok{ }\KeywordTok{quantile}\NormalTok{( d2}\OperatorTok{$}\NormalTok{year , }\DataTypeTok{probs=}\KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DataTypeTok{length.out=}\NormalTok{num\_knots) )}
-\NormalTok{B \textless{}{-}}\StringTok{ }\KeywordTok{bs}\NormalTok{(d2}\OperatorTok{$}\NormalTok{year,}
-        \DataTypeTok{knots=}\NormalTok{knot\_list[}\OperatorTok{{-}}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,num\_knots)],}
-        \DataTypeTok{degree=}\DecValTok{3}\NormalTok{ , }\DataTypeTok{intercept=}\OtherTok{TRUE}\NormalTok{)}
+\FunctionTok{data}\NormalTok{(cherry\_blossoms)}
+\NormalTok{d }\OtherTok{\textless{}{-}}\NormalTok{ cherry\_blossoms}
+\NormalTok{d2 }\OtherTok{\textless{}{-}}\NormalTok{ d[ }\FunctionTok{complete.cases}\NormalTok{(d}\SpecialCharTok{$}\NormalTok{doy) , ] }\CommentTok{\# complete cases on doy}
+\NormalTok{num\_knots }\OtherTok{\textless{}{-}} \DecValTok{30}
+\NormalTok{knot\_list }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{( d2}\SpecialCharTok{$}\NormalTok{year , }\AttributeTok{probs=}\FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\AttributeTok{length.out=}\NormalTok{num\_knots) )}
+\NormalTok{B }\OtherTok{\textless{}{-}} \FunctionTok{bs}\NormalTok{(d2}\SpecialCharTok{$}\NormalTok{year,}
+        \AttributeTok{knots=}\NormalTok{knot\_list[}\SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,num\_knots)],}
+        \AttributeTok{degree=}\DecValTok{3}\NormalTok{ , }\AttributeTok{intercept=}\ConstantTok{TRUE}\NormalTok{)}
 
-\NormalTok{m4}\FloatTok{.7}\NormalTok{\_}\DecValTok{30}\NormalTok{ \textless{}{-}}\StringTok{ }\KeywordTok{quap}\NormalTok{(}
-  \KeywordTok{alist}\NormalTok{(}
-\NormalTok{    D }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{( mu , sigma ) ,}
-\NormalTok{    mu \textless{}{-}}\StringTok{ }\NormalTok{a }\OperatorTok{+}\StringTok{ }\NormalTok{B }\OperatorTok{\%*\%}\StringTok{ }\NormalTok{w ,}
-\NormalTok{    a }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{100}\NormalTok{,}\DecValTok{10}\NormalTok{),}
-\NormalTok{    w }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{10}\NormalTok{),}
-\NormalTok{    sigma }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{)), }
-  \DataTypeTok{data=}\KeywordTok{list}\NormalTok{(}\DataTypeTok{D=}\NormalTok{d2}\OperatorTok{$}\NormalTok{doy, }\DataTypeTok{B=}\NormalTok{B) ,}
-  \DataTypeTok{start=}\KeywordTok{list}\NormalTok{(}\DataTypeTok{w=}\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\KeywordTok{ncol}\NormalTok{(B))))}
+\NormalTok{m4}\FloatTok{.7}\NormalTok{\_30 }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
+  \FunctionTok{alist}\NormalTok{(}
+\NormalTok{    D }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{( mu , sigma ) ,}
+\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ B }\SpecialCharTok{\%*\%}\NormalTok{ w ,}
+\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{100}\NormalTok{,}\DecValTok{10}\NormalTok{),}
+\NormalTok{    w }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{10}\NormalTok{),}
+\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{)), }
+  \AttributeTok{data=}\FunctionTok{list}\NormalTok{(}\AttributeTok{D=}\NormalTok{d2}\SpecialCharTok{$}\NormalTok{doy, }\AttributeTok{B=}\NormalTok{B) ,}
+  \AttributeTok{start=}\FunctionTok{list}\NormalTok{(}\AttributeTok{w=}\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FunctionTok{ncol}\NormalTok{(B))))}
 
-\NormalTok{mu \textless{}{-}}\StringTok{ }\KeywordTok{link}\NormalTok{( m4}\FloatTok{.7}\NormalTok{\_}\DecValTok{30}\NormalTok{ )}
-\NormalTok{mu\_PI \textless{}{-}}\StringTok{ }\KeywordTok{apply}\NormalTok{(mu,}\DecValTok{2}\NormalTok{, PI, }\FloatTok{0.97}\NormalTok{)}
-\KeywordTok{plot}\NormalTok{( d2}\OperatorTok{$}\NormalTok{year , d2}\OperatorTok{$}\NormalTok{doy , }\DataTypeTok{col=}\KeywordTok{col.alpha}\NormalTok{(rangi2,}\FloatTok{0.3}\NormalTok{) , }\DataTypeTok{pch=}\DecValTok{16}\NormalTok{ )}
-\KeywordTok{shade}\NormalTok{( mu\_PI , d2}\OperatorTok{$}\NormalTok{year , }\DataTypeTok{col=}\KeywordTok{col.alpha}\NormalTok{(}\StringTok{"black"}\NormalTok{,}\FloatTok{0.5}\NormalTok{) )}
+\NormalTok{mu }\OtherTok{\textless{}{-}} \FunctionTok{link}\NormalTok{( m4}\FloatTok{.7}\NormalTok{\_30 )}
+\NormalTok{mu\_PI }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(mu,}\DecValTok{2}\NormalTok{, PI, }\FloatTok{0.97}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{( d2}\SpecialCharTok{$}\NormalTok{year , d2}\SpecialCharTok{$}\NormalTok{doy , }\AttributeTok{col=}\FunctionTok{col.alpha}\NormalTok{(rangi2,}\FloatTok{0.3}\NormalTok{) , }\AttributeTok{pch=}\DecValTok{16}\NormalTok{ )}
+\FunctionTok{shade}\NormalTok{( mu\_PI , d2}\SpecialCharTok{$}\NormalTok{year , }\AttributeTok{col=}\FunctionTok{col.alpha}\NormalTok{(}\StringTok{"black"}\NormalTok{,}\FloatTok{0.5}\NormalTok{) )}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1469,21 +1731,21 @@ The weights listed below were recorded in the !Kung census, but heights were not
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{predicted\_weight \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{Individual =} \DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{,}
-         \DataTypeTok{weight =} \KeywordTok{c}\NormalTok{(}\FloatTok{46.95}\NormalTok{, }\FloatTok{43.72}\NormalTok{, }\FloatTok{64.78}\NormalTok{, }\FloatTok{32.59}\NormalTok{, }\FloatTok{54.63}\NormalTok{))}
+\NormalTok{predicted\_weight }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{Individual =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{,}
+         \AttributeTok{weight =} \FunctionTok{c}\NormalTok{(}\FloatTok{46.95}\NormalTok{, }\FloatTok{43.72}\NormalTok{, }\FloatTok{64.78}\NormalTok{, }\FloatTok{32.59}\NormalTok{, }\FloatTok{54.63}\NormalTok{))}
 
 \CommentTok{\# getting sampled means}
-\NormalTok{posterior\_mu \textless{}{-}}\StringTok{ }\KeywordTok{link}\NormalTok{(m4\_3c, }\DataTypeTok{data=}\NormalTok{predicted\_weight)}
+\NormalTok{posterior\_mu }\OtherTok{\textless{}{-}} \FunctionTok{link}\NormalTok{(m4\_3c, }\AttributeTok{data=}\NormalTok{predicted\_weight)}
 
-\NormalTok{predicted\_weight \textless{}{-}}\StringTok{ }\NormalTok{predicted\_weight }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\StringTok{\textasciigrave{}}\DataTypeTok{expected height}\StringTok{\textasciigrave{}}\NormalTok{ =}\StringTok{ }\KeywordTok{apply}\NormalTok{(posterior\_mu, }\DecValTok{2}\NormalTok{, mean), }
-         \DataTypeTok{LowerCI =} \KeywordTok{round}\NormalTok{(}\KeywordTok{apply}\NormalTok{(posterior\_mu, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{), }\DecValTok{2}\NormalTok{),}
-         \DataTypeTok{UpperCI =} \KeywordTok{round}\NormalTok{(}\KeywordTok{apply}\NormalTok{(posterior\_mu, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\DecValTok{1}\OperatorTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{), }\DecValTok{2}\NormalTok{),}
-         \StringTok{\textasciigrave{}}\DataTypeTok{89\% interval}\StringTok{\textasciigrave{}}\NormalTok{ =}\StringTok{ }\NormalTok{glue}\OperatorTok{::}\KeywordTok{glue}\NormalTok{(}\StringTok{"\{LowerCI\}..\{UpperCI\}"}\NormalTok{))  }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{select}\NormalTok{(}\OperatorTok{{-}}\NormalTok{LowerCI, }\OperatorTok{{-}}\NormalTok{UpperCI)}
+\NormalTok{predicted\_weight }\OtherTok{\textless{}{-}}\NormalTok{ predicted\_weight }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{expected height}\StringTok{\textasciigrave{}} \OtherTok{=} \FunctionTok{apply}\NormalTok{(posterior\_mu, }\DecValTok{2}\NormalTok{, mean), }
+         \AttributeTok{LowerCI =} \FunctionTok{round}\NormalTok{(}\FunctionTok{apply}\NormalTok{(posterior\_mu, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{), }\DecValTok{2}\NormalTok{),}
+         \AttributeTok{UpperCI =} \FunctionTok{round}\NormalTok{(}\FunctionTok{apply}\NormalTok{(posterior\_mu, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{), }\DecValTok{2}\NormalTok{),}
+         \StringTok{\textasciigrave{}}\AttributeTok{89\% interval}\StringTok{\textasciigrave{}} \OtherTok{=}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"\{LowerCI\}..\{UpperCI\}"}\NormalTok{))  }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{LowerCI, }\SpecialCharTok{{-}}\NormalTok{UpperCI)}
 
-\NormalTok{knitr}\OperatorTok{::}\KeywordTok{kable}\NormalTok{(predicted\_weight)}
+\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(predicted\_weight)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1519,22 +1781,22 @@ Select out all the rows in the Howell1 data with ages below 18 years of age. If 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{kung\_kids \textless{}{-}}\StringTok{ }\KeywordTok{filter}\NormalTok{(Howell1, age }\OperatorTok{\textless{}}\StringTok{ }\DecValTok{18}\NormalTok{)}
+\NormalTok{kung\_kids }\OtherTok{\textless{}{-}} \FunctionTok{filter}\NormalTok{(Howell1, age }\SpecialCharTok{\textless{}} \DecValTok{18}\NormalTok{)}
 
 \CommentTok{\# define the average weight, x{-}bar}
-\NormalTok{avg\_kid\_weight \textless{}{-}}\StringTok{ }\KeywordTok{mean}\NormalTok{(kung\_kids}\OperatorTok{$}\NormalTok{weight)}
+\NormalTok{avg\_kid\_weight }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(kung\_kids}\SpecialCharTok{$}\NormalTok{weight)}
 
 \CommentTok{\# fit model}
-\NormalTok{kung\_kids\_fit \textless{}{-}}\StringTok{ }\KeywordTok{quap}\NormalTok{(}
-  \KeywordTok{alist}\NormalTok{(}
-\NormalTok{    height }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(mu, sigma),}
-\NormalTok{    mu \textless{}{-}}\StringTok{ }\NormalTok{a }\OperatorTok{+}\StringTok{ }\NormalTok{b }\OperatorTok{*}\StringTok{ }\NormalTok{(weight }\OperatorTok{{-}}\StringTok{ }\NormalTok{avg\_kid\_weight),}
-\NormalTok{    a }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{140}\NormalTok{, }\DecValTok{20}\NormalTok{) ,}
-\NormalTok{    b }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dlnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{) ,}
-\NormalTok{    sigma }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) , }
-  \DataTypeTok{data=}\NormalTok{kung\_kids)}
+\NormalTok{kung\_kids\_fit }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
+  \FunctionTok{alist}\NormalTok{(}
+\NormalTok{    height }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu, sigma),}
+\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ b }\SpecialCharTok{*}\NormalTok{ (weight }\SpecialCharTok{{-}}\NormalTok{ avg\_kid\_weight),}
+\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{140}\NormalTok{, }\DecValTok{20}\NormalTok{) ,}
+\NormalTok{    b }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dlnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{) ,}
+\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) , }
+  \AttributeTok{data=}\NormalTok{kung\_kids)}
 
-\KeywordTok{precis}\NormalTok{(kung\_kids\_fit)}
+\FunctionTok{precis}\NormalTok{(kung\_kids\_fit)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1547,7 +1809,7 @@ Select out all the rows in the Howell1 data with ages below 18 years of age. If 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{b\_mean \textless{}{-}}\StringTok{ }\KeywordTok{precis}\NormalTok{(kung\_kids\_fit)[}\StringTok{\textquotesingle{}b\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}mean\textquotesingle{}}\NormalTok{]}
+\NormalTok{b\_mean }\OtherTok{\textless{}{-}} \FunctionTok{precis}\NormalTok{(kung\_kids\_fit)[}\StringTok{\textquotesingle{}b\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}mean\textquotesingle{}}\NormalTok{]}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1563,26 +1825,26 @@ Select out all the rows in the Howell1 data with ages below 18 years of age. If 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{mean\_estimates \textless{}{-}}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{weight =} \KeywordTok{seq}\NormalTok{(}\KeywordTok{min}\NormalTok{(kung\_kids}\OperatorTok{$}\NormalTok{weight), }\KeywordTok{max}\NormalTok{(kung\_kids}\OperatorTok{$}\NormalTok{weight), }\DataTypeTok{length.out =} \DecValTok{100}\NormalTok{))}
-\NormalTok{sample\_means \textless{}{-}}\StringTok{ }\KeywordTok{link}\NormalTok{(kung\_kids\_fit, mean\_estimates)}
-\NormalTok{mean\_estimates \textless{}{-}}
-\StringTok{  }\NormalTok{mean\_estimates }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{mu =} \KeywordTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, mean),}
-         \DataTypeTok{lowerCI =} \KeywordTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{),}
-         \DataTypeTok{upperCI =} \KeywordTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\DecValTok{1}\OperatorTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{))}
+\NormalTok{mean\_estimates }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{weight =} \FunctionTok{seq}\NormalTok{(}\FunctionTok{min}\NormalTok{(kung\_kids}\SpecialCharTok{$}\NormalTok{weight), }\FunctionTok{max}\NormalTok{(kung\_kids}\SpecialCharTok{$}\NormalTok{weight), }\AttributeTok{length.out =} \DecValTok{100}\NormalTok{))}
+\NormalTok{sample\_means }\OtherTok{\textless{}{-}} \FunctionTok{link}\NormalTok{(kung\_kids\_fit, mean\_estimates)}
+\NormalTok{mean\_estimates }\OtherTok{\textless{}{-}}
+\NormalTok{  mean\_estimates }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{mu =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, mean),}
+         \AttributeTok{lowerCI =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{),}
+         \AttributeTok{upperCI =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
 
-\NormalTok{simulated\_height\_samples \textless{}{-}}\StringTok{ }\KeywordTok{sim}\NormalTok{(kung\_kids\_fit, mean\_estimates)}
-\NormalTok{simulated\_height \textless{}{-}}
-\StringTok{  }\NormalTok{mean\_estimates }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{lowerCI =} \KeywordTok{apply}\NormalTok{(simulated\_height\_samples, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{),}
-         \DataTypeTok{upperCI =} \KeywordTok{apply}\NormalTok{(simulated\_height\_samples, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\DecValTok{1}\OperatorTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{))}
+\NormalTok{simulated\_height\_samples }\OtherTok{\textless{}{-}} \FunctionTok{sim}\NormalTok{(kung\_kids\_fit, mean\_estimates)}
+\NormalTok{simulated\_height }\OtherTok{\textless{}{-}}
+\NormalTok{  mean\_estimates }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{lowerCI =} \FunctionTok{apply}\NormalTok{(simulated\_height\_samples, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{),}
+         \AttributeTok{upperCI =} \FunctionTok{apply}\NormalTok{(simulated\_height\_samples, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
 
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ kung\_kids, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ weight, }\DataTypeTok{y=}\NormalTok{height)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_ribbon}\NormalTok{(}\DataTypeTok{data=}\NormalTok{simulated\_height, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y=}\NormalTok{lowerCI, }\DataTypeTok{ymin=}\NormalTok{lowerCI, }\DataTypeTok{ymax=}\NormalTok{upperCI), }\DataTypeTok{fill=}\StringTok{"blue"}\NormalTok{, }\DataTypeTok{alpha=}\FloatTok{0.5}\NormalTok{)}\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom\_ribbon}\NormalTok{(}\DataTypeTok{data=}\NormalTok{mean\_estimates, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y=}\NormalTok{mu, }\DataTypeTok{ymin=}\NormalTok{lowerCI, }\DataTypeTok{ymax=}\NormalTok{upperCI), }\DataTypeTok{fill=}\StringTok{"blue"}\NormalTok{)}\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{(}\DataTypeTok{data=}\NormalTok{mean\_estimates, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y=}\NormalTok{mu))}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ kung\_kids, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ weight, }\AttributeTok{y=}\NormalTok{height)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{simulated\_height, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{lowerCI, }\AttributeTok{ymin=}\NormalTok{lowerCI, }\AttributeTok{ymax=}\NormalTok{upperCI), }\AttributeTok{fill=}\StringTok{"blue"}\NormalTok{, }\AttributeTok{alpha=}\FloatTok{0.5}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{mean\_estimates, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{mu, }\AttributeTok{ymin=}\NormalTok{lowerCI, }\AttributeTok{ymax=}\NormalTok{upperCI), }\AttributeTok{fill=}\StringTok{"blue"}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{mean\_estimates, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{mu))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1615,24 +1877,24 @@ Suppose a colleague of yours, who works on allometry, glances at the practice pr
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{kung \textless{}{-}}\StringTok{ }
-\StringTok{  }\NormalTok{Howell1 }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{logWeight =} \KeywordTok{log}\NormalTok{(weight))}
+\NormalTok{kung }\OtherTok{\textless{}{-}} 
+\NormalTok{  Howell1 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{logWeight =} \FunctionTok{log}\NormalTok{(weight))}
 
 \CommentTok{\# define the average weight, x{-}bar}
-\NormalTok{avg\_log\_weight \textless{}{-}}\StringTok{ }\KeywordTok{mean}\NormalTok{(kung}\OperatorTok{$}\NormalTok{logWeight)}
+\NormalTok{avg\_log\_weight }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(kung}\SpecialCharTok{$}\NormalTok{logWeight)}
 
 \CommentTok{\# fit model}
-\NormalTok{kung\_fit \textless{}{-}}\StringTok{ }\KeywordTok{quap}\NormalTok{(}
-  \KeywordTok{alist}\NormalTok{(}
-\NormalTok{    height }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(mu, sigma),}
-\NormalTok{    mu \textless{}{-}}\StringTok{ }\NormalTok{a }\OperatorTok{+}\StringTok{ }\NormalTok{b }\OperatorTok{*}\StringTok{ }\NormalTok{(logWeight }\OperatorTok{{-}}\StringTok{ }\NormalTok{avg\_log\_weight),}
-\NormalTok{    a }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{140}\NormalTok{, }\DecValTok{20}\NormalTok{) ,}
-\NormalTok{    b }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dlnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{) ,}
-\NormalTok{    sigma }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) , }
-  \DataTypeTok{data=}\NormalTok{kung)}
+\NormalTok{kung\_fit }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
+  \FunctionTok{alist}\NormalTok{(}
+\NormalTok{    height }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu, sigma),}
+\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ b }\SpecialCharTok{*}\NormalTok{ (logWeight }\SpecialCharTok{{-}}\NormalTok{ avg\_log\_weight),}
+\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{140}\NormalTok{, }\DecValTok{20}\NormalTok{) ,}
+\NormalTok{    b }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dlnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{) ,}
+\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) , }
+  \AttributeTok{data=}\NormalTok{kung)}
 
-\KeywordTok{precis}\NormalTok{(kung\_fit)}
+\FunctionTok{precis}\NormalTok{(kung\_fit)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1666,29 +1928,29 @@ Suppose a colleague of yours, who works on allometry, glances at the practice pr
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{mean\_estimates \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{weight =} \KeywordTok{seq}\NormalTok{(}\KeywordTok{min}\NormalTok{(kung}\OperatorTok{$}\NormalTok{weight), }\KeywordTok{max}\NormalTok{(kung}\OperatorTok{$}\NormalTok{weight), }\DataTypeTok{length.out =} \DecValTok{100}\NormalTok{)) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{logWeight =} \KeywordTok{log}\NormalTok{(weight))}
+\NormalTok{mean\_estimates }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{weight =} \FunctionTok{seq}\NormalTok{(}\FunctionTok{min}\NormalTok{(kung}\SpecialCharTok{$}\NormalTok{weight), }\FunctionTok{max}\NormalTok{(kung}\SpecialCharTok{$}\NormalTok{weight), }\AttributeTok{length.out =} \DecValTok{100}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{logWeight =} \FunctionTok{log}\NormalTok{(weight))}
 
-\NormalTok{sample\_means \textless{}{-}}\StringTok{ }\KeywordTok{link}\NormalTok{(kung\_fit, mean\_estimates)}
-\NormalTok{mean\_estimates \textless{}{-}}
-\StringTok{  }\NormalTok{mean\_estimates }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{mu =} \KeywordTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, mean),}
-         \DataTypeTok{lowerCI =} \KeywordTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{),}
-         \DataTypeTok{upperCI =} \KeywordTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\DecValTok{1}\OperatorTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{))}
+\NormalTok{sample\_means }\OtherTok{\textless{}{-}} \FunctionTok{link}\NormalTok{(kung\_fit, mean\_estimates)}
+\NormalTok{mean\_estimates }\OtherTok{\textless{}{-}}
+\NormalTok{  mean\_estimates }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{mu =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, mean),}
+         \AttributeTok{lowerCI =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{),}
+         \AttributeTok{upperCI =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
 
-\NormalTok{simulated\_height\_samples \textless{}{-}}\StringTok{ }\KeywordTok{sim}\NormalTok{(kung\_fit, mean\_estimates)}
-\NormalTok{simulated\_height \textless{}{-}}
-\StringTok{  }\NormalTok{mean\_estimates }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{lowerCI =} \KeywordTok{apply}\NormalTok{(simulated\_height\_samples, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{),}
-         \DataTypeTok{upperCI =} \KeywordTok{apply}\NormalTok{(simulated\_height\_samples, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\DecValTok{1}\OperatorTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{))}
+\NormalTok{simulated\_height\_samples }\OtherTok{\textless{}{-}} \FunctionTok{sim}\NormalTok{(kung\_fit, mean\_estimates)}
+\NormalTok{simulated\_height }\OtherTok{\textless{}{-}}
+\NormalTok{  mean\_estimates }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{lowerCI =} \FunctionTok{apply}\NormalTok{(simulated\_height\_samples, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{),}
+         \AttributeTok{upperCI =} \FunctionTok{apply}\NormalTok{(simulated\_height\_samples, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
 
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ kung, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ weight, }\DataTypeTok{y=}\NormalTok{height)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_ribbon}\NormalTok{(}\DataTypeTok{data=}\NormalTok{simulated\_height, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y=}\NormalTok{lowerCI, }\DataTypeTok{ymin=}\NormalTok{lowerCI, }\DataTypeTok{ymax=}\NormalTok{upperCI), }\DataTypeTok{fill=}\StringTok{"blue"}\NormalTok{, }\DataTypeTok{alpha=}\FloatTok{0.5}\NormalTok{)}\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom\_ribbon}\NormalTok{(}\DataTypeTok{data=}\NormalTok{mean\_estimates, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y=}\NormalTok{mu, }\DataTypeTok{ymin=}\NormalTok{lowerCI, }\DataTypeTok{ymax=}\NormalTok{upperCI), }\DataTypeTok{fill=}\StringTok{"blue"}\NormalTok{)}\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{(}\DataTypeTok{data=}\NormalTok{mean\_estimates, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y=}\NormalTok{mu))}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ kung, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ weight, }\AttributeTok{y=}\NormalTok{height)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{simulated\_height, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{lowerCI, }\AttributeTok{ymin=}\NormalTok{lowerCI, }\AttributeTok{ymax=}\NormalTok{upperCI), }\AttributeTok{fill=}\StringTok{"blue"}\NormalTok{, }\AttributeTok{alpha=}\FloatTok{0.5}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{mean\_estimates, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{mu, }\AttributeTok{ymin=}\NormalTok{lowerCI, }\AttributeTok{ymax=}\NormalTok{upperCI), }\AttributeTok{fill=}\StringTok{"blue"}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{mean\_estimates, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{mu))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1702,22 +1964,22 @@ Plot the prior predictive distribution for the parabolic polynomial regression m
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{zWeight \textless{}{-}}\StringTok{ }\KeywordTok{c}\NormalTok{(}\KeywordTok{scale}\NormalTok{(kung}\OperatorTok{$}\NormalTok{weight))}
+\NormalTok{zWeight }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FunctionTok{scale}\NormalTok{(kung}\SpecialCharTok{$}\NormalTok{weight))}
 
-\NormalTok{N \textless{}{-}}\StringTok{ }\DecValTok{100}
-\NormalTok{a \textless{}{-}}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(N, }\DecValTok{100}\NormalTok{, }\DecValTok{20}\NormalTok{)}
-\NormalTok{b1 \textless{}{-}}\StringTok{ }\KeywordTok{rlnorm}\NormalTok{(N, }\FloatTok{2.5}\NormalTok{, }\FloatTok{0.5}\NormalTok{)}
-\NormalTok{b2 \textless{}{-}}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(N, }\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{)}
-\NormalTok{x \textless{}{-}}\StringTok{ }\NormalTok{zWeight}
-\NormalTok{x2 \textless{}{-}}\StringTok{ }\NormalTok{zWeight}\OperatorTok{\^{}}\DecValTok{2}
-\KeywordTok{plot}\NormalTok{(}\OtherTok{NULL}\NormalTok{, }\DataTypeTok{xlim=}\KeywordTok{range}\NormalTok{(zWeight), }\DataTypeTok{ylim=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{300}\NormalTok{),}
-    \DataTypeTok{xlab=}\StringTok{"zWeight"}\NormalTok{, }\DataTypeTok{ylab=}\StringTok{"height"}\NormalTok{)}
+\NormalTok{N }\OtherTok{\textless{}{-}} \DecValTok{100}
+\NormalTok{a }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(N, }\DecValTok{100}\NormalTok{, }\DecValTok{20}\NormalTok{)}
+\NormalTok{b1 }\OtherTok{\textless{}{-}} \FunctionTok{rlnorm}\NormalTok{(N, }\FloatTok{2.5}\NormalTok{, }\FloatTok{0.5}\NormalTok{)}
+\NormalTok{b2 }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(N, }\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{)}
+\NormalTok{x }\OtherTok{\textless{}{-}}\NormalTok{ zWeight}
+\NormalTok{x2 }\OtherTok{\textless{}{-}}\NormalTok{ zWeight}\SpecialCharTok{\^{}}\DecValTok{2}
+\FunctionTok{plot}\NormalTok{(}\ConstantTok{NULL}\NormalTok{, }\AttributeTok{xlim=}\FunctionTok{range}\NormalTok{(zWeight), }\AttributeTok{ylim=}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{300}\NormalTok{),}
+    \AttributeTok{xlab=}\StringTok{"zWeight"}\NormalTok{, }\AttributeTok{ylab=}\StringTok{"height"}\NormalTok{)}
 
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{N)\{}
-  \KeywordTok{curve}\NormalTok{( a[i] }\OperatorTok{+}\StringTok{ }\NormalTok{b1[i]}\OperatorTok{*}\NormalTok{x }\OperatorTok{+}\StringTok{ }\NormalTok{b2[i]}\OperatorTok{*}\NormalTok{(x}\OperatorTok{*}\NormalTok{x),}
-  \DataTypeTok{from=}\KeywordTok{min}\NormalTok{(zWeight), }\DataTypeTok{to=}\KeywordTok{max}\NormalTok{(zWeight), }
-  \DataTypeTok{add=}\OtherTok{TRUE}\NormalTok{,}
-  \DataTypeTok{col=}\KeywordTok{col.alpha}\NormalTok{(}\StringTok{"black"}\NormalTok{,}\FloatTok{0.2}\NormalTok{))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{N)\{}
+  \FunctionTok{curve}\NormalTok{( a[i] }\SpecialCharTok{+}\NormalTok{ b1[i]}\SpecialCharTok{*}\NormalTok{x }\SpecialCharTok{+}\NormalTok{ b2[i]}\SpecialCharTok{*}\NormalTok{(x}\SpecialCharTok{*}\NormalTok{x),}
+  \AttributeTok{from=}\FunctionTok{min}\NormalTok{(zWeight), }\AttributeTok{to=}\FunctionTok{max}\NormalTok{(zWeight), }
+  \AttributeTok{add=}\ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{col=}\FunctionTok{col.alpha}\NormalTok{(}\StringTok{"black"}\NormalTok{,}\FloatTok{0.2}\NormalTok{))}
 \NormalTok{\} }
 \end{Highlighting}
 \end{Shaded}
@@ -1732,22 +1994,22 @@ Return to data(cherry\_blossoms) and model the association between blossom date 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sakura \textless{}{-}}\StringTok{ }
-\StringTok{  }\NormalTok{cherry\_blossoms }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{drop\_na}\NormalTok{(doy, temp)}
+\NormalTok{sakura }\OtherTok{\textless{}{-}} 
+\NormalTok{  cherry\_blossoms }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{drop\_na}\NormalTok{(doy, temp)}
 
-\NormalTok{avg\_temp \textless{}{-}}\StringTok{ }\KeywordTok{mean}\NormalTok{(sakura}\OperatorTok{$}\NormalTok{temp)}
+\NormalTok{avg\_temp }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(sakura}\SpecialCharTok{$}\NormalTok{temp)}
 
-\NormalTok{sakura\_fit \textless{}{-}}\StringTok{ }\KeywordTok{quap}\NormalTok{(}
-  \KeywordTok{alist}\NormalTok{(}
-\NormalTok{    doy }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(mu, sigma),}
-\NormalTok{    mu \textless{}{-}}\StringTok{ }\NormalTok{a }\OperatorTok{+}\StringTok{ }\NormalTok{b }\OperatorTok{*}\StringTok{ }\NormalTok{(temp }\OperatorTok{{-}}\StringTok{ }\NormalTok{avg\_temp),}
-\NormalTok{    a }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{75}\NormalTok{, }\DecValTok{30}\NormalTok{), }\CommentTok{\# jan{-}may is about 150 days, so 75±60 is very conservative spring estimate}
-\NormalTok{    b }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\CommentTok{\# we would assume the relationship to be negative, so higher tempratures leading to sooner blooming}
-\NormalTok{    sigma }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{15}\NormalTok{)), }\CommentTok{\# ±30 gives us a month}
-  \DataTypeTok{data=}\NormalTok{sakura)}
+\NormalTok{sakura\_fit }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
+  \FunctionTok{alist}\NormalTok{(}
+\NormalTok{    doy }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu, sigma),}
+\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ b }\SpecialCharTok{*}\NormalTok{ (temp }\SpecialCharTok{{-}}\NormalTok{ avg\_temp),}
+\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{75}\NormalTok{, }\DecValTok{30}\NormalTok{), }\CommentTok{\# jan{-}may is about 150 days, so 75±60 is very conservative spring estimate}
+\NormalTok{    b }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\CommentTok{\# we would assume the relationship to be negative, so higher tempratures leading to sooner blooming}
+\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{15}\NormalTok{)), }\CommentTok{\# ±30 gives us a month}
+  \AttributeTok{data=}\NormalTok{sakura)}
 
-\KeywordTok{precis}\NormalTok{(sakura\_fit)}
+\FunctionTok{precis}\NormalTok{(sakura\_fit)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1760,27 +2022,27 @@ Return to data(cherry\_blossoms) and model the association between blossom date 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{mean\_estimates \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{temp =} \KeywordTok{seq}\NormalTok{(}\KeywordTok{min}\NormalTok{(sakura}\OperatorTok{$}\NormalTok{temp), }\KeywordTok{max}\NormalTok{(sakura}\OperatorTok{$}\NormalTok{temp), }\DataTypeTok{length.out =} \DecValTok{100}\NormalTok{))}
+\NormalTok{mean\_estimates }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{temp =} \FunctionTok{seq}\NormalTok{(}\FunctionTok{min}\NormalTok{(sakura}\SpecialCharTok{$}\NormalTok{temp), }\FunctionTok{max}\NormalTok{(sakura}\SpecialCharTok{$}\NormalTok{temp), }\AttributeTok{length.out =} \DecValTok{100}\NormalTok{))}
 
-\NormalTok{sample\_means \textless{}{-}}\StringTok{ }\KeywordTok{link}\NormalTok{(sakura\_fit, mean\_estimates)}
-\NormalTok{mean\_estimates \textless{}{-}}
-\StringTok{  }\NormalTok{mean\_estimates }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{mu =} \KeywordTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, mean),}
-         \DataTypeTok{lowerCI =} \KeywordTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{),}
-         \DataTypeTok{upperCI =} \KeywordTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\DecValTok{1}\OperatorTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{))}
+\NormalTok{sample\_means }\OtherTok{\textless{}{-}} \FunctionTok{link}\NormalTok{(sakura\_fit, mean\_estimates)}
+\NormalTok{mean\_estimates }\OtherTok{\textless{}{-}}
+\NormalTok{  mean\_estimates }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{mu =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, mean),}
+         \AttributeTok{lowerCI =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{),}
+         \AttributeTok{upperCI =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
 
-\NormalTok{simulated\_doy\_samples \textless{}{-}}\StringTok{ }\KeywordTok{sim}\NormalTok{(sakura\_fit, mean\_estimates)}
-\NormalTok{simulated\_doy \textless{}{-}}
-\StringTok{  }\NormalTok{mean\_estimates }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{lowerCI =} \KeywordTok{apply}\NormalTok{(simulated\_doy\_samples, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{),}
-         \DataTypeTok{upperCI =} \KeywordTok{apply}\NormalTok{(simulated\_doy\_samples, }\DecValTok{2}\NormalTok{, quantile, }\DataTypeTok{probs=}\DecValTok{1}\OperatorTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{))}
+\NormalTok{simulated\_doy\_samples }\OtherTok{\textless{}{-}} \FunctionTok{sim}\NormalTok{(sakura\_fit, mean\_estimates)}
+\NormalTok{simulated\_doy }\OtherTok{\textless{}{-}}
+\NormalTok{  mean\_estimates }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{lowerCI =} \FunctionTok{apply}\NormalTok{(simulated\_doy\_samples, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{),}
+         \AttributeTok{upperCI =} \FunctionTok{apply}\NormalTok{(simulated\_doy\_samples, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
 
-\KeywordTok{ggplot}\NormalTok{(sakura, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ temp, }\DataTypeTok{y=}\NormalTok{doy)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_ribbon}\NormalTok{(}\DataTypeTok{data=}\NormalTok{simulated\_doy, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y=}\NormalTok{lowerCI, }\DataTypeTok{ymin=}\NormalTok{lowerCI, }\DataTypeTok{ymax=}\NormalTok{upperCI), }\DataTypeTok{fill=}\StringTok{"blue"}\NormalTok{, }\DataTypeTok{alpha=}\FloatTok{0.5}\NormalTok{)}\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom\_ribbon}\NormalTok{(}\DataTypeTok{data=}\NormalTok{mean\_estimates, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y=}\NormalTok{mu, }\DataTypeTok{ymin=}\NormalTok{lowerCI, }\DataTypeTok{ymax=}\NormalTok{upperCI), }\DataTypeTok{fill=}\StringTok{"blue"}\NormalTok{)}\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{(}\DataTypeTok{data=}\NormalTok{mean\_estimates, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y=}\NormalTok{mu))}
+\FunctionTok{ggplot}\NormalTok{(sakura, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ temp, }\AttributeTok{y=}\NormalTok{doy)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{simulated\_doy, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{lowerCI, }\AttributeTok{ymin=}\NormalTok{lowerCI, }\AttributeTok{ymax=}\NormalTok{upperCI), }\AttributeTok{fill=}\StringTok{"blue"}\NormalTok{, }\AttributeTok{alpha=}\FloatTok{0.5}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{mean\_estimates, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{mu, }\AttributeTok{ymin=}\NormalTok{lowerCI, }\AttributeTok{ymax=}\NormalTok{upperCI), }\AttributeTok{fill=}\StringTok{"blue"}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{mean\_estimates, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{mu))}
 \end{Highlighting}
 \end{Shaded}
 
