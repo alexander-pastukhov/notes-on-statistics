@@ -194,7 +194,7 @@ When two variables, marriage age and rate in our case, are (almost) perfectly co
 $$D = \beta_A \cdot A + \beta_M \cdot M$$
 because `M = -A` (that's how we generated the data!), we can substitute `-A` for `M`
 $$D = \beta_A \cdot A - \beta_M \cdot A \\
-D = (\beta_A - \beta_M) \cdot A
+D = (\beta_A - \beta_M) \cdot A \\
 D = \beta_A^{true} \cdot A
 $$
 where
