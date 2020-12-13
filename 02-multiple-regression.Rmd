@@ -1,4 +1,4 @@
-# Multiple regression
+# Multiple Regression and Causal Reasoning
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(patchwork)
@@ -6,8 +6,99 @@ library(rethinking)
 library(tidyverse)
 ```
 
-This notes are on Chapter 5 "The Many Variables & The Spurious Waffles", specifically, on section 5.1 "Spurious association". If you are to remember one thing from that chapter, it should be "doing multiple regression is easy, understanding and interpreting it is hard". The relationship between the _marriage age_, _marriage rate_, and _divorce rate_ are both clear and mysterious. On the one hand, everything is correlated with everything.
+This notes are on Chapter 5 "The Many Variables & The Spurious Waffles", specifically, on section 5.1 "Spurious association". If you are to remember one thing from that chapter, it should be "doing multiple regression is easy, understanding and interpreting it is hard".
+## Peering into a black box
+To better understand the relationship between data and statistical analysis on the one hand and DAGs (directed acyclic graphs) on the other hand, I came up with an electric engineering metaphor^[Dear electric engineers, yes, I know that's not quite how it works but it is still a good metaphor!]. Imagine that you have an electric device that you cannot take apart. However, there are certain points where you can connect your multimeter and check whether current flows between these two points. You also have a schematics for the device but you have no idea whether it is accurate. The names of the connector nodes match but _the connectivity_ between them is anybody's guess. So, what do you do? You look at the schematics and identify two nodes where current should _definitely flow_ and you measure whether that is the case. Do you have signal? Good, that means that _at least with respect to the connectivity between these two nodes_ you schematics is not completely wrong. No signal? Sorry, your schematics is no good, find a different one or try making one yourself. Conversely, you can identify two nodes, so that _no current_ should flow between them and measure it _empirically_. No current? Good! Current? Bad, your schematics is wrong.
 
+The relationship between the device and the schematics is that of the large (device) and small (schematics) world. Your job is to iteratively adjust the latter, so that it matches the former. You need to keep prodding the black box until predictions from your schematics start matching the actual readings. Only then you can say that you understand how device works and you can make predictions about what it will do under different conditions. Although testing based on schematics can be automated, generating such schematics is a creating process. It depends on our knowledge about devices of that kind and about individual exposed nodes. 
+
+Hopefully, you can see how it maps on our observational or experimental data (large world, readings from the device) and DAGs (small world, presumed schematics). As a scientist, you _guess_^[If you feel that science is not about guessing, you are wrong and I have Richard Feynman on my side! You always start by guessing a particular law or rule and then use empirical data to check whether your guess was correct. If you made an _educated_ guess, your chances of it being correct are higher, so your job is to study the field and prior work to make your guess as educated as possible. But, at the end, it is still a guess and it can be wrong. Good news, at least in my experience, is that guesses that turn out to be spectacularly wrong are the most informative ones, as they reveal something unexpected and, thus, hitherto unknown about the process.] the causal relationships between individual variables and you draw a schematics for that (a DAG). Using this DAG, you identify pairs of variables that must be dependent or independent _assuming your DAG is correct_ and check the data on whether this is indeed the case. It is? Good, your DAG is not (entirely) wrong! They are not? Bad news, their causal relationship is different from what you (or others in prior work) came up with. You need to modify DAG or draw a completely different one, just like a engineer must modify the schematics.
+
+Note that this process is the opposite to that in a typical multivariate analysis approach using, say, ANOVA. In the latter case, you throw _everything_ together, including some/all interactions between the terms, and try figuring out causal relationship between individual independent and the dependent variable based on magnitude and significance of individual terms. So, _first_ you run the statistical analysis and _then_ you make your inferences about causal relationships. In causal reasoning using DAG, you _first_ formulate causal relationships and _then_ you use statistical analysis to check whether these relationship are correct. The second approach is much more powerful, because you can run ANOVA only once but you can formulate many DAGs that describe your data and test them iteratively, refining your understanding step-by-step. Moreover, ANOVA (or any other regression model like that) is about identifying relationships between invididual independent and the signle dependent variable (individual coefficients tell you how independent variables can be used to predict the dependent). DAG-based analysis allows you to predict and test relationship between pairs of _dependent_ variables as well, decomposing your complex model into _testable_ and _verifyable_ chunks. It is a more involved and time-consuming approach but it gives you much deeper understanding of the process you are styding compared to "throw everything into ANOVA and hope it will magically figure it out".
+
+Moreover, causal calculus via DAGs has another trick up its sleeve. You can use _conditional probabilities_ (see below) to flip the relationship between variables. If two variables are independent, they may be dependent when conditioned on some third variable. Or vice versa, depedent variables can become _conditionally independent_. This means that your predictions about connectivity between pairs of variables can be both more specific (e.g., they are related via a third variable or they both independently cause that third variable) and more testable, as you now have two _opposite_ predictions for the same pair of variables! You can check that current flows when it should (unconditional probability) and _does not flow_ once you condition it on the third variable. Both tests match? DAG is not that bad! One or none match? Back to the drawing board!
+
+## Turning unconditional dependence into conditional independence
+Below, you will see how multiple regression can show conditional independence of two variable in case of the fork DAG in divorce data. However, there is another more general way to understand this concept it terms of conditional probabilities $Pr(M|A)$ and $Pr(D|A)$. For this, it helps to understand condition probabilities as _filtering_ operation. When we compute conditional probability for a _specific_ value of $A$, this means that we slice the data, keeping only whose values of $M$ and $D$ that correspond to that chosen level of $A$. It is easier to understand, if we visualize that conditional-probability-as-filtering in synthetic data. For illustration purposes, I will synthesize divorce data, keeping the relationships but I will space marriage age linearly and generate the data so that there are 20 data points for each age (makes it easier to see and understand).
+```{r, out.width = "100%", fig.align = 'center'}
+set.seed(84321169)
+N <- 180
+sigma_noise <- 0.5
+# we repeat each value of age 10 times to make filtering operation easier to see
+sim_waffles <- tibble(MedianAgeMarriage = rep(seq(-2, 2, length.out=9), 20), 
+                      Divorce = rnorm(N, MedianAgeMarriage, sigma_noise),
+                      Marriage = -rnorm(N, MedianAgeMarriage, sigma_noise))
+
+MD_plot <- 
+  ggplot(data=sim_waffles, aes(x=Marriage, y=Divorce)) + 
+    geom_smooth(method="lm", formula=y~x) + 
+    geom_point() + 
+    xlab("Marriage rate") + 
+    ylab("Divorce rate")
+  
+AD_plot <- 
+  ggplot(data=sim_waffles, aes(x=MedianAgeMarriage, y=Divorce)) + 
+    geom_smooth(method="lm", formula=y~x) + 
+    geom_point() + 
+    xlab("Median age marriage") + 
+    ylab("Divorce rate")
+  
+AM_plot <- 
+  ggplot(data=sim_waffles, aes(x=MedianAgeMarriage, y=Marriage)) + 
+    geom_smooth(method="lm", formula=y~x) + 
+    geom_point() + 
+    xlab("Median age marriage") + 
+    ylab("Marriage rate")
+
+MD_plot | AD_plot | AM_plot
+```
+
+As you can see, all variables being dependent on each other, as in case of the original data. However, let us pick an arbitrary value, say $A=1$^[The data is "standardized", therefore, age of 1 is one standard deviation away from the mean marriage rate.] and see which dots on the left plot will be selected via _filtering_ on that value.
+
+```{r, out.width = "100%", fig.align = 'center' }
+MD_plot <- 
+  ggplot(data=sim_waffles, aes(x=Marriage, y=Divorce)) + 
+    geom_smooth(method="lm", formula=y~x, alpha=0.1) + 
+    geom_point(data=sim_waffles %>% filter(MedianAgeMarriage == 1), color="red") +
+    geom_point(data=sim_waffles %>% filter(MedianAgeMarriage != 1), alpha=0.15) + 
+    xlab("Marriage rate") + 
+    ylab("Divorce rate") 
+AD_plot <- 
+  ggplot(data=sim_waffles, aes(x=MedianAgeMarriage, y=Divorce)) + 
+    geom_smooth(method="lm", formula=y~x) + 
+    geom_point(data=sim_waffles %>% filter(MedianAgeMarriage == 1), color="red") +
+    geom_point(data=sim_waffles %>% filter(MedianAgeMarriage != 1), alpha=0.15) + 
+    xlab("Median age marriage") + 
+    ylab("Divorce rate")
+  
+AM_plot <-
+  ggplot(data=sim_waffles, aes(x=Marriage, y=MedianAgeMarriage)) + 
+    geom_smooth(method="lm", formula=y~x) + 
+    geom_point(data=sim_waffles %>% filter(MedianAgeMarriage == 1), color="red") +
+    geom_point(data=sim_waffles %>% filter(MedianAgeMarriage != 1), alpha=0.15) + 
+    ylab("Median age marriage") + 
+    xlab("Marriage rate") 
+
+MD_A1_plot <- 
+  ggplot(data=sim_waffles %>% filter(MedianAgeMarriage == 1), 
+         aes(x=Marriage, y=Divorce)) + 
+    geom_smooth(method="lm", formula=y~x, color="red") + 
+    geom_point(color="red") +
+    xlab("Marriage rate") + 
+    ylab("Divorce rate") +
+    labs(subtitle = "Pr( |Mariage Age = 1)")
+
+(AD_plot | MD_plot) /
+(MD_A1_plot |AM_plot)
+```
+
+First, take at top-left and bottom-right plots that plot, correspondingly, divorce and marriage rate versus marriage age. Note that I've flipped axes on the bottom-right plot, so that marriage rate is always mapped on x-axis. The _red_ dots in each plot correspond to divorce and marriage rates _given that_ (filtered on) marriage age is 1. The same dots are marked in red in the top-right plot and are plotted separately at the bottom-right. As you can see, the two variables _conditional on A=1_ are uncorrelated. Why? Because both were fully determined by marriage age and any variation (the spread of red dots vertically or horizontally in the top-left and bottom-right plots) was due to noise. Therefore, the plot on the bottom-left effectively plots noise in marriage rate versus noise in divorce rate and, by our synthetic data design, the noise in two variable was independent, hence, lack of correlation.
+
+This opportunity to turn dependence into independence by conditioning two variables on the third is at the heart of causal reasoning^[As you will learn later, the opposite is also true, so you can turn independence into conditional dependence.]. You draw a DAG and if it has a fork in it, you know that _given your educated guess about causal relationship is correct_ (small world!), your data (large world!) should show dependence _and_ conditional independence of the two variables (divorce and marriage rates). What if it does not? E.g., the two variables are always dependent or always independent, conditional or not? As we already discussed above, that just means that your educated guess was wrong and that relationship of the variables is different from how you thought it is. Thus, you need to go back to the drawing board, come up with another DAG, repeat the analysis and see if that new DAG is supported by data. If you have more variables, your DAGs will be more complex but the beauty of such causal reasoning is that you can concentrate on _parts_ of it, picking three variables and seeing whether your guess about these three variables was correct. This way, you can tinker with your causal model part-by-part, instead of hoping that you got _everything_ right on the very first attempt.
+
+## Magic of multiple regression
+
+When reading section 5.1 "Spurious association", I found relationships between the _marriage age_, _marriage rate_, and _divorce rate_ to be both clear and mysterious. On the one hand, everything is correlated with everything.
 ```{r echo=FALSE, out.width = "100%", fig.align = 'center'}
 data(WaffleDivorce)
 waffles <- WaffleDivorce
@@ -35,7 +126,7 @@ AM_plot <-
 
 MD_plot | AD_plot | AM_plot
 ```
-On the other hand, once we fit linear model to predict divorce rate based on both median age marriage and marriage rate, the latter is _clearly_ irrelevant (output of code 5.11 shows that its coefficient is effectively zero, meaning that it is ignored) and, therefore, it has not causal influence of divorce rate.
+On the other hand, once we fit linear model to predict divorce rate based on both median age marriage and marriage rate, the latter is _clearly_ irrelevant (output of code 5.11 shows that its coefficient is effectively zero, meaning that it is ignored) and, therefore, it has no causal influence on divorce rate.
 
 If you are like me^[Don't be like me, be better!], you said "Huh! But how does the model know that?". And, at least for me, explanations in the chapter did not help much. The key figure is 5.4, that shows that (omitting intercept and slope symbols) `median age marriage = marriage rate + *extra information*` but `marriage rate = median age marriage`. In a nutshell, both variables code the same information but there is _more_ of it in median age than in marriage rate, so the latter is ignored. Unfortunately, the answer "but how?" still stands. The figure 5.4, which shows fits on residuals is illustrative, but we do not fit residuals, we fit both variables at the same time _without_ fitting them on each other! Nowhere in the model 5.1.4 do we find 
 $$\mu^{M}_{i} = \alpha_{AM} + \beta_{AM} * A_i$$
@@ -43,7 +134,7 @@ $$\mu^{M}_{i} = \alpha_{AM} + \beta_{AM} * A_i$$
 So, what's going on? _How does it know?_ To understand this, let us start with an issue of _multicollinearity_.
 
 ## Multicollinearity
-TO make things easier to understand, let us use simulated data. Imagine that both marriage and divorce rate a perfectly linear dependent on marriage rate, so that $D_i = \beta_A^{true} \cdot A_i$ and $M_i = -A_i$. For the sake of simplicity $\beta_A^{true} = 1$. We pretend our variable are already standardized, so the plots would look something like this.
+To make things easier to understand, let us use simulated data. Imagine that both marriage and divorce rate are almost perfectly linearly dependent on marriage rate, so that $D_i = \beta_A^{true} \cdot A_i$ and $M_i = -A_i$. For the sake of simplicity $\beta_A^{true} = 1$. We pretend our variables are already standardized, so the plots would look something like this.
 ```{r echo=FALSE, out.width = "100%", fig.align = 'center'}
 set.seed(1212)
 N <- nrow(waffles)
@@ -75,7 +166,6 @@ AM_plot <-
 MD_plot | AD_plot | AM_plot
 ```
 The relationship is the same as in the plots above but, as we assumed an almost perfect correlation, there is not much spread around the line. Still, by definition of how we constructed the data, both marriage and divorce rate are _caused_ (computed from) median age and marriage rate is never used to compute the divorce rate. What happens if we analyze this simulated data using the same model 5.1.3, will it be able to figure "marriage rate does not matter" again?
-
 ```{r}
 sim_waffles <-
   sim_waffles %>%
@@ -97,9 +187,9 @@ sim_waffles_fit <- quap(
 
 precis(sim_waffles_fit)
 ```
-Oops, we broke it! $\beta_M$ is now about `-1.25` rather than zero and $\beta_A$ is around `-0.27` rather than one, as it should. Also note the uncertainty associated with both values, as they both totally overlap with zero (I've made priors for both betas broad, so that they are not pushed towards zero too aggressively). So, the data generation process is the same (`Divorce rate ← Age → Marriage rate`) and the model is the same (prior changes have no actual impact, as you will see below) but the "magic" of inferring the lack of `Divorce rate  → Marriage rate` is gone! The _only_ difference between the two data sets is variance (noise), so let us see how the absence of that extra noise in simulated data breaks the magic.
+Oh no, we broke it! $\beta_M$ is now about `-1.25` rather than zero and $\beta_A$ is around `-0.27` rather than one, as it should. Also note the uncertainty associated with both values, as they both totally overlap with zero^[I've made priors for both betas broad, so that they are not pushed towards zero too aggressively and their uncertainty is more evident]. So, the data generation process is the same (`Divorce rate ← Age → Marriage rate`) and the model is the same (prior changes have no particular impact in this case) but the "magic" of inferring the lack of `Divorce rate  → Marriage rate` is gone! The _only_ difference between the two data sets is extra variance (noise) in marriage rate variable, so let us see how the absence of that extra noise in simulated data breaks the magic.
 
-When two variables, marriage age and rate in our case, are (almost) perfectly correlated, that means that you can use one for another. Thus, when we write^[I've dropped likelihood and variance only to compress formulas and shed unimportant details. Adding them does not change the essence.]
+When two variables, marriage age and rate in our case, are (almost) perfectly correlated, that means that you can substitute one for another. Thus, when we write^[I've dropped likelihood and variance only to compress formulas and shed unimportant details. Adding them does not change the essence.]
 $$D = \beta_A \cdot A + \beta_M \cdot M$$
 because `M = -A` (that's how we generated the data!), we can substitute `-A` for `M`
 $$D = \beta_A \cdot A - \beta_M \cdot A \\
@@ -110,21 +200,20 @@ where
 $$ \beta_A^{true} = (\beta_A - \beta_M)
 $$ 
 
-That last bit is the curse of multicollinearity, because if two variable have _the same_ information, you are, effectively, fitting their _sum_! This is equivalent to fitting the sum^[in our case, the difference, because we defined that `M = -A`] of coefficients times one of the variables (does not matter which one, since they are identical, we used `A` but could have used `M`). If you look at the precis above, you will see exactly that! `bA = -0.27` and `bM = -1.25`, so plugging them in gives us 
+That last bit is the curse of multicollinearity, because if two variable have _the same_ information, you are, effectively, fitting their _sum_! This is equivalent to fitting the sum^[in our case, the difference, because we defined that `M = -A`] of coefficients times one of the variables (does not matter which one, since they are identical, we used `A` but could have used `M`). If you look at the precis output above, you will see exactly that! `bA = -0.27` and `bM = -1.25`, so plugging them in gives us 
 $$ \beta_A^{true} = (\beta_A - \beta_M) = (-0.27 - (-1.25)) = 0.98$$ 
 
-Hey, that is the slope that we used to construct divorce rate, so fitting does work! But what about uncertainty for _individual_ slopes? It stems directly from the fact that $\beta_A^{true} = (\beta_A - \beta_M) = 1$ (it is `1` just in our case, of course), as there are infinite number of numbers whose difference would give 1: `2-1`, `3-2`, `(-200)-(-201)`, `1000.41-999.41`, etc. All of them add up (subtract to) one, so the fitting procedure cannot settle on any specific region for each parameter. Any number will do, as long as the other one differs just by one. This phenomenon of _masked relationship_ is the focus of section 5.2, so you will learn more about it.
+Hey, that is the slope that we used to construct divorce rate, so fitting does work! But what about uncertainty for _individual_ slopes? It stems directly from the fact that $\beta_A^{true} = (\beta_A - \beta_M) = 1$ (it is `1` just in our case, of course), as there are infinite number of pairs of numbers whose difference would give 1: `2-1`, `3-2`, `(-200)-(-201)`, `1000.41-999.41`, etc. All of them add up (subtract to) one, so the fitting procedure cannot settle on any specific region for each parameter and any specific pair of values. Any number will do, as long as the _other one_ differs by one. This phenomenon of _masked relationship_ is the focus of section 5.2, so you will learn more about it soon.
 
 ## Back to spurious association
-Above, you have learned that if two variable have the same information, you can only fit _both_ of them but cannot get individual slopes But wasn't that the case for real data we started with? Marriage age and rate _are_ correlated, so why did it fit one (age) and not their sum? The answer is _extra noise_. In the real data marriage rate is age _plus some noise_: $M = -(A + \epsilon)$, where $\epsilon$ is traditionally used for "some noise". For the same of simplicity we assume that it is symmetric, so the observed standardized marriage can be above or below its true value. How does that change our linear model for divorce rate?
+Above, you have learned that if two variable have the same information, you can only fit _both_ of them but cannot get individual slopes. But wasn't that the case for real data we started with? Marriage age and rate _are_ correlated, so why fitting used one (age) and not their sum? The answer is _extra noise_ in marriage rate. In the real data marriage rate is age _plus some noise_: $M = -(A + \epsilon)$, where $\epsilon$ is traditionally used to denote "some noise". How does that change our linear model for divorce rate?
 $$
 D = \beta_A \cdot A - \beta_M \cdot A \\
 D = \beta_A \cdot A - \beta_M (A + \epsilon) \\
 D = (\beta_A  - \beta_M ) \cdot A - \beta_M \cdot \epsilon
 $$
 
-By definition, $\epsilon$ is _pure noise_ and has zero predictive value with respect to divorce rate, so we would fit it _alone_, we would expect to get a slope near zero (that is your "no significant relationship").
-
+By definition, $\epsilon$ is _pure noise_ and has zero predictive value with respect to divorce rate. This, if we would fit it _alone_, we would expect to get a slope near zero (that is your "no significant relationship").
 ```{r}
 set.seed(1231455)
 sim_waffles <- tibble(MedianAgeMarriage = rnorm(N),
@@ -139,9 +228,9 @@ ggplot(sim_waffles, aes(x=epsilon, y=Divorce)) +
     ylab("Marriage rate")
 ```
 
-But we are not fitting it alone, as the coefficient $\beta_M$ appears at _two_ places:
+But we are not fitting it alone, as the coefficient $\beta_M$ appears at _twice_:
 $$D = (\beta_A  - \beta_M) \cdot A - \beta_M \cdot \epsilon$$
-The latter part, $\beta_M \cdot \epsilon$, pushes $\beta_M$ towards zero (model penalizes residuals due to pure noise). But the former part, $(\beta_A  - \beta_M)$ only needs to add up to $\beta_A^{true}$, thus the closer  $\beta_M$ to zero, the closer is $\beta_A$ to $\beta_A^{true}$. And that how the magic works! If one variable is other variable plus noise, that _plus noise_ induces extra penalty and the only way to reduce residuals is to ignore the noise by setting the slope to zero but, therefore, you ignore the variable as well. You can see how added noise "disambiguates" the causal relationship^[I've used ordinary least squares just to make simulations faster. You will get the same result using Bayesian fittings procedures.].
+The latter part, $\beta_M \cdot \epsilon$, pushes $\beta_M$ towards zero (model ignores pure noise by assigning slope of zero). But the former part, $(\beta_A  - \beta_M)$ only needs to add up to $\beta_A^{true}$, so however we fix $\beta_M$, $\beta_A$ can accommodate. Thus the closer  $\beta_M$ to zero, the closer is $\beta_A$ to $\beta_A^{true}$. And that's how the magic works! If one variable is other variable plus noise, that _plus noise_ induces extra penalty and the only way to reduce residuals is to ignore the noise by setting the slope to zero. Therefore, you ignore the variable as well, because it is merely a noisy twin of a better variable. You can see how added noise "disambiguates" the causal relationship^[I've used ordinary least squares just to make simulations faster. You will get the same result using Bayesian fittings procedures.].
 
 ```{r}
 simulate_waffles <- function(sigma_noise){
@@ -179,5 +268,5 @@ ggplot(simulated_noise, aes(x=epsilon, y=Estimate)) +
 The stripes show uncertainty (estimate ± standard error) and you can appreciate how quickly it is reduced as marriage rate becomes noisier and just how little noise is required for "magic" to start working and converge on the true causal relationships.
 
 ## Warning
-So, a bit of noise will fix everything? Not necessarily! If _both_ marriage age and rate depend on some _third latent variable_, it will depend, for example, on which variable is noisier. The book will continue with this theme, so you will learn more but, in the meantime, the  key take-home message is still "doing multiple regression is easy, understanding and interpreting it is hard".
+So, a bit of noise will fix everything? Not necessarily! If _both_ marriage age and rate depend on some _third latent variable_, it will depend, for example, on which variable is noisier. The book will continue with this theme, so you will learn more but, in the meantime, the key take-home message is still "doing multiple regression is easy, understanding and interpreting it is hard".
 
