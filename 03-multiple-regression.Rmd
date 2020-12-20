@@ -1,0 +1,174 @@
+## Magic of multiple regression
+
+When reading section 5.1 "Spurious association", I found relationships between the _marriage age_, _marriage rate_, and _divorce rate_ to be both clear and mysterious. On the one hand, everything is correlated with everything.
+```{r echo=FALSE, out.width = "100%", fig.align = 'center'}
+data(WaffleDivorce)
+waffles <- WaffleDivorce
+
+MD_plot <- 
+  ggplot(data=waffles, aes(x=Marriage, y=Divorce)) + 
+  geom_smooth(method="lm", formula=y~x) + 
+  geom_point() + 
+  xlab("Marriage rate") + 
+  ylab("Divorce rate")
+
+AD_plot <- 
+  ggplot(data=waffles, aes(x=MedianAgeMarriage, y=Divorce)) + 
+  geom_smooth(method="lm", formula=y~x) + 
+  geom_point() + 
+  xlab("Median age marriage") + 
+  ylab("Divorce rate")
+
+AM_plot <- 
+  ggplot(data=waffles, aes(x=MedianAgeMarriage, y=Marriage)) + 
+  geom_smooth(method="lm", formula=y~x) + 
+  geom_point() + 
+  xlab("Median age marriage") + 
+  ylab("Marriage rate")
+
+MD_plot | AD_plot | AM_plot
+```
+On the other hand, once we fit linear model to predict divorce rate based on both median age marriage and marriage rate, the latter is _clearly_ irrelevant (output of code 5.11 shows that its coefficient is effectively zero, meaning that it is ignored) and, therefore, it has no causal influence on divorce rate.
+
+If you are like me^[Don't be like me, be better!], you said "Huh! But how does the model know that?". And, at least for me, explanations in the chapter did not help much. The key figure is 5.4, that shows that (omitting intercept and slope symbols) `median age marriage = marriage rate + *extra information*` but `marriage rate = median age marriage`. In a nutshell, both variables code the same information but there is _more_ of it in median age than in marriage rate, so the latter is ignored. Unfortunately, the answer "but how?" still stands. The figure 5.4, which shows fits on residuals is illustrative, but we do not fit residuals, we fit both variables at the same time _without_ fitting them on each other! Nowhere in the model 5.1.4 do we find 
+$$\mu^{M}_{i} = \alpha_{AM} + \beta_{AM} * A_i$$
+
+So, what's going on? _How does it know?_ To understand this, let us start with an issue of _multicollinearity_.
+                    
+                    ## Multicollinearity
+                    To make things easier to understand, let us use simulated data. Imagine that both marriage and divorce rate are almost perfectly linearly dependent on marriage rate, so that $D_i = \beta_A^{true} \cdot A_i$ and $M_i = -A_i$. For the sake of simplicity $\beta_A^{true} = 1$. We pretend our variables are already standardized, so the plots would look something like this.
+                    ```{r echo=FALSE, out.width = "100%", fig.align = 'center'}
+                    set.seed(1212)
+                    N <- nrow(waffles)
+                    sim_waffles <- tibble(MedianAgeMarriage = rnorm(N),
+                                          Divorce = rnorm(N, MedianAgeMarriage, 0.1),
+                                          Marriage = -rnorm(N, MedianAgeMarriage, 0.01))
+                    
+                    MD_plot <- 
+                      ggplot(data=sim_waffles, aes(x=Marriage, y=Divorce)) + 
+                      geom_smooth(method="lm", formula=y~x) + 
+                      geom_point() + 
+                      xlab("Marriage rate") + 
+                      ylab("Divorce rate")
+                    
+                    AD_plot <- 
+                      ggplot(data=sim_waffles, aes(x=MedianAgeMarriage, y=Divorce)) + 
+                      geom_smooth(method="lm", formula=y~x) + 
+                      geom_point() + 
+                      xlab("Median age marriage") + 
+                      ylab("Divorce rate")
+                    
+                    AM_plot <- 
+                      ggplot(data=sim_waffles, aes(x=MedianAgeMarriage, y=Marriage)) + 
+                      geom_smooth(method="lm", formula=y~x) + 
+                      geom_point() + 
+                      xlab("Median age marriage") + 
+                      ylab("Marriage rate")
+                    
+                    MD_plot | AD_plot | AM_plot
+                    ```
+                    The relationship is the same as in the plots above but, as we assumed an almost perfect correlation, there is not much spread around the line. Still, by definition of how we constructed the data, both marriage and divorce rate are _caused_ (computed from) median age and marriage rate is never used to compute the divorce rate. What happens if we analyze this simulated data using the same model 5.1.3, will it be able to figure "marriage rate does not matter" again?
+                      ```{r}
+                    sim_waffles <-
+                      sim_waffles %>%
+                      mutate(A = MedianAgeMarriage,
+                             M = Marriage,
+                             D = Divorce)
+                    
+                    sim_waffles_fit <- quap(
+                      alist(
+                        D ~ dnorm(mu , sigma) ,
+                        mu <- a + bM*M + bA*A,
+                        a ~ dnorm(0, 0.2),
+                        bA ~ dnorm(0, 10),
+                        bM ~ dnorm(0, 10),
+                        sigma ~ dexp(1)
+                      ), 
+                      data = sim_waffles,
+                    )
+                    
+                    precis(sim_waffles_fit)
+                    ```
+                    Oh no, we broke it! $\beta_M$ is now about `-1.25` rather than zero and $\beta_A$ is around `-0.27` rather than one, as it should. Also note the uncertainty associated with both values, as they both totally overlap with zero^[I've made priors for both betas broad, so that they are not pushed towards zero too aggressively and their uncertainty is more evident]. So, the data generation process is the same (`Divorce rate ← Age → Marriage rate`) and the model is the same (prior changes have no particular impact in this case) but the "magic" of inferring the lack of `Divorce rate  → Marriage rate` is gone! The _only_ difference between the two data sets is extra variance (noise) in marriage rate variable, so let us see how the absence of that extra noise in simulated data breaks the magic.
+
+When two variables, marriage age and rate in our case, are (almost) perfectly correlated, that means that you can substitute one for another. Thus, when we write^[I've dropped likelihood and variance only to compress formulas and shed unimportant details. Adding them does not change the essence.]
+                    $$D = \beta_A \cdot A + \beta_M \cdot M$$
+                      because `M = -A` (that's how we generated the data!), we can substitute `-A` for `M`
+$$D = \beta_A \cdot A - \beta_M \cdot A \\
+D = (\beta_A - \beta_M) \cdot A \\
+D = \beta_A^{true} \cdot A
+$$
+where
+$$ \beta_A^{true} = (\beta_A - \beta_M)
+$$ 
+
+That last bit is the curse of multicollinearity, because if two variable have _the same_ information, you are, effectively, fitting their _sum_! This is equivalent to fitting the sum^[in our case, the difference, because we defined that `M = -A`] of coefficients times one of the variables (does not matter which one, since they are identical, we used `A` but could have used `M`). If you look at the precis output above, you will see exactly that! `bA = -0.27` and `bM = -1.25`, so plugging them in gives us 
+$$ \beta_A^{true} = (\beta_A - \beta_M) = (-0.27 - (-1.25)) = 0.98$$ 
+
+Hey, that is the slope that we used to construct divorce rate, so fitting does work! But what about uncertainty for _individual_ slopes? It stems directly from the fact that $\beta_A^{true} = (\beta_A - \beta_M) = 1$ (it is `1` just in our case, of course), as there are infinite number of pairs of numbers whose difference would give 1: `2-1`, `3-2`, `(-200)-(-201)`, `1000.41-999.41`, etc. All of them add up (subtract to) one, so the fitting procedure cannot settle on any specific region for each parameter and any specific pair of values. Any number will do, as long as the _other one_ differs by one. This phenomenon of _masked relationship_ is the focus of section 5.2, so you will learn more about it soon.
+
+## Back to spurious association
+Above, you have learned that if two variable have the same information, you can only fit _both_ of them but cannot get individual slopes. But wasn't that the case for real data we started with? Marriage age and rate _are_ correlated, so why fitting used one (age) and not their sum? The answer is _extra noise_ in marriage rate. In the real data marriage rate is age _plus some noise_: $M = -(A + \epsilon)$, where $\epsilon$ is traditionally used to denote "some noise". How does that change our linear model for divorce rate?
+                                          $$
+                                          D = \beta_A \cdot A - \beta_M \cdot A \\
+                                        D = \beta_A \cdot A - \beta_M (A + \epsilon) \\
+                                        D = (\beta_A  - \beta_M ) \cdot A - \beta_M \cdot \epsilon
+                                        $$
+                                          
+                                          By definition, $\epsilon$ is _pure noise_ and has zero predictive value with respect to divorce rate. This, if we would fit it _alone_, we would expect to get a slope near zero (that is your "no significant relationship").
+                                        ```{r}
+                                        set.seed(1231455)
+                                        sim_waffles <- tibble(MedianAgeMarriage = rnorm(N),
+                                                              Divorce = rnorm(N, MedianAgeMarriage, 0.1),
+                                                              Marriage = -rnorm(N, MedianAgeMarriage, 0.01),
+                                                              epsilon = rnorm(N))
+                                        
+                                        ggplot(sim_waffles, aes(x=epsilon, y=Divorce)) + 
+                                          geom_smooth(method="lm", formula=y~x) + 
+                                          geom_point() + 
+                                          xlab(expression(epsilon)) + 
+                                          ylab("Marriage rate")
+                                        ```
+                                        
+                                        But we are not fitting it alone, as the coefficient $\beta_M$ appears at _twice_:
+                                          $$D = (\beta_A  - \beta_M) \cdot A - \beta_M \cdot \epsilon$$
+                                          The latter part, $\beta_M \cdot \epsilon$, pushes $\beta_M$ towards zero (model ignores pure noise by assigning slope of zero). But the former part, $(\beta_A  - \beta_M)$ only needs to add up to $\beta_A^{true}$, so however we fix $\beta_M$, $\beta_A$ can accommodate. Thus the closer  $\beta_M$ to zero, the closer is $\beta_A$ to $\beta_A^{true}$. And that's how the magic works! If one variable is other variable plus noise, that _plus noise_ induces extra penalty and the only way to reduce residuals is to ignore the noise by setting the slope to zero. Therefore, you ignore the variable as well, because it is merely a noisy twin of a better variable. You can see how added noise "disambiguates" the causal relationship^[I've used ordinary least squares just to make simulations faster. You will get the same result using Bayesian fittings procedures.].
+
+```{r}
+simulate_waffles <- function(sigma_noise){
+  # generate same data but for noise in Marraige from Age relationship
+  set.seed(169084)
+  sim_df <- sim_waffles <- tibble(MedianAgeMarriage = rnorm(N),
+                                  Divorce = rnorm(N, MedianAgeMarriage, 0.1),
+                                  Marriage = -rnorm(N, MedianAgeMarriage, sigma_noise))
+  
+  # fit data using OLS and pulling out two slope coefficients
+  lm(Divorce ~ Marriage + MedianAgeMarriage, data=sim_df) %>% 
+    summary() %>%
+    .$coefficients %>%
+    data.frame() %>%
+    rownames_to_column("Variable") %>%
+    slice(-1) %>%
+    mutate(LowerCI = Estimate - Std..Error,
+           UpperCI = Estimate + Std..Error) %>%
+    select(Variable, Estimate, LowerCI, UpperCI)
+}
+
+simulated_noise <- 
+  tibble(epsilon =exp(seq(log(0.001), log(0.3), length.out = 100))) %>%
+  group_by(epsilon) %>%
+  do(simulate_waffles(.$epsilon))
+
+ggplot(simulated_noise, aes(x=epsilon, y=Estimate)) + 
+  geom_ribbon(aes(ymin=LowerCI, ymax=UpperCI, fill=Variable), alpha= 0.5) + 
+  geom_line(aes(color=Variable)) + 
+  scale_x_log10(name=expression(epsilon)) + 
+  ylab("Slope estimate  ± standard error") +
+  labs(subtitle = expression(paste("Marriage = MedianAgeMarriage + Normal(0, ", epsilon, ")")))
+```
+
+The stripes show uncertainty (estimate ± standard error) and you can appreciate how quickly it is reduced as marriage rate becomes noisier and just how little noise is required for "magic" to start working and converge on the true causal relationships.
+
+## Warning
+So, a bit of noise will fix everything? Not necessarily! If _both_ marriage age and rate depend on some _third latent variable_, it will depend, for example, on which variable is noisier. The book will continue with this theme, so you will learn more but, in the meantime, the key take-home message is still "doing multiple regression is easy, understanding and interpreting it is hard".
+
