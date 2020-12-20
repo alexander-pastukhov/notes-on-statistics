@@ -1,12 +1,10 @@
-# Multiple Regression and Causal Reasoning
+# Directed Acyclic Graphs and Causal Reasoning
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(patchwork)
 library(rethinking)
 library(tidyverse)
 ```
-
-This notes are on Chapter 5 "The Many Variables & The Spurious Waffles", specifically, on section 5.1 "Spurious association". If you are to remember one thing from that chapter, it should be "doing multiple regression is easy, understanding and interpreting it is hard".
 
 ## Peering into a black box
 To better understand the relationship between data and statistical analysis on the one hand and DAGs (directed acyclic graphs) on the other hand, I came up with an electric engineering metaphor^[Dear electric engineers, yes, I know that's not quite how it works but it is still a good metaphor!]. Imagine that you have an electric device that you cannot take apart. However, there are certain points where you can connect your multimeter and check whether current flows between these two points. You also have a schematics for the device but you have no idea whether it is accurate. The names of the connector nodes match but _the connectivity_ between them is anybody's guess. So, what do you do? You look at the schematics and identify two nodes where current should _definitely flow_ and you measure whether that is the case. Do you have signal? Good, that means that _at least with respect to the connectivity between these two nodes_ you schematics is not completely wrong. No signal? Sorry, your schematics is no good, find a different one or try making one yourself. Conversely, you can identify two nodes, so that _no current_ should flow between them and measure it _empirically_. No current? Good! Current? Bad, your schematics is wrong.
