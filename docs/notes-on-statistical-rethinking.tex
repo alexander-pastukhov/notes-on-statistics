@@ -5,13 +5,12 @@
 \documentclass[
 ]{book}
 \usepackage{lmodern}
-\usepackage{amsmath}
+\usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
-  \usepackage{amssymb}
 \else % if luatex or xetex
   \usepackage{unicode-math}
   \defaultfontfeatures{Scale=MatchLowercase}
@@ -109,15 +108,12 @@
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{5}
 \usepackage{booktabs}
-\ifluatex
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
 \usepackage[]{natbib}
 \bibliographystyle{apalike}
 
 \title{Notes on and Solutions for Statistical Rethinking}
 \author{Alexander Pastukhov}
-\date{2020-12-13}
+\date{2021-02-01}
 
 \begin{document}
 \maketitle
@@ -129,7 +125,7 @@
 \hypertarget{precis}{%
 \chapter{Precis}\label{precis}}
 
-This is a collection of solutions for exercises but also of notes that attempt to provide further details and intuition for some topics, such as information theory, information criteria, MCMC algorithms, etc.
+This is a collection of notes that attempt to provide further details and intuition for some topics, such as loss functions, information theory, information criteria, MCMC algorithms, etc.
 
 \hypertarget{loss-functions}{%
 \chapter{Loss functions}\label{loss-functions}}
@@ -244,10 +240,8 @@ Later on in the book McElreath will note that erroneously assuming normal distri
 
 In contrast, in frequentist statistics, when you are stating that your observed residuals are a sample from a particular distribution, your actual residuals are used to determine parameters of this distribution. Then, however, you make your inferences using \emph{that distribution} not the residuals themselves. This is a very strong conjecture and probably the biggest leap of faith in frequentist statistics saying ``I know the true distribution''. Problem is, if you got your likelihood function / distribution wrong, your inferences are based on a model that describes \emph{something else} not your data. For example, you have a proportion data but you assume Gaussian distribution for residuals and build a model as if your residuals are always symmetrically distributed (not squashed on one side by floor or celing). That model will not be about your data, it will be about normally distributed \emph{something else}. The numbers for that \emph{something else} may look good (or bad) but they are not the numbers you are interested in. This is a mistake that is remarkably easy to do because computers won't stop you from making it. Think back to Chapter 1: Golems don't care! You can abuse any statistical model/test and they will simply spit out the numbers, even if tests are completely unsuitable for your data. Making sure that distribution is correct and that you are doing the right thing is on you, not the Golem!
 
-\hypertarget{multiple-regression-and-causal-reasoning}{%
-\chapter{Multiple Regression and Causal Reasoning}\label{multiple-regression-and-causal-reasoning}}
-
-This notes are on Chapter 5 ``The Many Variables \& The Spurious Waffles'', specifically, on section 5.1 ``Spurious association''. If you are to remember one thing from that chapter, it should be ``doing multiple regression is easy, understanding and interpreting it is hard''.
+\hypertarget{directed-acyclic-graphs-and-causal-reasoning}{%
+\chapter{Directed Acyclic Graphs and Causal Reasoning}\label{directed-acyclic-graphs-and-causal-reasoning}}
 
 \hypertarget{peering-into-a-black-box}{%
 \section{Peering into a black box}\label{peering-into-a-black-box}}
@@ -269,36 +263,36 @@ Below, you will see how multiple regression can show conditional independence of
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{set.seed}\NormalTok{(}\DecValTok{84321169}\NormalTok{)}
-\NormalTok{N }\OtherTok{\textless{}{-}} \DecValTok{180}
-\NormalTok{sigma\_noise }\OtherTok{\textless{}{-}} \FloatTok{0.5}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{84321169}\NormalTok{)}
+\NormalTok{N \textless{}{-}}\StringTok{ }\DecValTok{180}
+\NormalTok{sigma\_noise \textless{}{-}}\StringTok{ }\FloatTok{0.5}
 \CommentTok{\# we repeat each value of age 10 times to make filtering operation easier to see}
-\NormalTok{sim\_waffles }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{MedianAgeMarriage =} \FunctionTok{rep}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{9}\NormalTok{), }\DecValTok{20}\NormalTok{), }
-                      \AttributeTok{Divorce =} \FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise),}
-                      \AttributeTok{Marriage =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise))}
+\NormalTok{sim\_waffles \textless{}{-}}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{MedianAgeMarriage =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\OperatorTok{{-}}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DataTypeTok{length.out=}\DecValTok{9}\NormalTok{), }\DecValTok{20}\NormalTok{), }
+                      \DataTypeTok{Divorce =} \KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise),}
+                      \DataTypeTok{Marriage =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise))}
 
-\NormalTok{MD\_plot }\OtherTok{\textless{}{-}} 
-  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
-    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+\NormalTok{MD\_plot \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Marriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
   
-\NormalTok{AD\_plot }\OtherTok{\textless{}{-}} 
-  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
-    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+\NormalTok{AD\_plot \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
   
-\NormalTok{AM\_plot }\OtherTok{\textless{}{-}} 
-  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Marriage)) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
-    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
+\NormalTok{AM\_plot \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Marriage)) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
 
-\NormalTok{MD\_plot }\SpecialCharTok{|}\NormalTok{ AD\_plot }\SpecialCharTok{|}\NormalTok{ AM\_plot}
+\NormalTok{MD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{AD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{AM\_plot}
 \end{Highlighting}
 \end{Shaded}
 
@@ -308,40 +302,40 @@ As you can see, all variables being dependent on each other, as in case of the o
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{MD\_plot }\OtherTok{\textless{}{-}} 
-  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x, }\AttributeTok{alpha=}\FloatTok{0.1}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{==} \DecValTok{1}\NormalTok{), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{), }\AttributeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{) }
-\NormalTok{AD\_plot }\OtherTok{\textless{}{-}} 
-  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{==} \DecValTok{1}\NormalTok{), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{), }\AttributeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+\NormalTok{MD\_plot \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Marriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x, }\DataTypeTok{alpha=}\FloatTok{0.1}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{!=}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{) }
+\NormalTok{AD\_plot \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{!=}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
   
-\NormalTok{AM\_plot }\OtherTok{\textless{}{-}}
-  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{MedianAgeMarriage)) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{==} \DecValTok{1}\NormalTok{), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{), }\AttributeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }
+\NormalTok{AM\_plot \textless{}{-}}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Marriage, }\DataTypeTok{y=}\NormalTok{MedianAgeMarriage)) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{!=}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }
 
-\NormalTok{MD\_A1\_plot }\OtherTok{\textless{}{-}} 
-  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{==} \DecValTok{1}\NormalTok{), }
-         \FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\SpecialCharTok{+} 
-    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =} \StringTok{"Pr( |Mariage Age = 1)"}\NormalTok{)}
+\NormalTok{MD\_A1\_plot \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{), }
+         \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Marriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
+\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{) }\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =} \StringTok{"Pr( |Mariage Age = 1)"}\NormalTok{)}
 
-\NormalTok{(AD\_plot }\SpecialCharTok{|}\NormalTok{ MD\_plot) }\SpecialCharTok{/}
-\NormalTok{(MD\_A1\_plot }\SpecialCharTok{|}\NormalTok{AM\_plot)}
+\NormalTok{(AD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{MD\_plot) }\OperatorTok{/}
+\NormalTok{(MD\_A1\_plot }\OperatorTok{|}\NormalTok{AM\_plot)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -351,1715 +345,473 @@ First, take at top-left and bottom-right plots that plot, correspondingly, divor
 
 This opportunity to turn dependence into independence by conditioning two variables on the third is at the heart of causal reasoning\footnote{As you will learn later, the opposite is also true, so you can turn independence into conditional dependence.}. You draw a DAG and if it has a fork in it, you know that \emph{given your educated guess about causal relationship is correct} (small world!), your data (large world!) should show dependence \emph{and} conditional independence of the two variables (divorce and marriage rates). What if it does not? E.g., the two variables are always dependent or always independent, conditional or not? As we already discussed above, that just means that your educated guess was wrong and that relationship of the variables is different from how you thought it is. Thus, you need to go back to the drawing board, come up with another DAG, repeat the analysis and see if that new DAG is supported by data. If you have more variables, your DAGs will be more complex but the beauty of such causal reasoning is that you can concentrate on \emph{parts} of it, picking three variables and seeing whether your guess about these three variables was correct. This way, you can tinker with your causal model part-by-part, instead of hoping that you got \emph{everything} right on the very first attempt.
 
-\hypertarget{magic-of-multiple-regression}{%
-\section{Magic of multiple regression}\label{magic-of-multiple-regression}}
+\hypertarget{collider-bias}{%
+\chapter{Collider bias}\label{collider-bias}}
+
+This notes are on Chapter 5 ``The Many Variables \& The Spurious Waffles'', specifically, on section 5.1 ``Spurious association''. If you are to remember one thing from that chapter, it should be ``doing multiple regression is easy, understanding and interpreting it is hard''. As you will see below, fully understanding relationship between variables is complicate even when we are working with a minimal multiple regression with just two predictors.
 
 When reading section 5.1 ``Spurious association'', I found relationships between the \emph{marriage age}, \emph{marriage rate}, and \emph{divorce rate} to be both clear and mysterious. On the one hand, everything is correlated with everything.
 
-\begin{center}\includegraphics[width=1\linewidth]{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-13-1} \end{center}
+\begin{center}\includegraphics[width=1\linewidth]{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-14-1} \end{center}
 
 On the other hand, once we fit linear model to predict divorce rate based on both median age marriage and marriage rate, the latter is \emph{clearly} irrelevant (output of code 5.11 shows that its coefficient is effectively zero, meaning that it is ignored) and, therefore, it has no causal influence on divorce rate.
 
-If you are like me\footnote{Don't be like me, be better!}, you said ``Huh! But how does the model know that?''. And, at least for me, explanations in the chapter did not help much. The key figure is 5.4, that shows that (omitting intercept and slope symbols) \texttt{median\ age\ marriage\ =\ marriage\ rate\ +\ *extra\ information*} but \texttt{marriage\ rate\ =\ median\ age\ marriage}. In a nutshell, both variables code the same information but there is \emph{more} of it in median age than in marriage rate, so the latter is ignored. Unfortunately, the answer ``but how?'' still stands. The figure 5.4, which shows fits on residuals is illustrative, but we do not fit residuals, we fit both variables at the same time \emph{without} fitting them on each other! Nowhere in the model 5.1.4 do we find
-\[\mu^{M}_{i} = \alpha_{AM} + \beta_{AM} * A_i\]
+If you are like me\footnote{Don't be like me, be better!}, you said ``Huh! But how does the model know that?''. And, at least for me, explanations in the chapter did not help much. The key figure is 5.4, that shows that (omitting intercept and slope symbols) \texttt{median\ age\ marriage\ =\ marriage\ rate\ +\ *extra\ information*\ +\ noise} but \texttt{marriage\ rate\ =\ median\ age\ marriage\ +\ noise}. In a nutshell, both variables code the same information but marriage rate is a noisier version of it, so it is ignored. Unfortunately, the answer ``but how?'' still stands. The figure 5.4, which shows fits on residuals is illustrative, but we do not fit residuals, we fit both variables at the same time \emph{without} fitting them on each other! Nowhere in the model 5.1.4 do we find \[\mu^{M}_{i} = \alpha_{AM} + \beta_{AM} * A_i\]
 
 So, what's going on? \emph{How does it know?} To understand this, let us start with an issue of \emph{multicollinearity}.
 
 \hypertarget{multicollinearity}{%
 \section{Multicollinearity}\label{multicollinearity}}
 
-To make things easier to understand, let us use simulated data. Imagine that both marriage and divorce rate are almost perfectly linearly dependent on marriage rate, so that \(D_i = \beta_A^{true} \cdot A_i\) and \(M_i = -A_i\). For the sake of simplicity \(\beta_A^{true} = 1\). We pretend our variables are already standardized, so the plots would look something like this.
-
-\begin{center}\includegraphics[width=1\linewidth]{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-14-1} \end{center}
-
-The relationship is the same as in the plots above but, as we assumed an almost perfect correlation, there is not much spread around the line. Still, by definition of how we constructed the data, both marriage and divorce rate are \emph{caused} (computed from) median age and marriage rate is never used to compute the divorce rate. What happens if we analyze this simulated data using the same model 5.1.3, will it be able to figure ``marriage rate does not matter'' again?
+To make things easier to understand, let us use simulated data. Imagine that both marriage and divorce rate are both \emph{caused by} marriage age and are almost perfectly linearly dependent it, so that \(D_i = \beta_A^{true} \cdot A_i\) (for the sake of simplicity \(\beta_A^{true} = -1\)) and \(M_i = -A_i\). The \emph{causal} relationship that we are modeling is called a fork:
+\[Marriage~rate~\leftarrow~Age~of~marriage~\rightarrow~Divorce~rate\].
+We pretend our variables are already standardized, so the plots would look something like this.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sim\_waffles }\OtherTok{\textless{}{-}}
-\NormalTok{  sim\_waffles }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{A =}\NormalTok{ MedianAgeMarriage,}
-         \AttributeTok{M =}\NormalTok{ Marriage,}
-         \AttributeTok{D =}\NormalTok{ Divorce)}
+\KeywordTok{data}\NormalTok{(}\StringTok{"WaffleDivorce"}\NormalTok{)}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1212}\NormalTok{)}
+\NormalTok{N \textless{}{-}}\StringTok{ }\KeywordTok{nrow}\NormalTok{(WaffleDivorce)}
+\NormalTok{sim\_waffles \textless{}{-}}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{MedianAgeMarriage =} \KeywordTok{rnorm}\NormalTok{(N),}
+                      \DataTypeTok{Divorce =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
+                      \DataTypeTok{Marriage =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.01}\NormalTok{))}
 
-\NormalTok{sim\_waffles\_fit }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
-  \FunctionTok{alist}\NormalTok{(}
-\NormalTok{    D }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu , sigma) ,}
-\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ bM}\SpecialCharTok{*}\NormalTok{M }\SpecialCharTok{+}\NormalTok{ bA}\SpecialCharTok{*}\NormalTok{A,}
-\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.2}\NormalTok{),}
-\NormalTok{    bA }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
-\NormalTok{    bM }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
-\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\NormalTok{MD\_plot \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Marriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+
+\NormalTok{AD\_plot \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+
+\NormalTok{AM\_plot \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Marriage)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
+
+\NormalTok{MD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{AD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{AM\_plot}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=1\linewidth]{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-15-1} \end{center}
+
+The relationship is the same as in the plots above but, as we assumed an almost perfect correlation, there is not much spread around the regression line. Still, by definition of \emph{how we constructed the data}, both marriage and divorce rate are \emph{caused} (computed from) median age and, importantly, marriage rate is \emph{never} used to compute the divorce rate. What happens if we analyze this simulated data using the same model 5.1.3, will it be able to figure ``marriage rate does not matter'' again?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sim\_waffles \textless{}{-}}
+\StringTok{  }\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{A =}\NormalTok{ MedianAgeMarriage,}
+         \DataTypeTok{M =}\NormalTok{ Marriage,}
+         \DataTypeTok{D =}\NormalTok{ Divorce)}
+
+\NormalTok{sim\_waffles\_fit \textless{}{-}}\StringTok{ }\KeywordTok{quap}\NormalTok{(}
+  \KeywordTok{alist}\NormalTok{(}
+\NormalTok{    D }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(mu , sigma) ,}
+\NormalTok{    mu \textless{}{-}}\StringTok{ }\NormalTok{a }\OperatorTok{+}\StringTok{ }\NormalTok{bM}\OperatorTok{*}\NormalTok{M }\OperatorTok{+}\StringTok{ }\NormalTok{bA}\OperatorTok{*}\NormalTok{A,}
+\NormalTok{    a }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.2}\NormalTok{),}
+\NormalTok{    bA }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
+\NormalTok{    bM }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
+\NormalTok{    sigma }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{)}
 \NormalTok{  ), }
-  \AttributeTok{data =}\NormalTok{ sim\_waffles,}
+  \DataTypeTok{data =}\NormalTok{ sim\_waffles,}
 \NormalTok{)}
 
-\FunctionTok{precis}\NormalTok{(sim\_waffles\_fit)}
+\KeywordTok{precis}\NormalTok{(sim\_waffles\_fit)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-##               mean          sd        5.5%      94.5%
-## a     -0.002040905 0.012914885 -0.02268138 0.01859958
-## bA    -0.271365691 1.189014206 -2.17164004 1.62890866
-## bM    -1.249741284 1.187251535 -3.14719854 0.64771597
-## sigma  0.090132561 0.008997396  0.07575298 0.10451214
+##              mean          sd        5.5%      94.5%
+## a     0.002034578 0.012914402 -0.01860513 0.02267429
+## bA    0.267403927 1.188973843 -1.63280591 2.16761377
+## bM    1.245792079 1.187211226 -0.65160076 3.14318492
+## sigma 0.090129176 0.008996557  0.07575094 0.10450741
 \end{verbatim}
 
-Oh no, we broke it! \(\beta_M\) is now about \texttt{-1.25} rather than zero and \(\beta_A\) is around \texttt{-0.27} rather than one, as it should. Also note the uncertainty associated with both values, as they both totally overlap with zero\footnote{I've made priors for both betas broad, so that they are not pushed towards zero too aggressively and their uncertainty is more evident}. So, the data generation process is the same (\texttt{Divorce\ rate\ ←\ Age\ →\ Marriage\ rate}) and the model is the same (prior changes have no particular impact in this case) but the ``magic'' of inferring the lack of \texttt{Divorce\ rate\ \ →\ Marriage\ rate} is gone! The \emph{only} difference between the two data sets is extra variance (noise) in marriage rate variable, so let us see how the absence of that extra noise in simulated data breaks the magic.
+Oh no, we broke it! \(\beta_M\) is now about \texttt{1.25} rather than zero and \(\beta_A\) is around \texttt{0.27} rather than \texttt{-1}, as it should. Also note the uncertainty associated with both values, as they both overlap heavily with zero\footnote{I've made priors for both betas broad, so that they are not pushed towards zero too aggressively and uncertainty about them is more evident}. So, the data generation process is the same (\texttt{Divorce\ rate\ ←\ Age\ →\ Marriage\ rate}) and the model is the same (changes to priors have no particular impact in this case) but the ``magic'' of inferring the lack an ``causal arrow'' \texttt{Divorce\ rate\ \ →\ Marriage\ rate} is gone! The \emph{only} difference between the two data sets is extra variance (noise) in marriage rate variable, so let us see how the absence of that extra noise in simulated data breaks the magic.
 
-When two variables, marriage age and rate in our case, are (almost) perfectly correlated, that means that you can substitute one for another. Thus, when we write\footnote{I've dropped likelihood and variance only to compress formulas and shed unimportant details. Adding them does not change the essence.}
-\[D = \beta_A \cdot A + \beta_M \cdot M\]
-because \texttt{M\ =\ -A} (that's how we generated the data!), we can substitute \texttt{-A} for \texttt{M}
-\[D = \beta_A \cdot A - \beta_M \cdot A \\
-D = (\beta_A - \beta_M) \cdot A
-D = \beta_A^{true} \cdot A
-\]
+When two variables, marriage age and rate in our case, are (almost) perfectly correlated (\(M = -A\)), that means that you can substitute one for another. Thus, we can rewrite\footnote{I've dropped likelihood and variance only to compress formulas and shed unimportant details. Adding them does not change the essence.}
+\[D = \beta_A \cdot A + \beta_M \cdot M \\
+D = \beta_A \cdot A + \beta_M \cdot (-A) \\
+D = (\beta_A - \beta_M) \cdot A \\
+D = \beta_A^{true} \cdot A\]
 where
-\[ \beta_A^{true} = (\beta_A - \beta_M)
-\]
+\[ \beta_A^{true} = (\beta_A - \beta_M)\]
 
-That last bit is the curse of multicollinearity, because if two variable have \emph{the same} information, you are, effectively, fitting their \emph{sum}! This is equivalent to fitting the sum\footnote{in our case, the difference, because we defined that \texttt{M\ =\ -A}} of coefficients times one of the variables (does not matter which one, since they are identical, we used \texttt{A} but could have used \texttt{M}). If you look at the precis output above, you will see exactly that! \texttt{bA\ =\ -0.27} and \texttt{bM\ =\ -1.25}, so plugging them in gives us
-\[ \beta_A^{true} = (\beta_A - \beta_M) = (-0.27 - (-1.25)) = 0.98\]
+That last bit is the curse of multicollinearity, because if two variable have \emph{the same} information, you are, effectively, fitting their \emph{sum}! This is equivalent to fitting the sum\footnote{in our case, the difference, because we defined that \texttt{M\ =\ -A}.} of coefficients times one of the variables and does not matter which one, since they are identical. We used \texttt{A} because we know that it causes \texttt{M}. If you look at the precis output above, you will see that we did fit the \(\beta_A^{true}\)! Since \texttt{bA\ =\ 0.27} and \texttt{bM\ =\ 1.25}, so plugging them in gives us
+\[\beta_A^{true} = \beta_A - \beta_M = 0.27 - 1.25 = -0.98\]
 
-Hey, that is the slope that we used to construct divorce rate, so fitting does work! But what about uncertainty for \emph{individual} slopes? It stems directly from the fact that \(\beta_A^{true} = (\beta_A - \beta_M) = 1\) (it is \texttt{1} just in our case, of course), as there are infinite number of pairs of numbers whose difference would give 1: \texttt{2-1}, \texttt{3-2}, \texttt{(-200)-(-201)}, \texttt{1000.41-999.41}, etc. All of them add up (subtract to) one, so the fitting procedure cannot settle on any specific region for each parameter and any specific pair of values. Any number will do, as long as the \emph{other one} differs by one. This phenomenon of \emph{masked relationship} is the focus of section 5.2, so you will learn more about it soon.
-
-\hypertarget{back-to-spurious-association}{%
-\section{Back to spurious association}\label{back-to-spurious-association}}
-
-Above, you have learned that if two variable have the same information, you can only fit \emph{both} of them but cannot get individual slopes. But wasn't that the case for real data we started with? Marriage age and rate \emph{are} correlated, so why fitting used one (age) and not their sum? The answer is \emph{extra noise} in marriage rate. In the real data marriage rate is age \emph{plus some noise}: \(M = -(A + \epsilon)\), where \(\epsilon\) is traditionally used to denote ``some noise''. How does that change our linear model for divorce rate?
-\[
-D = \beta_A \cdot A - \beta_M \cdot A \\
-D = \beta_A \cdot A - \beta_M (A + \epsilon) \\
-D = (\beta_A  - \beta_M ) \cdot A - \beta_M \cdot \epsilon
-\]
-
-By definition, \(\epsilon\) is \emph{pure noise} and has zero predictive value with respect to divorce rate. This, if we would fit it \emph{alone}, we would expect to get a slope near zero (that is your ``no significant relationship'').
+Hey, that is the slope that we used to construct divorce rate, so fitting does work! Moreover, we can see that there is very little uncertainty about \(\beta_A^{true}\)
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1231455}\NormalTok{)}
-\NormalTok{sim\_waffles }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{MedianAgeMarriage =} \FunctionTok{rnorm}\NormalTok{(N),}
-                      \AttributeTok{Divorce =} \FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
-                      \AttributeTok{Marriage =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.01}\NormalTok{),}
-                      \AttributeTok{epsilon =} \FunctionTok{rnorm}\NormalTok{(N))}
+\NormalTok{posterior\_samples \textless{}{-}}\StringTok{ }
+\StringTok{  }\NormalTok{rethinking}\OperatorTok{::}\KeywordTok{extract.samples}\NormalTok{(sim\_waffles\_fit) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{bA\_true =}\NormalTok{ bA }\OperatorTok{{-}}\StringTok{ }\NormalTok{bM)}
 
-\FunctionTok{ggplot}\NormalTok{(sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{epsilon, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
-    \FunctionTok{xlab}\NormalTok{(}\FunctionTok{expression}\NormalTok{(epsilon)) }\SpecialCharTok{+} 
-    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-16-1.pdf}
-
-But we are not fitting it alone, as the coefficient \(\beta_M\) appears at \emph{twice}:
-\[D = (\beta_A  - \beta_M) \cdot A - \beta_M \cdot \epsilon\]
-The latter part, \(\beta_M \cdot \epsilon\), pushes \(\beta_M\) towards zero (model ignores pure noise by assigning slope of zero). But the former part, \((\beta_A - \beta_M)\) only needs to add up to \(\beta_A^{true}\), so however we fix \(\beta_M\), \(\beta_A\) can accommodate. Thus the closer \(\beta_M\) to zero, the closer is \(\beta_A\) to \(\beta_A^{true}\). And that's how the magic works! If one variable is other variable plus noise, that \emph{plus noise} induces extra penalty and the only way to reduce residuals is to ignore the noise by setting the slope to zero. Therefore, you ignore the variable as well, because it is merely a noisy twin of a better variable. You can see how added noise ``disambiguates'' the causal relationship\footnote{I've used ordinary least squares just to make simulations faster. You will get the same result using Bayesian fittings procedures.}.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{simulate\_waffles }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(sigma\_noise)\{}
-  \CommentTok{\# generate same data but for noise in Marraige from Age relationship}
-  \FunctionTok{set.seed}\NormalTok{(}\DecValTok{169084}\NormalTok{)}
-\NormalTok{  sim\_df }\OtherTok{\textless{}{-}}\NormalTok{ sim\_waffles }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{MedianAgeMarriage =} \FunctionTok{rnorm}\NormalTok{(N),}
-                                  \AttributeTok{Divorce =} \FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
-                                  \AttributeTok{Marriage =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise))}
-  
-  \CommentTok{\# fit data using OLS and pulling out two slope coefficients}
-  \FunctionTok{lm}\NormalTok{(Divorce }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Marriage }\SpecialCharTok{+}\NormalTok{ MedianAgeMarriage, }\AttributeTok{data=}\NormalTok{sim\_df) }\SpecialCharTok{\%\textgreater{}\%} 
-    \FunctionTok{summary}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
-\NormalTok{    .}\SpecialCharTok{$}\NormalTok{coefficients }\SpecialCharTok{\%\textgreater{}\%}
-    \FunctionTok{data.frame}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
-    \FunctionTok{rownames\_to\_column}\NormalTok{(}\StringTok{"Variable"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-    \FunctionTok{slice}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{LowerCI =}\NormalTok{ Estimate }\SpecialCharTok{{-}}\NormalTok{ Std..Error,}
-           \AttributeTok{UpperCI =}\NormalTok{ Estimate }\SpecialCharTok{+}\NormalTok{ Std..Error) }\SpecialCharTok{\%\textgreater{}\%}
-    \FunctionTok{select}\NormalTok{(Variable, Estimate, LowerCI, UpperCI)}
-\NormalTok{\}}
-
-\NormalTok{simulated\_noise }\OtherTok{\textless{}{-}} 
-  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{epsilon =}\FunctionTok{exp}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\FunctionTok{log}\NormalTok{(}\FloatTok{0.001}\NormalTok{), }\FunctionTok{log}\NormalTok{(}\FloatTok{0.3}\NormalTok{), }\AttributeTok{length.out =} \DecValTok{100}\NormalTok{))) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{group\_by}\NormalTok{(epsilon) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{do}\NormalTok{(}\FunctionTok{simulate\_waffles}\NormalTok{(.}\SpecialCharTok{$}\NormalTok{epsilon))}
-
-\FunctionTok{ggplot}\NormalTok{(simulated\_noise, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{epsilon, }\AttributeTok{y=}\NormalTok{Estimate)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_ribbon}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{ymin=}\NormalTok{LowerCI, }\AttributeTok{ymax=}\NormalTok{UpperCI, }\AttributeTok{fill=}\NormalTok{Variable), }\AttributeTok{alpha=} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{color=}\NormalTok{Variable)) }\SpecialCharTok{+} 
-  \FunctionTok{scale\_x\_log10}\NormalTok{(}\AttributeTok{name=}\FunctionTok{expression}\NormalTok{(epsilon)) }\SpecialCharTok{+} 
-  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Slope estimate  ± standard error"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =} \FunctionTok{expression}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Marriage = MedianAgeMarriage + Normal(0, "}\NormalTok{, epsilon, }\StringTok{")"}\NormalTok{)))}
+\KeywordTok{ggplot}\NormalTok{(posterior\_samples, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{bA\_true)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{100}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"bA\_true = bA {-} bM"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-17-1.pdf}
 
-The stripes show uncertainty (estimate ± standard error) and you can appreciate how quickly it is reduced as marriage rate becomes noisier and just how little noise is required for ``magic'' to start working and converge on the true causal relationships.
+But what about uncertainty for \emph{individual} slopes? It stems directly from the fact that \(\beta_A^{true} = \beta_A - \beta_M = -1\) (it is \texttt{-1} in our case, of course). There are infinite number of pairs of numbers whose difference would give -1: \(1-2\), \(2-3\), \((-200)-(-199)\), \(999.41-1000.41\), etc. All of them add up (subtract to) -1, so the fitting procedure cannot settle on any specific region for \emph{each} parameter and any specific pair of values. Any number will do, as long as the \emph{other one} differs by one.
 
-\hypertarget{warning}{%
-\section{Warning}\label{warning}}
+\hypertarget{back-to-spurious-association}{%
+\section{Back to spurious association}\label{back-to-spurious-association}}
 
-So, a bit of noise will fix everything? Not necessarily! If \emph{both} marriage age and rate depend on some \emph{third latent variable}, it will depend, for example, on which variable is noisier. The book will continue with this theme, so you will learn more but, in the meantime, the key take-home message is still ``doing multiple regression is easy, understanding and interpreting it is hard''.
+Above, you have learned that if two variable have the same information, you can only fit \emph{both} of them but cannot get individual slopes. But wasn't that the case for real data we started with? Marriage age and rate \emph{are} correlated, so why fitting used one (age) and not their sum? The answer is \emph{extra noise} in marriage rate. In the real data marriage rate is age \emph{plus some noise}: \(M = -A + \epsilon\), where \(\epsilon\) is traditionally used to denote ``some noise''. How does that extra noise change our linear model for divorce rate?
+\[D = \beta_A \cdot A + \beta_M \cdot M \\
+D = \beta_A \cdot A + \beta_M (- A + \epsilon) \\
+D = (\beta_A  - \beta_M ) \cdot A + \beta_M \cdot \epsilon\]
 
-\hypertarget{solutions-for-chapter-2}{%
-\chapter{Solutions for Chapter 2}\label{solutions-for-chapter-2}}
+By definition, \(\epsilon\) is \emph{pure noise} and has zero predictive value with respect to divorce rate. Thus, if we would fit it \emph{alone}, we would expect to get a slope near zero, that is ``no significant relationship''.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(tidyverse)}
-\FunctionTok{library}\NormalTok{(rethinking)}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1231455}\NormalTok{)}
+\NormalTok{sim\_waffles \textless{}{-}}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{MedianAgeMarriage =} \KeywordTok{rnorm}\NormalTok{(N),}
+                      \DataTypeTok{Divorce =} \KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
+                      \DataTypeTok{Marriage =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.01}\NormalTok{),}
+                      \DataTypeTok{epsilon =} \KeywordTok{rnorm}\NormalTok{(N))}
+
+\KeywordTok{ggplot}\NormalTok{(sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{epsilon, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\KeywordTok{expression}\NormalTok{(epsilon)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{e1}{%
-\subsubsection*{2E1}\label{e1}}
-\addcontentsline{toc}{subsubsection}{2E1}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-18-1.pdf}
 
-Which of the expressions below correspond to the statement: the probability of rain on Monday?
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  Pr(rain)
-\item
-  \textbf{Pr(rain \textbar{} Monday) ✓}
-\item
-  Pr(Monday \textbar{} rain)
-\item
-  Pr(rain, Monday) / Pr(Monday)
-\end{enumerate}
-
-\hypertarget{e2}{%
-\subsubsection*{2E2}\label{e2}}
-\addcontentsline{toc}{subsubsection}{2E2}
-
-Which of the following statements corresponds to the expression: Pr(Monday\textbar rain)?
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  The probability of rain on Monday.
-\item
-  The probability of rain, given that it is Monday.
-\item
-  \textbf{The probability that it is Monday, given that it is raining. ✓}
-\item
-  The probability that it is Monday and that it is raining.
-\end{enumerate}
-
-\hypertarget{e3}{%
-\subsubsection*{2E3}\label{e3}}
-\addcontentsline{toc}{subsubsection}{2E3}
-
-Which of the expressions below correspond to the statement: the probability that it is Monday, given that it is raining?
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  \textbf{Pr ( Monday \textbar{} rain ) ✓}
-\item
-  Pr(rain \textbar{} Monday)
-\item
-  Pr(rain \textbar{} Monday) Pr(Monday)
-\item
-  \textbf{Pr(rain \textbar{} Monday) Pr(Monday) / Pr(rain)✓}
-\item
-  Pr(Monday \textbar{} rain) Pr(rain) / Pr(Monday)
-\end{enumerate}
-
-\hypertarget{e4}{%
-\subsubsection*{2E4}\label{e4}}
-\addcontentsline{toc}{subsubsection}{2E4}
-
-The Bayesian statistician Bruno de Finetti (1906-- 1985) began his 1973 book on probability theory with the declaration: ``PROBABILITY DOES NOT EXIST.'' The capitals appeared in the original, so I imagine de Finetti wanted us to shout this statement. What he meant is that probability is a device for describing uncertainty from the perspective of an observer with limited knowledge; it has no objective reality. Discuss the globe tossing example from the chapter, in light of this statement. What does it mean to say ``the probability of water is 0.7''?
-
-\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
-
-He meant that, at least at macro level, there are no truly random events. At that scale, all events, such as motion of a globe throughout its flight, are described by deterministic laws of physics. Therefore, the outcome of globe tossing is deterministic and predictable if we have a complete knowledge about its initial momentum and about other forces at play (e.g., air movement). In most cases, we do not have the full knowledge and, therefore, our predictions are likely to diverge from the observed outcome and be mostly but not always correct. Hence, the concept of probability. At the end, noise is never truly random, noise is information that we did not include into our model explicitly.
-
-\hypertarget{m1}{%
-\subsubsection*{2M1}\label{m1}}
-\addcontentsline{toc}{subsubsection}{2M1}
-
-Recall the globe tossing model from the chapter. Compute and plot the grid approximate posterior distribution for each of the following sets of observations. In each case, assume a uniform prior for p.
+But we are not fitting it alone, as the coefficient \(\beta_M\) appears at \emph{twice}:
+\[D = (\beta_A  - \beta_M) \cdot A + \beta_M \cdot \epsilon\]
+The latter part, \(\beta_M \cdot \epsilon\), pushes \(\beta_M\) towards zero slope, which is the best solution for pure noise, as you saw in the plot above. But the former part, \(\beta_A - \beta_M\) only needs to add up to \(\beta_A^{true}\), so however we fix \(\beta_M\), \(\beta_A\) can accommodate. Thus the closer \(\beta_M\) to zero, the closer is \(\beta_A\) to \(\beta_A^{true}\). And that's how the magic works! If one variable is other variable plus noise, that \emph{plus noise} induces extra penalty (extra residuals) and the only way to reduce residuals is to ignore the \emph{uncorrelated} noise by setting the slope to zero. Therefore, you ignore the variable as well, because it is merely a noisy twin of a better variable. You can see how added noise ``disambiguates'' the causal relationship\footnote{I've used ordinary least squares just to make simulations faster. You will get the same result using Bayesian fittings procedures.}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\#\textquotesingle{} Computes posterior for water probability assuming binomial likelihood}
-\CommentTok{\#\textquotesingle{}}
-\CommentTok{\#\textquotesingle{} @param observations vector of "W" and "L"}
-\CommentTok{\#\textquotesingle{} @param prior numeric vector, its length determines grid resolution}
-\CommentTok{\#\textquotesingle{}}
-\CommentTok{\#\textquotesingle{} @return tibble with Pwater (from 0 to 1), Posterior (probability of water for given Pwater), and Prior}
-\CommentTok{\#\textquotesingle{}}
-\CommentTok{\#\textquotesingle{} @examples}
-\CommentTok{\#\textquotesingle{} probability\_of\_water(c("W", "W", "W"), rep(1, 100))}
-\NormalTok{probability\_of\_water }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(observations, prior)\{}
-\NormalTok{  p\_grid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\DecValTok{0}\NormalTok{, }\AttributeTok{to=}\DecValTok{1}\NormalTok{, }\AttributeTok{length.out=}\FunctionTok{length}\NormalTok{(prior))}
-\NormalTok{  likelihood }\OtherTok{\textless{}{-}} \FunctionTok{dbinom}\NormalTok{(}\FunctionTok{sum}\NormalTok{(observations }\SpecialCharTok{==} \StringTok{"W"}\NormalTok{), }\AttributeTok{size=}\FunctionTok{length}\NormalTok{(observations), }\AttributeTok{prob=}\NormalTok{p\_grid)}
-\NormalTok{  unstandardized\_posterior }\OtherTok{\textless{}{-}}\NormalTok{ likelihood }\SpecialCharTok{*}\NormalTok{ prior}
-  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{Pwater =}\NormalTok{ p\_grid,}
-         \AttributeTok{Posterior =}\NormalTok{ unstandardized\_posterior }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(unstandardized\_posterior),}
-         \AttributeTok{Prior =}\NormalTok{ prior)}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{1. W, W, W}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{posterior2M1 }\OtherTok{\textless{}{-}} \FunctionTok{probability\_of\_water}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{100}\NormalTok{))}
-\FunctionTok{ggplot}\NormalTok{(posterior2M1, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Pwater, }\AttributeTok{y=}\NormalTok{Posterior)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{()}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/2M1-1-1.pdf}
-
-\textbf{2. W, W, W, L}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{posterior2M2 }\OtherTok{\textless{}{-}} \FunctionTok{probability\_of\_water}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"L"}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{100}\NormalTok{))}
-\FunctionTok{ggplot}\NormalTok{(posterior2M2, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Pwater, }\AttributeTok{y=}\NormalTok{Posterior)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{()}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/2M1-2-1.pdf}
-
-\textbf{3. L, W, W, L, W, W, W}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{posterior2M3 }\OtherTok{\textless{}{-}} \FunctionTok{probability\_of\_water}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"L"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"L"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{100}\NormalTok{))}
-\FunctionTok{ggplot}\NormalTok{(posterior2M3, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Pwater, }\AttributeTok{y=}\NormalTok{Posterior)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{()}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/2M1-3-1.pdf}
-
-\hypertarget{m2}{%
-\subsubsection*{2M2}\label{m2}}
-\addcontentsline{toc}{subsubsection}{2M2}
-
-Now assume a prior for p that is equal to zero when p\textless0.5 and is a positive constant when p≥0.5. Again compute and plot the grid approximate posterior distribution for each of the sets of observations in the problem just above.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{p\_grid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\DecValTok{0}\NormalTok{, }\AttributeTok{to=}\DecValTok{1}\NormalTok{, }\AttributeTok{length.out =} \DecValTok{100}\NormalTok{)}
-\NormalTok{priorM2 }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(p\_grid }\SpecialCharTok{\textgreater{}=} \FloatTok{0.5}\NormalTok{)}
-
-\NormalTok{posterior2M3 }\OtherTok{\textless{}{-}} \FunctionTok{probability\_of\_water}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"L"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"L"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{, }\StringTok{"W"}\NormalTok{), priorM2)}
-\FunctionTok{ggplot}\NormalTok{(posterior2M3, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Pwater, }\AttributeTok{y=}\NormalTok{Posterior)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{() }
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/2M2-1.pdf}
-
-\hypertarget{m3}{%
-\subsubsection*{2M3}\label{m3}}
-\addcontentsline{toc}{subsubsection}{2M3}
-
-Suppose there are two globes, one for Earth and one for Mars. The Earth globe is 70\% covered in water. The Mars globe is 100\% land. Further suppose that one of these globes --- you don't know which --- was tossed in the air and produced a ``land'' observation. Assume that each globe was equally likely to be tossed. Show that the posterior probability that the globe was the Earth, conditional on seeing ``land'' (Pr ( Earth \textbar{} land ) ), is 0.23.
-
-\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
-
-Bayes Formula tells us that
-\[Pr(Planet | land) = \frac{Pr(land | Planet) Pr(Planet)}{Pr(land)}\]
-As \(Pr(land)\) is a normalization constant, we can ignore it for a moment. Accordingly,
-\[uPr(Earth | land) = 0.3 \cdot 0.5 = 0.15\\
-uPr(Mars | land) = 1 \cdot 0.5 = 0.5\]
-where \(uPr()\) is unstandardized plausibility. Normalizing it, we get
-\[Pr(Earth | land) = \frac{0.15}{0.15 + 0.5} = 0.2308\]
-
-\hypertarget{m4}{%
-\subsubsection*{2M4}\label{m4}}
-\addcontentsline{toc}{subsubsection}{2M4}
-
-Suppose you have a deck with only three cards. Each card has two sides, and each side is either black or white. One card has two black sides. The second card has one black and one white side. The third card has two white sides. Now suppose all three cards are placed in a bag and shuffled. Someone reaches into the bag and pulls out a card and places it flat on a table. A black side is shown facing up, but you don't know the color of the side facing down. Show that the probability that the other side is also black is 2/3. Use the counting method (Section 2 of the chapter) to approach this problem. This means counting up the ways that each card could produce the observed data (a black side facing up on the table).
-
-\begin{itemize}
-\tightlist
-\item
-  B\textbar B: B(1) → \textbf{B(2) : 1}
-\item
-  B\textbar B: B(2) → \textbf{B(1) : 1}
-\item
-  B\textbar W : B → W : 1
-\item
-  W\textbar B : 0
-\item
-  W\textbar W : 0
-\item
-  W\textbar W : 0
-\end{itemize}
-
-There are three possible outcomes, given the visible side is black and two out of three lead to a black back side: \(\frac{2}{3}\).
-
-\hypertarget{m5}{%
-\subsubsection*{2M5}\label{m5}}
-\addcontentsline{toc}{subsubsection}{2M5}
-
-Now suppose there are four cards: B/B, B/W, W/W, and another B/B. Again suppose a card is drawn from the bag and a black side appears face up. Again calculate the probability that the other side is black.
-
-\begin{itemize}
-\tightlist
-\item
-  B\textbar B: B(1) → \textbf{B(2): 1}
-\item
-  B\textbar B: B(2) → \textbf{B(1) : 1}
-\item
-  B\textbar W : B → W : 1
-\item
-  W\textbar B : 0
-\item
-  W\textbar W : 0
-\item
-  W\textbar W : 0
-\item
-  B\textbar B: B(3) → \textbf{B(4): 1}
-\item
-  B\textbar B: B(4) → \textbf{B(3) : 1}
-\end{itemize}
-
-There are three possible outcomes, given the visible side is black and four out of five lead to a black back side: \(\frac{4}{5}\)
-
-\hypertarget{m6}{%
-\subsubsection*{2M6}\label{m6}}
-\addcontentsline{toc}{subsubsection}{2M6}
-
-Imagine that black ink is heavy, and so cards with black sides are heavier than cards with white sides. As a result, it's less likely that a card with black sides is pulled from the bag. So again assume there are three cards: B/B, B/W, and W/W. After experimenting a number of times, you conclude that for every way to pull the B/B card from the bag, there are 2 ways to pull the B/W card and 3 ways to pull the W/W card. Again suppose that a card is pulled and a black side appears face up. Show that the probability the other side is black is now 0.5. Use the counting method, as before.
-
-\begin{itemize}
-\tightlist
-\item
-  B\textbar B: B(1) → \textbf{B(2): 1 × 1 (prior) = 1}
-\item
-  B\textbar B: B(2) → \textbf{B(1) : 1 × 1 (prior) = 1}
-\item
-  B\textbar W : B → W : 1 × 2 (prior) = 2
-\item
-  W\textbar B : 0 × 2 (prior) = 0
-\item
-  W\textbar W : 0 × 3 (prior) = 0
-\item
-  W\textbar W : 0 × 3 (prior) = 0
-\end{itemize}
-
-Now the counts are two out of four that other side is black, i.e.~\(0.5\).
-
-\hypertarget{m7}{%
-\subsubsection*{2M7}\label{m7}}
-\addcontentsline{toc}{subsubsection}{2M7}
-
-Assume again the original card problem, with a single card showing a black side face up. Before looking at the other side, we draw another card from the bag and lay it face up on the table. The face that is shown on the new card is white. Show that the probability that the first card, the one showing a black side, has black on its other side is now 0.75. Use the counting method, if you can. Hint: Treat this like the sequence of globe tosses, counting all the ways to see each observation, for each possible first card.
-
-Possible card sequences, bold means that back side of the first card is black:
-
-\begin{itemize}
-\item
-  \textbf{B(1)\textbar B(2) → W\textbar B : 1}
-\item
-  \textbf{B(2)\textbar B(1) → W\textbar B : 1}
-\item
-  B(1)\textbar B(2) → B\textbar W : 0
-\item
-  B(2)\textbar B(1) → B\textbar W : 0
-\item
-  \textbf{B(1)\textbar B(2) → W(1)\textbar W(2) : 1}
-\item
-  \textbf{B(2)\textbar B(1) → W(1)\textbar W(2) : 1}
-\item
-  \textbf{B(1)\textbar B(2) → W(2)\textbar W(1) : 1}
-\item
-  \textbf{B(2)\textbar B(1) → W(2)\textbar W(1) : 1}
-\item
-  B\textbar W → B(1)\textbar B(2) : 0
-\item
-  W\textbar B → B(1)\textbar B(2) : 0
-\item
-  B\textbar W → B(2)\textbar B(1) : 0
-\item
-  W\textbar B → B(2)\textbar B(1) : 0
-\item
-  B\textbar W → W(1)\textbar W(2) : 1
-\item
-  W\textbar B → W(1)\textbar W(2) : 0
-\item
-  B\textbar W → W(2)\textbar W(1) : 1
-\item
-  W\textbar B → W(2)\textbar W(1) : 0
-\item
-  W(1)\textbar W(2) → W\textbar B : 0
-\item
-  W(2)\textbar W(1) → W\textbar B : 0
-\item
-  W(1)\textbar W(2) → B\textbar W : 0
-\item
-  W(2)\textbar W(1) → B\textbar W : 0
-\item
-  W(1)\textbar W(2) → B(1)\textbar B(2) : 0
-\item
-  W(2)\textbar W(1) → B(1)\textbar B(2) : 0
-\item
-  W(1)\textbar W(2) → B(2)\textbar B(1) : 0
-\item
-  W(2)\textbar W(1) → B(2)\textbar B(1) : 0
-\end{itemize}
-
-Total of eight possible path, six of them have black back for the first card: \(0.75\).
-
-\hypertarget{h1}{%
-\subsubsection*{2H1}\label{h1}}
-\addcontentsline{toc}{subsubsection}{2H1}
-
-Suppose there are two species of panda bear. Both are equally common in the wild and live in the same places. They look exactly alike and eat the same food, and there is yet no genetic assay capable of telling them apart. They differ however in their family sizes. Species A gives birth to twins 10\% of the time, otherwise birthing a single infant. Species B births twins 20\% of the time, otherwise birthing singleton infants. Assume these numbers are known with certainty, from many years of field research.
-
-Now suppose you are managing a captive panda breeding program. You have a new female panda of unknown species, and she has just given birth to twins. What is the probability that her next birth will also be twins?
-
-\[uPr(A | twins) = Pr(twins | A) * Pr(A) = 0.1 * 0.5 = 0.05 \\
-uPr(B | twins) = Pr(twins | B) * Pr(B) = 0.2 * 0.5 = 0.1\]
-
-After normalization \(Pr(A | twins) = 1/3\) and \(Pr(B | twins) = 2/3\).
-
-Probability that you will see twins again per species is
-\[Pr(twins | A, twins) = Pr(A | twings) * Pr (twins | A) = 1 / 3 * 0.1  = 0.1 / 3 \\
-Pr(twins | B, twins) = Pr(B | twings) * Pr (twins | B) = 2 / 3 * 0.2 = 0.4 / 3\]
-
-The total probability is \(\frac{0.1}{3} + \frac{0.4}{3} = \frac{0.5}{3} \approx 0.167\)
-
-\hypertarget{h2}{%
-\subsubsection*{2H2}\label{h2}}
-\addcontentsline{toc}{subsubsection}{2H2}
-
-Recall all the facts from the problem above. Now compute the probability that the panda we have is from species A, assuming we have observed only the first birth and that it was twins.
-
-\[uPr(A | twins) = Pr(twins | A) * Pr(A) = 0.1 * 0.5 = 0.05 \\
-uPr(B | twins) = Pr(twins | B) * Pr(B) = 0.2 * 0.5 = 0.1\]
-
-After normalization \(Pr(A | twins) = 1/3\)
-
-\hypertarget{h3}{%
-\subsubsection*{2H3}\label{h3}}
-\addcontentsline{toc}{subsubsection}{2H3}
-
-Continuing on from the previous problem, suppose the same panda mother has a second birth and that it is not twins, but a singleton infant. Compute the posterior probability that this panda is species A.
-
-\[uPr(A | twins) = Pr(twins | A) * Pr(A) = 0.1 * 0.5 = 0.05 \\
-uPr(B | twins) = Pr(twins | B) * Pr(B) = 0.2 * 0.5 = 0.1\]
-
-After normalization \(Pr(A | twins) = 1/3\) and \(Pr(B | twins) = 2/3\).
-
-Given that next birth is a singleton:
-\[uPr(A | twins, singleton) = Pr(A | twins) * (1 - Pr(twins|A)) = 1/3 \cdot 0.9 = 0.9/3\\
-uPr(B | twins, singleton) = Pr(B | twins) * (1 - Pr(twins|B)) = 2/3 \cdot 0.8 = 1.6/3\]
-
-After normalization \(Pr(A | twins, singleton) = 0.36\) (and \(Pr(B | twins, singleton) = 0.64\)).
-
-\hypertarget{h4}{%
-\subsubsection*{2H4}\label{h4}}
-\addcontentsline{toc}{subsubsection}{2H4}
-
-A common boast of Bayesian statisticians is that Bayesian inference makes it easy to use all of the data, even if the data are of different types.
-
-So suppose now that a veterinarian comes along who has a new genetic test that she claims can identify the species of our mother panda. But the test, like all tests, is imperfect. This is the information you have about the test:
-• The probability it correctly identifies a species A panda is 0.8.
-• The probability it correctly identifies a species B panda is 0.65.
-
-The vet administers the test to your panda and tells you that the test is positive for species A. First ignore your previous information from the births and compute the posterior probability that your panda is species A. Then redo your calculation, now using the birth data as well.
-
-\[uPr(A | test) = Pr(test | A) * Pr (A) = 0.8 * 0.5\\
-uPr(B | test) = (1 - Pr(test | B)) * Pr (B) = (1 - 0.65) * 0.5 = 0.35 * 0.5\]
-After normalization \(Pr(A | test) \approx 0.7\) and \(Pr(B | test) \approx 0.3\).
-
-Given the twins, this becomes
-\[uPr(A | test, twins) = Pr(A | test) * Pr(twins | A) = 0.7 * 0.1 = 0.07\\
-uPr(B | test, twins) = Pr(B | test) * Pr(twins | B) = 0.3 * 0.2 = 0.06\]
-After normalization \(Pr(A | test, twins) \approx 0.533\) and \(Pr(B | test, twins) \approx 0.467\).
-
-Given the singleton, this becomes
-\[uPr(A | test, twins, singleton) = Pr(A | test, twins) * (1 - Pr(twins | A)) = 0.533 * 0.9 = 0.48\\
-uPr(B | test, twins, singleton) = Pr(B | test, twins) * (1 - Pr(twins | B)) = 0.467 * 0.8 = 0.3736\]
-After normalization \(Pr(A | test, twins, singleton) \approx 0.5625\) and \(Pr(B | test, twins, singleton) \approx 0.4375\).
-
-\hypertarget{solutions-for-chapter-3}{%
-\chapter{Solutions for Chapter 3}\label{solutions-for-chapter-3}}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(tidyverse)}
-\FunctionTok{library}\NormalTok{(rethinking)}
-\end{Highlighting}
-\end{Shaded}
-
-\hypertarget{initialization-code-for-easy-exercises}{%
-\subsubsection{Initialization code for easy exercises}\label{initialization-code-for-easy-exercises}}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{p\_grid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\DecValTok{0}\NormalTok{, }\AttributeTok{to=}\DecValTok{1}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{1000}\NormalTok{)}
-\NormalTok{prior }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
-\NormalTok{likelihood }\OtherTok{\textless{}{-}} \FunctionTok{dbinom}\NormalTok{(}\DecValTok{6}\NormalTok{, }\AttributeTok{size=}\DecValTok{9}\NormalTok{, }\AttributeTok{prob=}\NormalTok{p\_grid)}
-\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ likelihood }\SpecialCharTok{*}\NormalTok{ prior}
-\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ posterior }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(posterior)}
-\FunctionTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
-\NormalTok{samples }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(p\_grid, }\AttributeTok{prob=}\NormalTok{posterior, }\AttributeTok{size=}\FloatTok{1e4}\NormalTok{, }\AttributeTok{replace=}\ConstantTok{TRUE}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\hypertarget{e1-1}{%
-\subsubsection*{3E1}\label{e1-1}}
-\addcontentsline{toc}{subsubsection}{3E1}
-
-How much posterior probability lies below p = 0.2?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.2}\NormalTok{, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"p below 0.2: \{mean(samples \textless{} 0.2)\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E1-1.pdf}
-
-\hypertarget{e2-1}{%
-\subsubsection*{3E2}\label{e2-1}}
-\addcontentsline{toc}{subsubsection}{3E2}
-
-How much posterior probability lies below p = 0.8?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.8}\NormalTok{, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"p below 0.8: \{mean(samples \textless{} 0.8)\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E2-1.pdf}
-
-\hypertarget{e3-1}{%
-\subsubsection*{3E3}\label{e3-1}}
-\addcontentsline{toc}{subsubsection}{3E3}
-
-How much posterior probability lies between p = 0.2 and p = 0.8?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.2}\NormalTok{, }\FloatTok{0.8}\NormalTok{), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"p between 0.2 and 0.8: \{mean(samples \textless{} 0.8 \& samples \textgreater{} 0.2)\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E3-1.pdf}
-
-\hypertarget{e4-1}{%
-\subsubsection*{3E4}\label{e4-1}}
-\addcontentsline{toc}{subsubsection}{3E4}
-
-20\% of the posterior probability lies below which value of p?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{q20 }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(samples, }\FloatTok{0.2}\NormalTok{)}
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ q20, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"20\% of the posterior probability lies below \{round(q20, 2)\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E4-1.pdf}
-
-\hypertarget{e5}{%
-\subsubsection*{3E5}\label{e5}}
-\addcontentsline{toc}{subsubsection}{3E5}
-
-20\% of the posterior probability lies above which value of p?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{q80 }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(samples, }\FloatTok{0.8}\NormalTok{)}
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ q80, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"20\% of the posterior probability lies above \{round(q80, 2)\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E5-1.pdf}
-
-\hypertarget{e6}{%
-\subsubsection*{3E6}\label{e6}}
-\addcontentsline{toc}{subsubsection}{3E6}
-
-Which values of p contain the narrowest interval equal to 66\% of the posterior probability?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{hpdi66 }\OtherTok{\textless{}{-}} \FunctionTok{HPDI}\NormalTok{(samples, }\FloatTok{0.66}\NormalTok{)}
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ hpdi66, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"Narrowest interval equal to 66\% of the posterior probability is \{round(hpdi66[1], 3)\}..\{round(hpdi66[2], 3)\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E6-1.pdf}
-
-\hypertarget{e7}{%
-\subsubsection*{3E7}\label{e7}}
-\addcontentsline{toc}{subsubsection}{3E7}
-
-Which values of p contain 66\% of the posterior probability, assuming equal posterior probability both below and above the interval?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{pi66 }\OtherTok{\textless{}{-}} \FunctionTok{PI}\NormalTok{(samples, }\FloatTok{0.66}\NormalTok{)}
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ pi66, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"66\% of the posterior probability, assuming equal posterior probability are between \{round(pi66[1], 3)\}..\{round(pi66[2], 3)\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3E7-1.pdf}
-
-\hypertarget{m1-1}{%
-\subsubsection*{3M1}\label{m1-1}}
-\addcontentsline{toc}{subsubsection}{3M1}
-
-Suppose the globe tossing data had turned out to be 8 water in 15 tosses. Construct the posterior distribution, using grid approximation. Use the same flat prior as before.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{p\_grid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\DecValTok{0}\NormalTok{, }\AttributeTok{to=}\DecValTok{1}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{1000}\NormalTok{)}
-\NormalTok{prior }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
-\NormalTok{likelihood }\OtherTok{\textless{}{-}} \FunctionTok{dbinom}\NormalTok{(}\DecValTok{8}\NormalTok{, }\AttributeTok{size=}\DecValTok{15}\NormalTok{, }\AttributeTok{prob=}\NormalTok{p\_grid)}
-\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ likelihood }\SpecialCharTok{*}\NormalTok{ prior}
-\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ posterior }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(posterior)}
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{p\_grid, }\AttributeTok{y=}\NormalTok{posterior)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle=}\StringTok{"8 water in 15 tosses"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M1-1.pdf}
-
-\hypertarget{m2-1}{%
-\subsubsection*{3M2}\label{m2-1}}
-\addcontentsline{toc}{subsubsection}{3M2}
-
-Draw 10,000 samples from the grid approximation from above. Then use the samples to calculate the 90\% HPDI for p.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
-\NormalTok{samples }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(p\_grid, }\AttributeTok{prob=}\NormalTok{posterior, }\AttributeTok{size=}\FloatTok{1e4}\NormalTok{, }\AttributeTok{replace=}\ConstantTok{TRUE}\NormalTok{)}
-
-\NormalTok{hpdi90 }\OtherTok{\textless{}{-}} \FunctionTok{HPDI}\NormalTok{(samples, }\FloatTok{0.9}\NormalTok{)}
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ hpdi90, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"HPDI 90\% is \{round(hpdi66[1], 3)\}..\{round(hpdi66[2], 3)\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M2-1.pdf}
-
-\hypertarget{m3-1}{%
-\subsubsection*{3M3}\label{m3-1}}
-\addcontentsline{toc}{subsubsection}{3M3}
-
-Construct a posterior predictive check for this model and data. This means simulate the distribution of samples, averaging over the posterior uncertainty in p . What is the probability of observing 8 water in 15 tosses?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{predicted\_water8\_15 }\OtherTok{\textless{}{-}} 
-  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{N =} \FunctionTok{rbinom}\NormalTok{(}\FunctionTok{length}\NormalTok{(samples), }\AttributeTok{size=}\DecValTok{15}\NormalTok{, }\AttributeTok{prob=}\NormalTok{samples)) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{group\_by}\NormalTok{(N) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{summarize}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{p =}\NormalTok{ count }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(count))}
+\NormalTok{simulate\_waffles \textless{}{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(sigma\_noise)\{}
+  \CommentTok{\# generate same data but for noise in Marraige from Age relationship}
+  \KeywordTok{set.seed}\NormalTok{(}\DecValTok{169084}\NormalTok{)}
+\NormalTok{  sim\_df \textless{}{-}}\StringTok{ }\NormalTok{sim\_waffles \textless{}{-}}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{MedianAgeMarriage =} \KeywordTok{rnorm}\NormalTok{(N),}
+                                  \DataTypeTok{Divorce =} \KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
+                                  \DataTypeTok{Marriage =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise))}
   
-\NormalTok{p8 }\OtherTok{\textless{}{-}} 
-\NormalTok{  predicted\_water8\_15 }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{filter}\NormalTok{(N }\SpecialCharTok{==} \DecValTok{8}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{pull}\NormalTok{(p)}
-
-\FunctionTok{ggplot}\NormalTok{(predicted\_water8\_15, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{N, }\AttributeTok{y=}\NormalTok{ p)) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"The probability of observing 8 water in 15 tosses is \{p8\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M3-1.pdf}
-
-\hypertarget{m4-1}{%
-\subsubsection*{3M4}\label{m4-1}}
-\addcontentsline{toc}{subsubsection}{3M4}
-
-Using the posterior distribution constructed from the new (8/15) data, now calculate the probability of observing 6 water in 9 tosses.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{predicted\_water6\_9 }\OtherTok{\textless{}{-}} 
-  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{N =} \FunctionTok{rbinom}\NormalTok{(}\FunctionTok{length}\NormalTok{(samples), }\AttributeTok{size=}\DecValTok{9}\NormalTok{, }\AttributeTok{prob=}\NormalTok{samples)) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{group\_by}\NormalTok{(N) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{summarize}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{p =}\NormalTok{ count }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(count))}
-  
-\NormalTok{p6 }\OtherTok{\textless{}{-}} 
-\NormalTok{  predicted\_water6\_9 }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{filter}\NormalTok{(N }\SpecialCharTok{==} \DecValTok{6}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{pull}\NormalTok{(p)}
-
-\FunctionTok{ggplot}\NormalTok{(predicted\_water6\_9, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{N, }\AttributeTok{y=}\NormalTok{ p)) }\SpecialCharTok{+} 
-    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"The probability of observing 6 water in 9 tosses is \{p6\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M4-1.pdf}
-
-\hypertarget{m5-1}{%
-\subsubsection*{3M5}\label{m5-1}}
-\addcontentsline{toc}{subsubsection}{3M5}
-
-Start over at 3M1 , but now use a prior that is zero below p = 0.5 and a constant above p = 0.5. This corresponds to prior information that a majority of the Earth's surface is water. Repeat each problem above and compare the inferences. What difference does the better prior make? If it helps, compare inferences (using both priors) to the true value p = 0.7.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{p\_grid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\DecValTok{0}\NormalTok{, }\AttributeTok{to=}\DecValTok{1}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{1000}\NormalTok{)}
-\NormalTok{prior }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(p\_grid }\SpecialCharTok{\textgreater{}=} \FloatTok{0.5}\NormalTok{)}
-\NormalTok{likelihood }\OtherTok{\textless{}{-}} \FunctionTok{dbinom}\NormalTok{(}\DecValTok{8}\NormalTok{, }\AttributeTok{size=}\DecValTok{15}\NormalTok{, }\AttributeTok{prob=}\NormalTok{p\_grid)}
-\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ likelihood }\SpecialCharTok{*}\NormalTok{ prior}
-\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ posterior }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(posterior)}
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{p\_grid, }\AttributeTok{y=}\NormalTok{posterior)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle=}\StringTok{"8 water in 15 tosses"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M5-1-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
-\NormalTok{samples }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(p\_grid, }\AttributeTok{prob=}\NormalTok{posterior, }\AttributeTok{size=}\FloatTok{1e4}\NormalTok{, }\AttributeTok{replace=}\ConstantTok{TRUE}\NormalTok{)}
-
-\NormalTok{hpdi90 }\OtherTok{\textless{}{-}} \FunctionTok{HPDI}\NormalTok{(samples, }\FloatTok{0.9}\NormalTok{)}
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ hpdi90, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Remake of 3M2"}\NormalTok{,}
-       \AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"HPDI 90\% is \{round(hpdi66[1], 3)\}..\{round(hpdi66[2], 3)\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M5-2-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{predicted\_water8\_15\_remake }\OtherTok{\textless{}{-}} 
-  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{N =} \FunctionTok{rbinom}\NormalTok{(}\FunctionTok{length}\NormalTok{(samples), }\AttributeTok{size=}\DecValTok{15}\NormalTok{, }\AttributeTok{prob=}\NormalTok{samples)) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{group\_by}\NormalTok{(N) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{summarize}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{p =}\NormalTok{ count }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(count))}
-  
-\NormalTok{p8 }\OtherTok{\textless{}{-}} 
-\NormalTok{  predicted\_water8\_15\_remake }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{filter}\NormalTok{(N }\SpecialCharTok{==} \DecValTok{8}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{pull}\NormalTok{(p)}
-
-\FunctionTok{ggplot}\NormalTok{(predicted\_water8\_15\_remake, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{N, }\AttributeTok{y=}\NormalTok{ p)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{predicted\_water8\_15, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Remake of 3M3"}\NormalTok{,}
-       \AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"The probability of observing 8 water in 15 tosses is \{p8\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M5-3-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{predicted\_water6\_9\_remake }\OtherTok{\textless{}{-}} 
-  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{N =} \FunctionTok{rbinom}\NormalTok{(}\FunctionTok{length}\NormalTok{(samples), }\AttributeTok{size=}\DecValTok{9}\NormalTok{, }\AttributeTok{prob=}\NormalTok{samples)) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{group\_by}\NormalTok{(N) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{summarize}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)  }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{p =}\NormalTok{ count }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(count))}
-  
-\NormalTok{p6 }\OtherTok{\textless{}{-}} 
-\NormalTok{  predicted\_water6\_9\_remake }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{filter}\NormalTok{(N }\SpecialCharTok{==} \DecValTok{6}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{pull}\NormalTok{(p)}
-
-\FunctionTok{ggplot}\NormalTok{(predicted\_water6\_9\_remake, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{N, }\AttributeTok{y=}\NormalTok{ p)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{predicted\_water6\_9, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"The probability of observing 6 water in 9 tosses is \{p6\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M5-4-1.pdf}
-
-\hypertarget{m6-1}{%
-\subsubsection*{3M6}\label{m6-1}}
-\addcontentsline{toc}{subsubsection}{3M6}
-
-Suppose you want to estimate the Earth's proportion of water very precisely. Specifically, you want the 99\% percentile interval of the posterior distribution of p to be only 0.05 wide. This means the distance between the upper and lower bound of the interval should be 0.05. How many times will you have to toss the globe to do this?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{true\_proportion }\OtherTok{\textless{}{-}} \FloatTok{0.5}
-\NormalTok{toss\_quantiles }\OtherTok{\textless{}{-}} 
-  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{tossesN =} \FunctionTok{seq}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{3000}\NormalTok{, }\AttributeTok{by=}\DecValTok{1}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{lowerN =} \FunctionTok{qbinom}\NormalTok{(}\FloatTok{0.005}\NormalTok{, tossesN, true\_proportion),}
-         \AttributeTok{upperN =} \FunctionTok{qbinom}\NormalTok{(}\FloatTok{0.995}\NormalTok{, tossesN, true\_proportion),}
-         \AttributeTok{lowerP =}\NormalTok{ lowerN }\SpecialCharTok{/}\NormalTok{ tossesN,}
-         \AttributeTok{upperP =}\NormalTok{ upperN }\SpecialCharTok{/}\NormalTok{ tossesN,}
-         \AttributeTok{deltaP =}\NormalTok{ upperP }\SpecialCharTok{{-}}\NormalTok{ lowerP)}
-
-\NormalTok{minimal\_N }\OtherTok{\textless{}{-}} 
-\NormalTok{  toss\_quantiles }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{filter}\NormalTok{(deltaP }\SpecialCharTok{\textless{}} \FloatTok{0.05}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{pull}\NormalTok{(tossesN)}
-
-\FunctionTok{ggplot}\NormalTok{(toss\_quantiles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{tossesN, }\AttributeTok{y=}\NormalTok{deltaP)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \FloatTok{0.05}\NormalTok{, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{scale\_y\_log10}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Via qbinom"}\NormalTok{,}
-       \AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"For proportion \{true\_proportion\} you need \{minimal\_N\} tosses to get 99\% PI under 0.05"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M6-qbinom-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{simulate\_and\_compute\_PI99 }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(tossN, true\_proportion)\{}
-\NormalTok{  simulated\_N }\OtherTok{\textless{}{-}} \FunctionTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, tossN, true\_proportion)}
-\NormalTok{  simulated\_P }\OtherTok{\textless{}{-}}\NormalTok{ simulated\_N }\SpecialCharTok{/}\NormalTok{ tossN}
-  \FunctionTok{diff}\NormalTok{(rethinking}\SpecialCharTok{::}\FunctionTok{PI}\NormalTok{(simulated\_P, }\AttributeTok{prob=}\FloatTok{0.99}\NormalTok{))}
+  \CommentTok{\# fit data using OLS and pulling out two slope coefficients}
+  \KeywordTok{lm}\NormalTok{(Divorce }\OperatorTok{\textasciitilde{}}\StringTok{ }\NormalTok{Marriage }\OperatorTok{+}\StringTok{ }\NormalTok{MedianAgeMarriage, }\DataTypeTok{data=}\NormalTok{sim\_df) }\OperatorTok{\%\textgreater{}\%}\StringTok{ }
+\StringTok{    }\KeywordTok{summary}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
+\StringTok{    }\NormalTok{.}\OperatorTok{$}\NormalTok{coefficients }\OperatorTok{\%\textgreater{}\%}
+\StringTok{    }\KeywordTok{data.frame}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
+\StringTok{    }\KeywordTok{rownames\_to\_column}\NormalTok{(}\StringTok{"Variable"}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{    }\KeywordTok{slice}\NormalTok{(}\OperatorTok{{-}}\DecValTok{1}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{    }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{LowerCI =}\NormalTok{ Estimate }\OperatorTok{{-}}\StringTok{ }\NormalTok{Std..Error,}
+           \DataTypeTok{UpperCI =}\NormalTok{ Estimate }\OperatorTok{+}\StringTok{ }\NormalTok{Std..Error) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{    }\KeywordTok{select}\NormalTok{(Variable, Estimate, LowerCI, UpperCI)}
 \NormalTok{\}}
 
-\NormalTok{true\_proportion }\OtherTok{\textless{}{-}} \FloatTok{0.5}
-\NormalTok{toss\_sims }\OtherTok{\textless{}{-}} 
-  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{tossesN =} \FunctionTok{seq}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{3000}\NormalTok{, }\AttributeTok{by=}\DecValTok{1}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{rowwise}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{deltaP =}\FunctionTok{simulate\_and\_compute\_PI99}\NormalTok{(tossesN, true\_proportion))}
+\NormalTok{simulated\_noise \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{epsilon =}\KeywordTok{exp}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\KeywordTok{log}\NormalTok{(}\FloatTok{0.001}\NormalTok{), }\KeywordTok{log}\NormalTok{(}\FloatTok{0.3}\NormalTok{), }\DataTypeTok{length.out =} \DecValTok{100}\NormalTok{))) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{group\_by}\NormalTok{(epsilon) }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{do}\NormalTok{(}\KeywordTok{simulate\_waffles}\NormalTok{(.}\OperatorTok{$}\NormalTok{epsilon))}
 
-\NormalTok{minimal\_N }\OtherTok{\textless{}{-}} 
-\NormalTok{  toss\_sims }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{filter}\NormalTok{(deltaP }\SpecialCharTok{\textless{}} \FloatTok{0.05}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{pull}\NormalTok{(tossesN)}
-
-\FunctionTok{ggplot}\NormalTok{(toss\_sims, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{tossesN, }\AttributeTok{y=}\NormalTok{deltaP)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \FloatTok{0.05}\NormalTok{, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{scale\_y\_log10}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Via rbinom simulations"}\NormalTok{,}
-       \AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"For proportion \{true\_proportion\} you need \{minimal\_N\} tosses to get 99\% PI under 0.05"}\NormalTok{))}
+\KeywordTok{ggplot}\NormalTok{(simulated\_noise, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{epsilon, }\DataTypeTok{y=}\NormalTok{Estimate)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_ribbon}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{ymin=}\NormalTok{LowerCI, }\DataTypeTok{ymax=}\NormalTok{UpperCI, }\DataTypeTok{fill=}\NormalTok{Variable), }\DataTypeTok{alpha=} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_line}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{color=}\NormalTok{Variable)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{scale\_x\_log10}\NormalTok{(}\DataTypeTok{name=}\KeywordTok{expression}\NormalTok{(epsilon)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Slope estimate  ± standard error"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =} \KeywordTok{expression}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"Marriage = MedianAgeMarriage + Normal(0, "}\NormalTok{, epsilon, }\StringTok{")"}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3M6-simulation-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-19-1.pdf}
 
-\hypertarget{hard}{%
-\subsubsection*{Hard}\label{hard}}
-\addcontentsline{toc}{subsubsection}{Hard}
+The stripes show uncertainty (estimate ± standard error) and you can appreciate how quickly it is reduced as marriage rate becomes noisier and just how little noise is required for ``magic'' to start working and converge on the true causal relationship\footnote{It is true only in a sense that it matches the processes of creating the data. It is \emph{not} necessarily truly true for real data!}.
+
+\hypertarget{chain-dag}{%
+\section{Chain DAG}\label{chain-dag}}
+
+So, a bit of noise will fix everything and we can \emph{know} causal relationships between the three variables? Not necessarily! Consider another possible causal diagram:
+\[Marriage~rate~\rightarrow~Age~of~marriage~\rightarrow~Divorce~rate\]
+Now marriage rate causes age of marriage that, in turn, causes divorce rate. Again, let us use synthetic data, so that we can be sure what causes what. However, we will add a fair amount of noise to make it more like real data and avoid multicoliniarity.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{data}\NormalTok{(homeworkch3)}
+\KeywordTok{data}\NormalTok{(}\StringTok{"WaffleDivorce"}\NormalTok{)}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{8973791}\NormalTok{)}
+\NormalTok{N \textless{}{-}}\StringTok{ }\KeywordTok{nrow}\NormalTok{(WaffleDivorce)}
+\NormalTok{sim\_waffles \textless{}{-}}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{Marriage =} \KeywordTok{rnorm}\NormalTok{(N),}
+                      \DataTypeTok{MedianAgeMarriage =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, Marriage, }\FloatTok{0.2}\NormalTok{),}
+                      \DataTypeTok{Divorce =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.2}\NormalTok{))}
+
+\NormalTok{MD\_plot \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Marriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+
+\NormalTok{AD\_plot \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+
+\NormalTok{AM\_plot \textless{}{-}}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Marriage)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
+
+\NormalTok{MD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{AD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{AM\_plot}
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{h1-1}{%
-\subsubsection*{3H1}\label{h1-1}}
-\addcontentsline{toc}{subsubsection}{3H1}
+\begin{center}\includegraphics[width=1\linewidth]{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-20-1} \end{center}
 
-Using grid approximation, compute the posterior distribution for the probability of a birth being a boy. Assume a uniform prior probability. Which parameter value maximizes the posterior probability?
+The plots look very similar to those that we had before, so let us run the model.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{birth }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(birth1, birth2)}
-\NormalTok{birthN }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(birth)}
-\NormalTok{boyN }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(birth)}
-
-\NormalTok{p\_grid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\DecValTok{0}\NormalTok{, }\AttributeTok{to=}\DecValTok{1}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{1000}\NormalTok{)}
-\NormalTok{prior }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
-\NormalTok{likelihood }\OtherTok{\textless{}{-}} \FunctionTok{dbinom}\NormalTok{(boyN, }\AttributeTok{size=}\NormalTok{birthN, }\AttributeTok{prob=}\NormalTok{p\_grid)}
-\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ likelihood }\SpecialCharTok{*}\NormalTok{ prior}
-\NormalTok{posterior }\OtherTok{\textless{}{-}}\NormalTok{ posterior }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(posterior)}
-
-\NormalTok{boyP }\OtherTok{\textless{}{-}}\NormalTok{ p\_grid[}\FunctionTok{which.max}\NormalTok{(posterior)]}
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{p\_grid, }\AttributeTok{y=}\NormalTok{posterior)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{()}\SpecialCharTok{+}
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ boyP, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"Mode: \{round(boyP, 3)\}"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3H1-1.pdf}
-
-\hypertarget{h2-1}{%
-\subsubsection*{3H2}\label{h2-1}}
-\addcontentsline{toc}{subsubsection}{3H2}
-
-Using the sample function, draw 10,000 random parameter values from the posterior distribution you calculated above. Use these samples to estimate the 50\%, 89\%, and 97\% highest posterior density intervals.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
-\NormalTok{samples }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(p\_grid, }\AttributeTok{prob=}\NormalTok{posterior, }\AttributeTok{size=}\FloatTok{1e4}\NormalTok{, }\AttributeTok{replace=}\ConstantTok{TRUE}\NormalTok{)}
-
-\NormalTok{HPDI50 }\OtherTok{\textless{}{-}}\NormalTok{ rethinking}\SpecialCharTok{::}\FunctionTok{HPDI}\NormalTok{(samples, }\AttributeTok{prob =} \FloatTok{0.5}\NormalTok{)}
-\NormalTok{HPDI89 }\OtherTok{\textless{}{-}}\NormalTok{ rethinking}\SpecialCharTok{::}\FunctionTok{HPDI}\NormalTok{(samples, }\AttributeTok{prob =} \FloatTok{0.89}\NormalTok{)}
-\NormalTok{HPDI97 }\OtherTok{\textless{}{-}}\NormalTok{ rethinking}\SpecialCharTok{::}\FunctionTok{HPDI}\NormalTok{(samples, }\AttributeTok{prob =} \FloatTok{0.97}\NormalTok{)}
-
-\NormalTok{all\_HPDI }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(HPDI50, HPDI89, HPDI97)}
-\FunctionTok{names}\NormalTok{(all\_HPDI) }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
-
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{samples)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{40}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ HPDI50, }\AttributeTok{color=}\StringTok{"green"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ HPDI89, }\AttributeTok{color=}\StringTok{"blue"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ HPDI97, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{breaks =}\NormalTok{ all\_HPDI, }\AttributeTok{labels =} \FunctionTok{round}\NormalTok{(all\_HPDI, }\DecValTok{3}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3H2-1.pdf}
-
-\hypertarget{h3-1}{%
-\subsubsection*{3H3}\label{h3-1}}
-\addcontentsline{toc}{subsubsection}{3H3}
-
-Use rbinom to simulate 10,000 replicates of 200 births. You should end up with 10,000 numbers, each one a count of boys out of 200 births. Compare the distribution of predicted numbers of boys to the actual count in the data (111 boys out of 200 births). There are many good ways to visualize the simulations, but the dens command (part of the rethinking package) is probably the easiest way in this case. Does it look like the model fits the data well? That is, does the distribution of predictions include the actual observation as a central, likely outcome?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{sim\_boys }\OtherTok{\textless{}{-}} \FunctionTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, }\DecValTok{200}\NormalTok{, boyN }\SpecialCharTok{/}\NormalTok{ birthN)}
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{sim\_boys)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_density}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ boyN, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3H3-1.pdf}
-
-\hypertarget{h4-1}{%
-\subsubsection*{3H4}\label{h4-1}}
-\addcontentsline{toc}{subsubsection}{3H4}
-
-Now compare 10,000 counts of boys from 100 simulated first borns only to the number of boys in the first births, birth1. How does the model look in this light?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{sim\_boys }\OtherTok{\textless{}{-}} \FunctionTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, }\DecValTok{100}\NormalTok{, boyN }\SpecialCharTok{/}\NormalTok{ birthN)}
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{sim\_boys)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_density}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FunctionTok{sum}\NormalTok{(birth1), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3H4-1.pdf}
-
-\hypertarget{h5}{%
-\subsubsection*{3H5}\label{h5}}
-\addcontentsline{toc}{subsubsection}{3H5}
-
-The model assumes that sex of first and second births are independent. To check this assumption, focus now on second births that followed female first borns. Compare 10,000 simulated counts of boys to only those second births that followed girls. To do this correctly, you need to count the number of first borns who were girls and simulate that many births, 10,000 times. Compare the counts of boys in your simulations to the actual observed count of boys following girls. How does the model look in this light? Any guesses what is going on in these data?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{birth\_after\_girl }\OtherTok{\textless{}{-}}\NormalTok{ birth2[birth1 }\SpecialCharTok{==} \DecValTok{0}\NormalTok{]}
-\NormalTok{sim\_boys }\OtherTok{\textless{}{-}} \FunctionTok{rbinom}\NormalTok{(}\FloatTok{1e4}\NormalTok{, }\FunctionTok{length}\NormalTok{(birth\_after\_girl), boyN }\SpecialCharTok{/}\NormalTok{ birthN)}
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{sim\_boys)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_density}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FunctionTok{sum}\NormalTok{(birth\_after\_girl), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/3H5-1.pdf}
-
-\hypertarget{solutions-for-chapter-4}{%
-\chapter{Solutions for Chapter 4}\label{solutions-for-chapter-4}}
-
-\hypertarget{e1-2}{%
-\subsubsection*{4E1}\label{e1-2}}
-\addcontentsline{toc}{subsubsection}{4E1}
-
-In the model definition below, which line is the likelihood?
-\[\rightarrow ~ y_i \sim Normal(\mu, \sigma) ~ \leftarrow\\
-\mu \sim Normal(0, 10) \\
-\sigma \sim Exponential(1)\]
-
-\hypertarget{e2-2}{%
-\subsubsection*{4E2}\label{e2-2}}
-\addcontentsline{toc}{subsubsection}{4E2}
-
-In the model definition just above, how many parameters are in the posterior distribution?
-
-**Two: \(\mu\) and \(\sigma\).
-
-\hypertarget{e3-2}{%
-\subsubsection*{4E3}\label{e3-2}}
-\addcontentsline{toc}{subsubsection}{4E3}
-
-Using the model definition above, write down the appropriate form of Bayes' theorem that includes the proper likelihood and priors.
-
-\[
-Pr(\mu, \sigma | y) = \frac{\prod_i Normal(y_i| \mu, \sigma) \cdot Normal(mu | 0, 10) \cdot Exponential(\sigma | 1)}
-{\int \int \prod_i Normal(y_i| \mu, \sigma) \cdot Normal(mu | 0, 10) \cdot Exponential(\sigma | 1) \partial \mu \partial \sigma}
-\]
-
-\hypertarget{e4-2}{%
-\subsubsection*{4E4}\label{e4-2}}
-\addcontentsline{toc}{subsubsection}{4E4}
-
-In the model definition below, which line is the linear model?
-
-\[y_i ∼ Normal(\mu, \sigma) \\
-\rightarrow ~\mu_i = \alpha + \beta x_i ~\leftarrow\\
-α ∼ Normal(0, 10) \\ 
-β ∼ Normal(0, 1) \\
-σ ∼ Exponential(2)\]
-
-\hypertarget{e5-1}{%
-\subsubsection*{4E5}\label{e5-1}}
-\addcontentsline{toc}{subsubsection}{4E5}
-
-In the model definition just above, how many parameters are in the posterior distribution?
-
-Three, \(α\), \(β\) (used to compute \(\mu\)), and \(\sigma\).
-
-\hypertarget{m1-2}{%
-\subsubsection*{4M1}\label{m1-2}}
-\addcontentsline{toc}{subsubsection}{4M1}
-
-For the model definition below, simulate observed y values from the prior (not the posterior).
-
-\[y_i \sim Normal(\mu,\sigma) \\
-\mu \sim Normal(0, 10) \\
-\sigma \sim Exponential(1)\]
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(ggplot2)}
-
-\NormalTok{samples\_N }\OtherTok{\textless{}{-}} \FloatTok{1e4}
-\NormalTok{mu }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(samples\_N, }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{)}
-\NormalTok{sigma }\OtherTok{\textless{}{-}} \FunctionTok{rexp}\NormalTok{(samples\_N, }\DecValTok{1}\NormalTok{)}
-\NormalTok{y\_sim }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(samples\_N, mu, sigma)}
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{y\_sim)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{50}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Simulated Y"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/4M1-1.pdf}
-
-\hypertarget{m2-2}{%
-\subsubsection*{4M2}\label{m2-2}}
-\addcontentsline{toc}{subsubsection}{4M2}
-
-Translate the model just above into a quap formula.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{quap\_formula }\OtherTok{\textless{}{-}} \FunctionTok{alist}\NormalTok{(}
-\NormalTok{  y }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu, sigma),}
-\NormalTok{  mu }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{10}\NormalTok{),}
-\NormalTok{  sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\hypertarget{m3-2}{%
-\subsubsection*{4M3}\label{m3-2}}
-\addcontentsline{toc}{subsubsection}{4M3}
-
-Translate the quap model formula below into a mathematical model definition.
-
-\begin{verbatim}
-y ~ dnorm( mu , sigma ),
-mu <- a + b*x,
-a ~ dnorm( 0 , 10 ),
-b ~ dunif( 0 , 1 ),
-sigma ~ dexp( 1 )
-\end{verbatim}
-
-\[y_i ∼ Normal(\mu, \sigma) \\
-\mu_i = \alpha + \beta x_i \\
-α ∼ Normal(0, 10) \\ 
-β ∼ Uniform(0, 1) \\
-σ ∼ Exponential(1)\]
-
-\hypertarget{m4-2}{%
-\subsubsection*{4M4}\label{m4-2}}
-\addcontentsline{toc}{subsubsection}{4M4}
-
-A sample of students is measured for height each year for 3 years. After the third year, you want to fit a linear regression predicting height using year as a predictor. Write down the mathematical model definition for this regression, using any variable names and priors you choose. Be prepared to defend your choice of priors.
-
-I assume \emph{students} as in \emph{college students}. Therefore, you would expect an adult height, may be slightly lower, hence \texttt{170} for the intercept. You don't expect them to grow much, hence conservative slope for the effect of the year. I assume a fairly broad but strictly positive prior for \(\sigma\).
-
-\[h_i ∼ Normal(\mu, \sigma) \\
-\mu_i = \alpha + \beta year_i \\
-α ∼ Normal(170, 10) \\ 
-β ∼ Normal(0, 1) \\
-σ ∼ Exponential(0.1)\]
-
-\hypertarget{m5-2}{%
-\subsubsection*{4M5}\label{m5-2}}
-\addcontentsline{toc}{subsubsection}{4M5}
-
-Now suppose I remind you that every student got taller each year. Does this information lead you to change your choice of priors? How?
-
-I would ensure that \(\beta\) can be only positive, so \(β ∼ Exponential(1)\).
-
-\hypertarget{m6-2}{%
-\subsubsection*{4M6}\label{m6-2}}
-\addcontentsline{toc}{subsubsection}{4M6}
-
-Now suppose I tell you that the variance among heights for students of the same age is never more than 64cm. How does this lead you to revise your priors?
-
-Based on the density plot, I would pick a more conservative prior of \(\sigma \sim Exponential(0.5)\) that drops off more rapidly and just barely includes \(\sqrt(64)\).
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{x }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{100}\NormalTok{)}
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{x, }\AttributeTok{y=} \FunctionTok{dexp}\NormalTok{(x, }\FloatTok{0.5}\NormalTok{))) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{breaks =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Probability density"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-21-1.pdf}
-
-\hypertarget{m7-1}{%
-\subsubsection*{4M7}\label{m7-1}}
-\addcontentsline{toc}{subsubsection}{4M7}
-
-Refit model m4.3 from the chapter, but omit the mean weight xbar this time. Compare the new model's posterior to that of the original model. In particular, look at the covariance among the parameters. What is different? Then compare the posterior predictions of both models.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# load data again, since it\textquotesingle{}s a long way back}
-\FunctionTok{library}\NormalTok{(rethinking)}
-\FunctionTok{data}\NormalTok{(Howell1); }
-\NormalTok{d }\OtherTok{\textless{}{-}}\NormalTok{ Howell1; }
-\NormalTok{d2 }\OtherTok{\textless{}{-}}\NormalTok{ d[d}\SpecialCharTok{$}\NormalTok{age }\SpecialCharTok{\textgreater{}=} \DecValTok{18}\NormalTok{,]}
-
-\CommentTok{\# define the average weight, x{-}bar}
-\NormalTok{xbar }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(d2}\SpecialCharTok{$}\NormalTok{weight)}
-\CommentTok{\# fit model}
-
-\NormalTok{m4\_3c }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
-  \FunctionTok{alist}\NormalTok{(}
-\NormalTok{    height }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu, sigma),}
-\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ b }\SpecialCharTok{*}\NormalTok{ (weight }\SpecialCharTok{{-}}\NormalTok{ xbar),}
-\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{178}\NormalTok{, }\DecValTok{20}\NormalTok{) ,}
-\NormalTok{    b }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dlnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{) ,}
-\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) , }
-  \AttributeTok{data=}\NormalTok{d2)}
-
-\NormalTok{m4\_3 }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
-  \FunctionTok{alist}\NormalTok{(}
-\NormalTok{    height }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu, sigma),}
-\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ b }\SpecialCharTok{*}\NormalTok{ weight,}
-\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{178}\NormalTok{, }\DecValTok{20}\NormalTok{) ,}
-\NormalTok{    b }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dlnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{) ,}
-\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) , }
-  \AttributeTok{data=}\NormalTok{d2)}
-
-\FunctionTok{precis}\NormalTok{(m4\_3)}
+\NormalTok{sim\_waffles \textless{}{-}}
+\StringTok{  }\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{A =}\NormalTok{ MedianAgeMarriage,}
+         \DataTypeTok{M =}\NormalTok{ Marriage,}
+         \DataTypeTok{D =}\NormalTok{ Divorce)}
+
+\NormalTok{sim\_waffles\_fit \textless{}{-}}\StringTok{ }\KeywordTok{quap}\NormalTok{(}
+  \KeywordTok{alist}\NormalTok{(}
+\NormalTok{    D }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(mu , sigma) ,}
+\NormalTok{    mu \textless{}{-}}\StringTok{ }\NormalTok{a }\OperatorTok{+}\StringTok{ }\NormalTok{bM}\OperatorTok{*}\NormalTok{M }\OperatorTok{+}\StringTok{ }\NormalTok{bA}\OperatorTok{*}\NormalTok{A,}
+\NormalTok{    a }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.2}\NormalTok{),}
+\NormalTok{    bA }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
+\NormalTok{    bM }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
+\NormalTok{    sigma }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\NormalTok{  ), }
+  \DataTypeTok{data =}\NormalTok{ sim\_waffles,}
+\NormalTok{)}
+
+\KeywordTok{precis}\NormalTok{(sim\_waffles\_fit)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
 ##              mean         sd        5.5%       94.5%
-## a     114.5342008 1.89774719 111.5012343 117.5671674
-## b       0.8907326 0.04175799   0.8239952   0.9574699
-## sigma   5.0727190 0.19124895   4.7670662   5.3783718
+## a      0.01141493 0.02370058 -0.02646318  0.04929304
+## bA    -1.04399582 0.11019913 -1.22011532 -0.86787631
+## bM    -0.05011269 0.12299879 -0.24668851  0.14646313
+## sigma  0.16656407 0.01661272  0.14001374  0.19311440
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{precis}\NormalTok{(m4\_3c)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##              mean         sd        5.5%      94.5%
-## a     154.6013683 0.27030768 154.1693645 155.033372
-## b       0.9032809 0.04192363   0.8362788   0.970283
-## sigma   5.0718813 0.19115482   4.7663790   5.377384
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{round}\NormalTok{(}\FunctionTok{vcov}\NormalTok{(m4\_3), }\DecValTok{3}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##            a      b sigma
-## a      3.601 -0.078 0.009
-## b     -0.078  0.002 0.000
-## sigma  0.009  0.000 0.037
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{round}\NormalTok{(}\FunctionTok{vcov}\NormalTok{(m4\_3c), }\DecValTok{3}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##           a     b sigma
-## a     0.073 0.000 0.000
-## b     0.000 0.002 0.000
-## sigma 0.000 0.000 0.037
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{post }\OtherTok{\textless{}{-}} \FunctionTok{extract.samples}\NormalTok{(m4\_3)}
-\NormalTok{a\_map }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(post}\SpecialCharTok{$}\NormalTok{a)}
-\NormalTok{b\_map }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(post}\SpecialCharTok{$}\NormalTok{b)}
-
-\NormalTok{w }\OtherTok{\textless{}{-}}\NormalTok{ d2}\SpecialCharTok{$}\NormalTok{weight}
-\NormalTok{prediction }\OtherTok{\textless{}{-}}\NormalTok{ a\_map }\SpecialCharTok{+}\NormalTok{ b\_map}\SpecialCharTok{*}\NormalTok{w}
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ d2, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{weight, }\AttributeTok{y=}\NormalTok{height)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data =} \ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{w, }\AttributeTok{y=}\NormalTok{prediction))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/4M7-5-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{post }\OtherTok{\textless{}{-}} \FunctionTok{extract.samples}\NormalTok{(m4\_3c)}
-\NormalTok{a\_map }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(post}\SpecialCharTok{$}\NormalTok{a)}
-\NormalTok{b\_map }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(post}\SpecialCharTok{$}\NormalTok{b)}
-
-\NormalTok{w }\OtherTok{\textless{}{-}}\NormalTok{ d2}\SpecialCharTok{$}\NormalTok{weight}
-\NormalTok{prediction }\OtherTok{\textless{}{-}}\NormalTok{ a\_map }\SpecialCharTok{+}\NormalTok{ b\_map}\SpecialCharTok{*}\NormalTok{(w }\SpecialCharTok{{-}}\NormalTok{ xbar)}
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ d2, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{weight, }\AttributeTok{y=}\NormalTok{height)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data =} \ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{w, }\AttributeTok{y=}\NormalTok{prediction))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-22-1.pdf}
-
-\hypertarget{m8}{%
-\subsubsection*{4M8}\label{m8}}
-\addcontentsline{toc}{subsubsection}{4M8}
-
-In the chapter, we used 15 knots with the cherry blossom spline. Increase the number of knots and observe what happens to the resulting spline. Then adjust also the width of the prior on the weights---change the standard deviation of the prior and watch what happens. What do you think the combination of knot number and the prior on the weights controls?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{data}\NormalTok{(cherry\_blossoms)}
-\NormalTok{d }\OtherTok{\textless{}{-}}\NormalTok{ cherry\_blossoms}
-\NormalTok{d2 }\OtherTok{\textless{}{-}}\NormalTok{ d[ }\FunctionTok{complete.cases}\NormalTok{(d}\SpecialCharTok{$}\NormalTok{doy) , ] }\CommentTok{\# complete cases on doy}
-\NormalTok{num\_knots }\OtherTok{\textless{}{-}} \DecValTok{30}
-\NormalTok{knot\_list }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{( d2}\SpecialCharTok{$}\NormalTok{year , }\AttributeTok{probs=}\FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\AttributeTok{length.out=}\NormalTok{num\_knots) )}
-\NormalTok{B }\OtherTok{\textless{}{-}} \FunctionTok{bs}\NormalTok{(d2}\SpecialCharTok{$}\NormalTok{year,}
-        \AttributeTok{knots=}\NormalTok{knot\_list[}\SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,num\_knots)],}
-        \AttributeTok{degree=}\DecValTok{3}\NormalTok{ , }\AttributeTok{intercept=}\ConstantTok{TRUE}\NormalTok{)}
-
-\NormalTok{m4}\FloatTok{.7}\NormalTok{\_30 }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
-  \FunctionTok{alist}\NormalTok{(}
-\NormalTok{    D }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{( mu , sigma ) ,}
-\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ B }\SpecialCharTok{\%*\%}\NormalTok{ w ,}
-\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{100}\NormalTok{,}\DecValTok{10}\NormalTok{),}
-\NormalTok{    w }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{10}\NormalTok{),}
-\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{)), }
-  \AttributeTok{data=}\FunctionTok{list}\NormalTok{(}\AttributeTok{D=}\NormalTok{d2}\SpecialCharTok{$}\NormalTok{doy, }\AttributeTok{B=}\NormalTok{B) ,}
-  \AttributeTok{start=}\FunctionTok{list}\NormalTok{(}\AttributeTok{w=}\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FunctionTok{ncol}\NormalTok{(B))))}
-
-\NormalTok{mu }\OtherTok{\textless{}{-}} \FunctionTok{link}\NormalTok{( m4}\FloatTok{.7}\NormalTok{\_30 )}
-\NormalTok{mu\_PI }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(mu,}\DecValTok{2}\NormalTok{, PI, }\FloatTok{0.97}\NormalTok{)}
-\FunctionTok{plot}\NormalTok{( d2}\SpecialCharTok{$}\NormalTok{year , d2}\SpecialCharTok{$}\NormalTok{doy , }\AttributeTok{col=}\FunctionTok{col.alpha}\NormalTok{(rangi2,}\FloatTok{0.3}\NormalTok{) , }\AttributeTok{pch=}\DecValTok{16}\NormalTok{ )}
-\FunctionTok{shade}\NormalTok{( mu\_PI , d2}\SpecialCharTok{$}\NormalTok{year , }\AttributeTok{col=}\FunctionTok{col.alpha}\NormalTok{(}\StringTok{"black"}\NormalTok{,}\FloatTok{0.5}\NormalTok{) )}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/4M8-1.pdf}
-\textbf{Together, they control just how wiggly vs.~smooth the resultant curve is.}
-
-\hypertarget{h1-2}{%
-\subsubsection*{4H1}\label{h1-2}}
-\addcontentsline{toc}{subsubsection}{4H1}
-
-The weights listed below were recorded in the !Kung census, but heights were not recorded for these individuals. Provide predicted heights and 89\% intervals for each of these individuals. That is, fill in the table below, using model-based predictions.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{predicted\_weight }\OtherTok{\textless{}{-}} 
-  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{Individual =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{,}
-         \AttributeTok{weight =} \FunctionTok{c}\NormalTok{(}\FloatTok{46.95}\NormalTok{, }\FloatTok{43.72}\NormalTok{, }\FloatTok{64.78}\NormalTok{, }\FloatTok{32.59}\NormalTok{, }\FloatTok{54.63}\NormalTok{))}
-
-\CommentTok{\# getting sampled means}
-\NormalTok{posterior\_mu }\OtherTok{\textless{}{-}} \FunctionTok{link}\NormalTok{(m4\_3c, }\AttributeTok{data=}\NormalTok{predicted\_weight)}
-
-\NormalTok{predicted\_weight }\OtherTok{\textless{}{-}}\NormalTok{ predicted\_weight }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{expected height}\StringTok{\textasciigrave{}} \OtherTok{=} \FunctionTok{apply}\NormalTok{(posterior\_mu, }\DecValTok{2}\NormalTok{, mean), }
-         \AttributeTok{LowerCI =} \FunctionTok{round}\NormalTok{(}\FunctionTok{apply}\NormalTok{(posterior\_mu, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{), }\DecValTok{2}\NormalTok{),}
-         \AttributeTok{UpperCI =} \FunctionTok{round}\NormalTok{(}\FunctionTok{apply}\NormalTok{(posterior\_mu, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{), }\DecValTok{2}\NormalTok{),}
-         \StringTok{\textasciigrave{}}\AttributeTok{89\% interval}\StringTok{\textasciigrave{}} \OtherTok{=}\NormalTok{ glue}\SpecialCharTok{::}\FunctionTok{glue}\NormalTok{(}\StringTok{"\{LowerCI\}..\{UpperCI\}"}\NormalTok{))  }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{LowerCI, }\SpecialCharTok{{-}}\NormalTok{UpperCI)}
-
-\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(predicted\_weight)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{tabular}{r|r|r|l}
-\hline
-Individual & weight & expected height & 89\% interval\\
-\hline
-1 & 46.95 & 156.3876 & 155.97..156.83\\
-\hline
-2 & 43.72 & 153.4682 & 153.05..153.89\\
-\hline
-3 & 64.78 & 172.5032 & 171.1..173.91\\
-\hline
-4 & 32.59 & 143.4083 & 142.5..144.37\\
-\hline
-5 & 54.63 & 163.3292 & 162.57..164.07\\
-\hline
-\end{tabular}
-
-\hypertarget{h2-2}{%
-\subsubsection*{4H2}\label{h2-2}}
-\addcontentsline{toc}{subsubsection}{4H2}
-
-Select out all the rows in the Howell1 data with ages below 18 years of age. If you do it right, you should end up with a new data frame with 192 rows in it.
-
-\begin{enumerate}
-\def\labelenumi{\alph{enumi}.}
-\tightlist
-\item
-  Fit a linear regression to these data, using quap. Present and interpret the estimates. For
-  every 10 units of increase in weight, how much taller does the model predict a child gets?
-\end{enumerate}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{kung\_kids }\OtherTok{\textless{}{-}} \FunctionTok{filter}\NormalTok{(Howell1, age }\SpecialCharTok{\textless{}} \DecValTok{18}\NormalTok{)}
-
-\CommentTok{\# define the average weight, x{-}bar}
-\NormalTok{avg\_kid\_weight }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(kung\_kids}\SpecialCharTok{$}\NormalTok{weight)}
-
-\CommentTok{\# fit model}
-\NormalTok{kung\_kids\_fit }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
-  \FunctionTok{alist}\NormalTok{(}
-\NormalTok{    height }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu, sigma),}
-\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ b }\SpecialCharTok{*}\NormalTok{ (weight }\SpecialCharTok{{-}}\NormalTok{ avg\_kid\_weight),}
-\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{140}\NormalTok{, }\DecValTok{20}\NormalTok{) ,}
-\NormalTok{    b }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dlnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{) ,}
-\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) , }
-  \AttributeTok{data=}\NormalTok{kung\_kids)}
-
-\FunctionTok{precis}\NormalTok{(kung\_kids\_fit)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##             mean         sd       5.5%      94.5%
-## a     108.348193 0.60862837 107.375488 109.320899
-## b       2.716657 0.06831574   2.607475   2.825839
-## sigma   8.437208 0.43057023   7.749073   9.125342
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{b\_mean }\OtherTok{\textless{}{-}} \FunctionTok{precis}\NormalTok{(kung\_kids\_fit)[}\StringTok{\textquotesingle{}b\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}mean\textquotesingle{}}\NormalTok{]}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{For every 10 units of increase in weight, the model predict a child will get 27.2 cm taller.}
-
-\begin{enumerate}
-\def\labelenumi{\alph{enumi}.}
-\setcounter{enumi}{1}
-\tightlist
-\item
-  Plot the raw data, with height on the vertical axis and weight on the horizontal axis. Superimpose the MAP regression line and 89\% interval for the mean. Also superimpose the 89\% interval for predicted heights.
-\end{enumerate}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{mean\_estimates }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{weight =} \FunctionTok{seq}\NormalTok{(}\FunctionTok{min}\NormalTok{(kung\_kids}\SpecialCharTok{$}\NormalTok{weight), }\FunctionTok{max}\NormalTok{(kung\_kids}\SpecialCharTok{$}\NormalTok{weight), }\AttributeTok{length.out =} \DecValTok{100}\NormalTok{))}
-\NormalTok{sample\_means }\OtherTok{\textless{}{-}} \FunctionTok{link}\NormalTok{(kung\_kids\_fit, mean\_estimates)}
-\NormalTok{mean\_estimates }\OtherTok{\textless{}{-}}
-\NormalTok{  mean\_estimates }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{mu =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, mean),}
-         \AttributeTok{lowerCI =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{),}
-         \AttributeTok{upperCI =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
-
-\NormalTok{simulated\_height\_samples }\OtherTok{\textless{}{-}} \FunctionTok{sim}\NormalTok{(kung\_kids\_fit, mean\_estimates)}
-\NormalTok{simulated\_height }\OtherTok{\textless{}{-}}
-\NormalTok{  mean\_estimates }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{lowerCI =} \FunctionTok{apply}\NormalTok{(simulated\_height\_samples, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{),}
-         \AttributeTok{upperCI =} \FunctionTok{apply}\NormalTok{(simulated\_height\_samples, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
-
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ kung\_kids, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ weight, }\AttributeTok{y=}\NormalTok{height)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{simulated\_height, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{lowerCI, }\AttributeTok{ymin=}\NormalTok{lowerCI, }\AttributeTok{ymax=}\NormalTok{upperCI), }\AttributeTok{fill=}\StringTok{"blue"}\NormalTok{, }\AttributeTok{alpha=}\FloatTok{0.5}\NormalTok{)}\SpecialCharTok{+}
-  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{mean\_estimates, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{mu, }\AttributeTok{ymin=}\NormalTok{lowerCI, }\AttributeTok{ymax=}\NormalTok{upperCI), }\AttributeTok{fill=}\StringTok{"blue"}\NormalTok{)}\SpecialCharTok{+}
-  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{mean\_estimates, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{mu))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/4H2b-1.pdf}
-
-\begin{enumerate}
-\def\labelenumi{\alph{enumi}.}
-\setcounter{enumi}{2}
-\tightlist
-\item
-  What aspects of the model fit concern you? Describe the kinds of assumptions you would
-  change, if any, to improve the model. You don't have to write any new code. Just explain what the
-  model appears to be doing a bad job of, and what you hypothesize would be a better model.
-\end{enumerate}
-
-\textbf{The relationship is clearly no linear with rapid growth for smaller children turning into a more slow one for older ones.}
-
-\hypertarget{h3-2}{%
-\subsubsection*{4H3}\label{h3-2}}
-\addcontentsline{toc}{subsubsection}{4H3}
-
-Suppose a colleague of yours, who works on allometry, glances at the practice problems just above. Your colleague exclaims, ``That's silly. Everyone knows that it's only the logarithm of body weight that scales with height!'' Let's take your colleague's advice and see what happens.
-
-\begin{enumerate}
-\def\labelenumi{(\alph{enumi})}
-\tightlist
-\item
-  Model the relationship between height (cm) and the natural logarithm of weight (log-kg). Use the entire Howell1 data frame, all 544 rows, adults and non-adults. Can you interpret the resulting estimates?
-\end{enumerate}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{kung }\OtherTok{\textless{}{-}} 
-\NormalTok{  Howell1 }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{logWeight =} \FunctionTok{log}\NormalTok{(weight))}
-
-\CommentTok{\# define the average weight, x{-}bar}
-\NormalTok{avg\_log\_weight }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(kung}\SpecialCharTok{$}\NormalTok{logWeight)}
-
-\CommentTok{\# fit model}
-\NormalTok{kung\_fit }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
-  \FunctionTok{alist}\NormalTok{(}
-\NormalTok{    height }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu, sigma),}
-\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ b }\SpecialCharTok{*}\NormalTok{ (logWeight }\SpecialCharTok{{-}}\NormalTok{ avg\_log\_weight),}
-\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{140}\NormalTok{, }\DecValTok{20}\NormalTok{) ,}
-\NormalTok{    b }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dlnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{) ,}
-\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) , }
-  \AttributeTok{data=}\NormalTok{kung)}
-
-\FunctionTok{precis}\NormalTok{(kung\_fit)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##             mean        sd       5.5%      94.5%
-## a     138.263717 0.2201177 137.911927 138.615508
-## b      47.072415 0.3826000  46.460947  47.683884
-## sigma   5.134294 0.1556374   4.885555   5.383032
-\end{verbatim}
-
-\textbf{Not really, as \texttt{b} now refers to change in height in response to 1 log-Kg of weight.}
-
-\begin{enumerate}
-\def\labelenumi{(\alph{enumi})}
-\setcounter{enumi}{1}
-\tightlist
-\item
-  Begin with this plot: plot( height \textasciitilde{} weight , data=Howell1 ). Then use samples from the quadratic approximate posterior of the model in (a) to superimpose on the plot:
-
-  \begin{enumerate}
-  \def\labelenumii{(\arabic{enumii})}
-  \tightlist
-  \item
-    the predicted mean height as a function of weight,
-  \item
-    the 97\% interval for the mean, and
-  \item
-    the 97\% interval for predicted heights.
-  \end{enumerate}
-\end{enumerate}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{mean\_estimates }\OtherTok{\textless{}{-}} 
-  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{weight =} \FunctionTok{seq}\NormalTok{(}\FunctionTok{min}\NormalTok{(kung}\SpecialCharTok{$}\NormalTok{weight), }\FunctionTok{max}\NormalTok{(kung}\SpecialCharTok{$}\NormalTok{weight), }\AttributeTok{length.out =} \DecValTok{100}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{logWeight =} \FunctionTok{log}\NormalTok{(weight))}
-
-\NormalTok{sample\_means }\OtherTok{\textless{}{-}} \FunctionTok{link}\NormalTok{(kung\_fit, mean\_estimates)}
-\NormalTok{mean\_estimates }\OtherTok{\textless{}{-}}
-\NormalTok{  mean\_estimates }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{mu =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, mean),}
-         \AttributeTok{lowerCI =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{),}
-         \AttributeTok{upperCI =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
-
-\NormalTok{simulated\_height\_samples }\OtherTok{\textless{}{-}} \FunctionTok{sim}\NormalTok{(kung\_fit, mean\_estimates)}
-\NormalTok{simulated\_height }\OtherTok{\textless{}{-}}
-\NormalTok{  mean\_estimates }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{lowerCI =} \FunctionTok{apply}\NormalTok{(simulated\_height\_samples, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{),}
-         \AttributeTok{upperCI =} \FunctionTok{apply}\NormalTok{(simulated\_height\_samples, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
-
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ kung, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ weight, }\AttributeTok{y=}\NormalTok{height)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{simulated\_height, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{lowerCI, }\AttributeTok{ymin=}\NormalTok{lowerCI, }\AttributeTok{ymax=}\NormalTok{upperCI), }\AttributeTok{fill=}\StringTok{"blue"}\NormalTok{, }\AttributeTok{alpha=}\FloatTok{0.5}\NormalTok{)}\SpecialCharTok{+}
-  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{mean\_estimates, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{mu, }\AttributeTok{ymin=}\NormalTok{lowerCI, }\AttributeTok{ymax=}\NormalTok{upperCI), }\AttributeTok{fill=}\StringTok{"blue"}\NormalTok{)}\SpecialCharTok{+}
-  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{mean\_estimates, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{mu))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/4H3b-1.pdf}
-
-\hypertarget{h4-2}{%
-\subsubsection*{4H4}\label{h4-2}}
-\addcontentsline{toc}{subsubsection}{4H4}
-
-Plot the prior predictive distribution for the parabolic polynomial regression model in the chapter. You can modify the code that plots the linear regression prior predictive distribution. Can you modify the prior distributions of α, β1, and β2 so that the prior predictions stay within the biologically reasonable outcome space? That is to say: Do not try to fit the data by hand. But do try to keep the curves consistent with what you know about height and weight, before seeing these exact data.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{zWeight }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FunctionTok{scale}\NormalTok{(kung}\SpecialCharTok{$}\NormalTok{weight))}
-
-\NormalTok{N }\OtherTok{\textless{}{-}} \DecValTok{100}
-\NormalTok{a }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(N, }\DecValTok{100}\NormalTok{, }\DecValTok{20}\NormalTok{)}
-\NormalTok{b1 }\OtherTok{\textless{}{-}} \FunctionTok{rlnorm}\NormalTok{(N, }\FloatTok{2.5}\NormalTok{, }\FloatTok{0.5}\NormalTok{)}
-\NormalTok{b2 }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(N, }\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{)}
-\NormalTok{x }\OtherTok{\textless{}{-}}\NormalTok{ zWeight}
-\NormalTok{x2 }\OtherTok{\textless{}{-}}\NormalTok{ zWeight}\SpecialCharTok{\^{}}\DecValTok{2}
-\FunctionTok{plot}\NormalTok{(}\ConstantTok{NULL}\NormalTok{, }\AttributeTok{xlim=}\FunctionTok{range}\NormalTok{(zWeight), }\AttributeTok{ylim=}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{300}\NormalTok{),}
-    \AttributeTok{xlab=}\StringTok{"zWeight"}\NormalTok{, }\AttributeTok{ylab=}\StringTok{"height"}\NormalTok{)}
-
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{N)\{}
-  \FunctionTok{curve}\NormalTok{( a[i] }\SpecialCharTok{+}\NormalTok{ b1[i]}\SpecialCharTok{*}\NormalTok{x }\SpecialCharTok{+}\NormalTok{ b2[i]}\SpecialCharTok{*}\NormalTok{(x}\SpecialCharTok{*}\NormalTok{x),}
-  \AttributeTok{from=}\FunctionTok{min}\NormalTok{(zWeight), }\AttributeTok{to=}\FunctionTok{max}\NormalTok{(zWeight), }
-  \AttributeTok{add=}\ConstantTok{TRUE}\NormalTok{,}
-  \AttributeTok{col=}\FunctionTok{col.alpha}\NormalTok{(}\StringTok{"black"}\NormalTok{,}\FloatTok{0.2}\NormalTok{))}
-\NormalTok{\} }
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/4H4-1.pdf}
-
-\hypertarget{h5-1}{%
-\subsubsection*{4H5}\label{h5-1}}
-\addcontentsline{toc}{subsubsection}{4H5}
-
-Return to data(cherry\_blossoms) and model the association between blossom date (doy) and March temperature (temp). Note that there are many missing values in both variables. You may consider a linear model, a polynomial, or a spline on temperature. How well does temperature trend predict the blossom trend?
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{sakura }\OtherTok{\textless{}{-}} 
-\NormalTok{  cherry\_blossoms }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{drop\_na}\NormalTok{(doy, temp)}
-
-\NormalTok{avg\_temp }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(sakura}\SpecialCharTok{$}\NormalTok{temp)}
-
-\NormalTok{sakura\_fit }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
-  \FunctionTok{alist}\NormalTok{(}
-\NormalTok{    doy }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu, sigma),}
-\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ b }\SpecialCharTok{*}\NormalTok{ (temp }\SpecialCharTok{{-}}\NormalTok{ avg\_temp),}
-\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{75}\NormalTok{, }\DecValTok{30}\NormalTok{), }\CommentTok{\# jan{-}may is about 150 days, so 75±60 is very conservative spring estimate}
-\NormalTok{    b }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\CommentTok{\# we would assume the relationship to be negative, so higher tempratures leading to sooner blooming}
-\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dunif}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{15}\NormalTok{)), }\CommentTok{\# ±30 gives us a month}
-  \AttributeTok{data=}\NormalTok{sakura)}
-
-\FunctionTok{precis}\NormalTok{(sakura\_fit)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##             mean        sd       5.5%      94.5%
-## a     104.919743 0.2107589 104.582909 105.256576
-## b      -2.733661 0.2951189  -3.205318  -2.262004
-## sigma   5.912675 0.1491559   5.674295   6.151055
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{mean\_estimates }\OtherTok{\textless{}{-}} 
-  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{temp =} \FunctionTok{seq}\NormalTok{(}\FunctionTok{min}\NormalTok{(sakura}\SpecialCharTok{$}\NormalTok{temp), }\FunctionTok{max}\NormalTok{(sakura}\SpecialCharTok{$}\NormalTok{temp), }\AttributeTok{length.out =} \DecValTok{100}\NormalTok{))}
-
-\NormalTok{sample\_means }\OtherTok{\textless{}{-}} \FunctionTok{link}\NormalTok{(sakura\_fit, mean\_estimates)}
-\NormalTok{mean\_estimates }\OtherTok{\textless{}{-}}
-\NormalTok{  mean\_estimates }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{mu =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, mean),}
-         \AttributeTok{lowerCI =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{),}
-         \AttributeTok{upperCI =} \FunctionTok{apply}\NormalTok{(sample\_means, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
-
-\NormalTok{simulated\_doy\_samples }\OtherTok{\textless{}{-}} \FunctionTok{sim}\NormalTok{(sakura\_fit, mean\_estimates)}
-\NormalTok{simulated\_doy }\OtherTok{\textless{}{-}}
-\NormalTok{  mean\_estimates }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{lowerCI =} \FunctionTok{apply}\NormalTok{(simulated\_doy\_samples, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{),}
-         \AttributeTok{upperCI =} \FunctionTok{apply}\NormalTok{(simulated\_doy\_samples, }\DecValTok{2}\NormalTok{, quantile, }\AttributeTok{probs=}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\DecValTok{1}\FloatTok{{-}0.89}\NormalTok{)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{))}
-
-\FunctionTok{ggplot}\NormalTok{(sakura, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ temp, }\AttributeTok{y=}\NormalTok{doy)) }\SpecialCharTok{+} 
-  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{simulated\_doy, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{lowerCI, }\AttributeTok{ymin=}\NormalTok{lowerCI, }\AttributeTok{ymax=}\NormalTok{upperCI), }\AttributeTok{fill=}\StringTok{"blue"}\NormalTok{, }\AttributeTok{alpha=}\FloatTok{0.5}\NormalTok{)}\SpecialCharTok{+}
-  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{mean\_estimates, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{mu, }\AttributeTok{ymin=}\NormalTok{lowerCI, }\AttributeTok{ymax=}\NormalTok{upperCI), }\AttributeTok{fill=}\StringTok{"blue"}\NormalTok{)}\SpecialCharTok{+}
-  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
-  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{mean\_estimates, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{mu))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/4H5-1.pdf}
-\textbf{Reasonably well, but you can see a lot of spread in the middle, so other factors are clearly at play.}
-
-\hypertarget{h6}{%
-\subsubsection*{4H6}\label{h6}}
-\addcontentsline{toc}{subsubsection}{4H6}
-
-Simulate the prior predictive distribution for the cherry blossom spline in the chapter. Adjust the prior on the weights and observe what happens. What do you think the prior on the weights is doing?
-
-\hypertarget{h8}{%
-\subsubsection*{4H8}\label{h8}}
-\addcontentsline{toc}{subsubsection}{4H8}
-
-The cherry blossom spline in the chapter used an intercept α, but technically it doesn't require one. The first basis functions could substitute for the intercept. Try refitting the cherry blossom spline without the intercept. What else about the model do you need to change to make this work?
+The model fit is virtually identical to that for the real data and, effectively, for a noisy simulated fork DAG. Yet, remember, that the underlying causal relationship between marriage rate and marriage age are now \emph{opposite}. In the fork DAG, age was causing marriage rate. Here, in the chain DAG, marriage rate for causing age. Moreover, the way we generated synthetic data, marriage rate causes divorce rate, although its effect is \emph{mediated} via marriage age. Yet, looking at the parameter values for \(\beta_M\) we might be tempted to conclude that marriage rate has no effect on divorce rate. To understand why, think about the relationship between marriage rate and age again. We designed it, so that \(A = -M + \epsilon\) and \(D = -A\) (we ignore the noise in the latter part for clarity). Substituting, we get \(D = M - \epsilon\) or, since we designed noise to be symmetric, we can also write \(D = M + \epsilon\). To put it differently, divorce rate are based on \emph{actual} values of age, which include noise. So, somewhat paradoxically, the cleaner version of the original variable is less correlated. If it still unclear, let me try with a metaphor. Imagine your friend sings you a song she heard. \(original \rightarrow friend \rightarrow you\). She remembered it wrong, so her version is somewhat different from the original. But because you are used to \emph{her} version of the song, the original, once you finally hear it, sounds wrong, as it does not have the distortions introduced by your friend.
+
+\hypertarget{take-home-message}{%
+\section{Take-home message}\label{take-home-message}}
+
+So, two DAGs, two \emph{differently} generated data sets, yet, one statistical model. Both DAGs agree that there is a direct causal path between marriage age and divorce but have opposite assumptions about causal relationship between marriage age and rate. What should we conclude from this? That it might be impossible to understand causal relationships between all variables even for the simplest case of just two predictors. The only thing to do is to embrace this ambiguity and be aware of it whenever you interpret regression models. So, you should use DAGs exactly for this purpose of understanding in how many ways can you generate the observed data. I understand that a simple unambiguous story is far more appealing\footnote{``Just tell me how things are!''} but as Jochen Braun of Magdeburg says: ``Do not fall for your own propaganda!''. Selecting just one story / DAG does not make them true. Considering all possible DAGs will likely lead to insights based on predictions they make. Even if your current data cannot decide between them, their different predictions for future experiment will help to solve the puzzle eventually.
+
+Another take home message: Regression models cannot do magic. They can quantify correctional relationship and their signal-to-noise ratios but they do not know causality and they won't tell you which model is the ``true'' model. Imagine that we never measured marriage age, we would model divorce rate from marriage rate and would be quite pleased with the results. And, given how noisy the real data is, we probably did not consider some other \emph{very important} variables, those presence might render age as irrelevant as the marriage rate is now. Again, assuming the chain DAG
+\[marriage~rate \rightarrow age \rightarrow variable~we~missed \rightarrow divorce~rate\]
+Statistical models only work in a small world you created for them. Models are golems, they cannot and do not know about the large world. You do, so it is on you to understand both their limitations and power. Models can help you understand the process you are investigating but they won't understand it for you!
+
+\hypertarget{the-haunted-dag}{%
+\chapter{The haunted DAG}\label{the-haunted-dag}}
+
+These are notes on section \textbf{6.3.2 The haunted DAG} that demonstrates how collider bias can arise, if one of the variables is unobserved and we do not realize that the have a collider in our DAG. The DAG itself is below, I've only changed \texttt{Unobserved} into \texttt{Neighborhood}.
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-23-1.pdf}
+
+The example in the book shows that if we include \texttt{Grandparents} while ``controlling for'' influence of \texttt{Parents} but ignore influence of the \texttt{Neighborhood}, the influence of \texttt{Grandparents} is \emph{negative} rather than \emph{zero}. It is zero in the book but it can originally be positive or negative, point is it is different from what is inferred by the model. And, importantly, an estimated effect of \texttt{Parents} is also different from its true value. The book shows it visually but I found that in this case algebra is helpful to understand it at the level of ``how does a regression model know''.
+
+Let us start with a \emph{full} model. For the sake of simplicity, we will ignore coefficients for computing \texttt{Parents} variable from \texttt{Grandparents} and \texttt{Neighborhood} but this does not change the general picture.
+
+\[ P = G + N\]
+Thus, the linear model for child education is
+\[C = \beta_P P + \beta_G G + \beta_N N\]
+
+Substituting \$ P = G + N\$ gives us
+\[C = \beta_P (G + N) + \beta_G G + \beta_N N\]
+
+Rearranging terms a little
+\[C = (\beta_P + \beta_G) G + (\beta_P  + \beta_N) N\]
+
+Note that this means that we do not fit individual coefficients, in both cases we fit a \emph{sum} of two. And, as with multicollinearity, individual coefficients can be in a wrong place and unreliable as long as they add up to the ``true'' coefficient value. Thus, ignoring the noise and concealing the effect of \texttt{Parents}, we might as well fit
+\[C = \beta_G^\prime G + \beta_N^\prime N\]
+where, \(\beta_G^\prime = \beta_P + \beta_G\) and \(\beta_N^\prime = \beta_P + \beta_N\) are the total effect of grandparents and neighborhood of child education.
+
+What if we ignore \texttt{Neighborhood}? This means that we explicitly set \(\beta_N = 0\) and that is the point when the sum of coefficients starts causing us problems. Recall that the model fits \(\beta_P + \beta_N\) and not each term separately. Thus, setting one of them to 0 does not upset the model, as it can always compensate with the \emph{other} coefficient. Here, that \emph{other} coefficient is \(\beta_P\), so its value now is that of the ``true'' sum: \(\beta_P = \beta_P^{true} + \beta_N^{true}\).
+
+Unfortunately for us, \(\beta_P\) appears at \emph{two} places, as it is also used to quantify effect of grandparents:
+\[(\beta_P + \beta_G) G\]
+
+Originally, it reflected only the influence of parents, so it was not a problem. But now it is artificially inflated \footnote{In general, changed depending on the effect signs of individual effects.} as it stands for influence of both parents \emph{and} neighborhood. Problem? Not for a model that fits a \emph{sum}. How do you make sure that \emph{the sum} still adds up? You change \emph{other} coefficients! Here, we can still wiggle \(\beta_G\) so that everything adds up. Given that
+\[\beta_P = \beta_P^{true} + \beta_N^{true}\]
+model just needs to subtract that same \(\beta_N^{true}\) and get our sum back. So
+\[\beta_P + \beta_G = (\beta_P^{true} + \beta_N^{true}) + (\beta_G^{true} - \beta_N^{true})\]
+
+Thus, if we do not explicitly model the effect of neighborhood, it sneaks in nonetheless, hiding inside \emph{both} parent and grandparent coefficients. What makes it really problematic and confusing is that the effect is \emph{opposite} for the two terms: if we \emph{add} \(\beta_N^{true}\) at one place, we must \emph{subtract} it at the other.
+
+So, what are you supposed to do with this new knowledge? You do not take fitted model coefficients at their face value. You always have a fine-print ``Only assuming that my small world is correct and it probably is not'' at the back of your head. You think of several models and think of ways to tease out the true relationship. DAGs and statistical models can help you, but they cannot do magic and tell the ``real truth'' by themselves.
+
+\hypertarget{information-criteria}{%
+\chapter{Information Criteria}\label{information-criteria}}
+
+These are notes on information criteria, presented in chapter 7 of the Statistical Rethinking book. The purpose of this note is to provide some intuition about the information criteria presented in the ``Statistical Rethinking'' book. I deliberately oversimplified and overgeneralized certain aspects to paint a ``bigger picture''.
+
+\hypertarget{deviance}{%
+\section{Deviance}\label{deviance}}
+
+In the chapter, deviance is introduced as a an estimate for KL-divergence, which in turn is a relative entropy, i.e., the difference between cross-entropy and actual entropy of events. Keep that in mind but you could look at deviance itself as a straightforward goodness-of-fit measure, similar to squared residuals and coefficient of determination \(R^2\). In both cases, you have difference between model prediction (the regression line) and an actual data point. In ordinary least squares (OLS) approach, you quantify this imperfection of prediction by squaring residuals. You sum up all residuals to get the sum of squared residuals (\(SS_{res}\)) and then you can compute \(R^2\) by comparing it to the total sum of residuals in the data (\(SS_{total}\)):
+\[R^2 = 1 - \frac{SS_{res}}{SS_{total}}\]
+
+If you use likelihood, you compute the probability that a data point comes from a distribution defined by a model. Then, you compute the (total) joint probability by multiplying all probabilities or, better still, by computing the sum of their log-transform (log likelihood). Then, you can compare the observed log likelihood to the highest theoretically possible log likelihood for a \emph{saturated model} (\(\Theta_s\)), which has as many parameters as there are data points, so that it predicts each point perfectly. This is the original definition of (total) \emph{deviance}:
+\[D = -2 \cdot (log(p(y|\Theta)) - log(p(y|\Theta_s)))\]
+
+Recall that \(log(\frac{a}{b}) = log(a) - log(b)\), so we can rearrange it and see that it is a log-ratio of likelihoods:
+\[D = -2 \cdot  log \left(\frac{p(y|\Theta)}{p(y|\Theta_s)}\right)\]
+As \(p(y|\Theta)\) increases, the fraction inside get closer to 1. The \(log()\) bit flips and non-linearly scales it. The minus sign flips it back and we end up with smaller numbers meaning better fit.
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-24-1.pdf}
+
+The \(2\) is there to facilitate significance testing for \emph{nested} models. Models \(\Theta1\) and \(\Theta2\) are nested, if \(\Theta2\) has all predictors of \(\Theta1\) plus \emph{k} predictors. E.g., model \(Divorce = Marriage~Rate\) is nested inside \(Divorce = Marriage~Rate + Marriage~Age\) with later model having 1 more parameter. Your actual model \(\Theta\) is nested inside the saturated model \(\Theta_s\) that has \(k = n - k_{model}\) more parameters, where \(n\) is sample size and \(k_{model}\) is number of parameters in your model. It turns out that in this case, you can determine whether the difference in goodness-of-fit between two models is significant using chi-squared distribution with \emph{k} degrees of freedom. The only catch is that log-ratio is half the magnitude, so you need that \(2\) to match things up\footnote{I did not follow the derivation of that correspondence yet, so I cannot comment on how and why.}.
+
+At this point, you might remember that the definition of deviance in the book was for a single model:
+\[D = -2 \cdot log(p(y|\Theta)\]
+
+Unfortunately, same term can be used both ways, to refer to a log likelihood of a single model or, technically more correctly, to the log-ratio you saw above. In reality, you will mostly see deviance defined as in the book because it is used to compare nested models via chi-square distribution as I've described above, with only difference that you compare any two nested models, not just to a saturated one. This is how nested models are frequently compared, for example, see \href{https://stat.ethz.ch/R-manual/R-patched/library/stats/html/anova.html}{anova()} function in R.
+
+Note that a deviance for a single model still expresses the same idea of goodness-of-fit but is merely not normalized. Thus deviance as in the book \(D = -2 \cdot log(p(y|\Theta)\) corresponds to sum of residuals (absolute values mean nothing but you can use them to compare two models on the same data), whereas \emph{total} deviance corresponds to the \(R^2\) (values are directly interpretable, theoretically, you can use them to compare models fit on different samples).
+
+\hypertarget{general-idea-information-criteria-as-miles-per-gallon}{%
+\section{General idea: information criteria as miles-per-gallon}\label{general-idea-information-criteria-as-miles-per-gallon}}
+
+The general formula for all information criteria discussed below is
+\[-2\cdot log(\frac{goodness~of~fit}{model~complexity})\]
+
+The goodness-of-fit in the numerator is the likelihood, the joint probability of observing the model given each data point \(\prod_i p(\Theta|y_i)\). The denominator expresses model complexity, i.e., its flexibility in fitting the sample and, therefore, its tendency to overfit. Thus, the fraction itself is \emph{goodness-of-fit per unit of model complexity}. This is like miles-per-gallon for car efficiency, so better models are more efficient models, churning out more goodness per complexity.
+
+The numerator is the same for all information criteria discussed below and they differ only in how they compute the model complexity.
+
+\hypertarget{akaike-information-criterion-aic}{%
+\section{Akaike Information Criterion (AIC)}\label{akaike-information-criterion-aic}}
+
+The formula most commonly used is
+\[ AIC = -2\cdot log(p(\Theta|y)) + 2k \]
+where \(k\) is the number of parameters of the model. If you are not a mathematician who is used to translate back-and-forth using logarithms, you may fail spot to the ratio I was talking about earlier. For this, you need to keep in mind that \(log(\frac{a}{b}) = log(a) - log(b)\) and that \(a = log(exp(a))\). Let us re-arrange a bit to get the log-ratio back:
+\[ AIC = -2\cdot log(p(\Theta|y)) + 2k \]
+\[ AIC = -2 (log(p(\Theta|y)) - k)\]
+\[ AIC = -2 (log(p(\Theta|y)) - log(exp(k))\]
+\[ AIC = -2 \cdot log \left(\frac{p(\Theta|y)}{exp(k)} \right)\]
+And here it is, the log-ratio I've promised! As you can see, AIC assumes that model complexity grows exponentially with the number of parameters. In other words, adding another parameter increases complexity \textasciitilde{}\(2.718\) times.
+
+If you are to use AIC, the current recommendation is to \emph{correct it} with an extra penalty for the size of the sample
+\[AICc = AIC + \frac{2k^2 + 2k}{n - k - 1}\]
+where \(n\) is the sample size. I won't do it here but you should be able to work out how it is added into the exponent in the denominator.
+
+\hypertarget{bayesian-information-criterion-bic}{%
+\section{Bayesian information criterion (BIC)}\label{bayesian-information-criterion-bic}}
+
+A.k.a. Schwarz information criterion (SIC, SBC, SBIC). The motivation is the same as with AIC but the complexity term, in addition to the number of parameters, also reflects the sample size \(n\).
+
+\[BIC = -2\cdot log(p(\Theta|y)) + log(n) k \]
+
+Let us do re-arranging again
+\[BIC = -2\cdot log(p(\Theta|y)) + log(n) k \]
+\[BIC = -2 \left( log(p(\Theta|y)) + log(n) \frac{k}{2} \right) \]
+\[BIC = -2 \left( log(p(\Theta|y)) + log \left(exp(log(n) \cdot \frac{k}{2} \right) \right) \]
+
+For the complexity term, we need to keep in mind that \(exp(a \cdot b) = exp(a)^b\). Thus,
+\[exp \left(log(n) \cdot \frac{k}{2} \right)= exp(log(n)) ^ \frac{k}{2} = n^\frac{k}{2}\]
+Putting the complexity term back, we get
+\[BIC = -2 \left( log(p(\Theta|y)) + log \left(n^\frac{k}{2} \right) \right)\]
+\[BIC = -2 \cdot log \left(\frac{p(\Theta|y)}{n^\frac{k}{2}} \right)\]
+Thus, we end up with very similar power law complexity term which uses sample size instead of Euler's number as the base.
+
+\hypertarget{problem-of-aic-and-bic-one-size-may-not-fit-all}{%
+\section{Problem of AIC and BIC: one size may not fit all}\label{problem-of-aic-and-bic-one-size-may-not-fit-all}}
+
+Both AIC and BIC assume that model complexity and flexibility, that leads to overfitting, is reflected in the number of parameters \emph{k}. However, this is a fairly indirect measure of a model flexibility, based on how models in general tend to overfit data in general. But you probably want to know how your specific model uses its parameters to fit your specific sample and how much overfitting you should expect in that specific case. Because even if a parameter is present in the model, it may not be able to fully use it in case of regularization or multilevel models.
+
+Regularization, in form of strong priors, lasso/ridge regression, etc., restricts the range of values that a given parameter can take. Thus, a model cannot exploit it as much as \emph{other} parameters and will be less able to use it to improve fit to the sample. Similarly, in hierarchical multilevel modeling, you may have dozens or hundreds of parameters that describe intercepts and/or slopes for individual participants (random factors, in general), but most of them could be trivially average (same as or very similar to the group average) and contribute little to the actual fit. In these cases, a simple raw count, which treats all parameters as equals, will overestimate model complexity.
+
+The desire to go beyond one-size-fits-all approach and be as model- and data-specific led to development of deviance information criterion (DIC) and widely-applicable information criterion (WAIC). Both use posterior distribution of \emph{in-sample} deviance and base their penalty on how \emph{variable} this posterior distribution is. Higher variance, meaning that a model produces very different fits ranging from excellent to terrible, hints that model is too flexible for its own good and leads to higher complexity estimate (penalty for overfitting). Conversely, very similar posterior deviance (low variance) means that model is too restricted to fine-tune itself to the sample and its complexity is low.
+
+If you understand why variance of the posterior distribution of divergence is related to models' flexibility and, therefore, to the number of effective parameters, just skip the next section. If not, I came up with a musical instruments metaphor that I and at least some people I've tested it upon found useful.
+
+\hypertarget{musical-instruments-metaphor}{%
+\section{Musical instruments metaphor}\label{musical-instruments-metaphor}}
+
+Imagine that you are trying to play a song that you have just heard. But the only instrument you have is a triangle. This is not a particularly flexible instruments pitch-wise, so your rendition of that song will not be very good (your model underfits the data). The good news is that even if you do your worst and do not really try, no one will notice because your worst performance will sound very much like your best one. Simply because it is very hard to make songs sound different using a triangle. Thus, if you play that song many times, trying different versions of it with us judging how close you are to the original, the score we will give you will be very similar (low variance of the deviance for fitting to sample).
+
+But what if I give you an instrument that can vary the pitch at least a bit, like a xylophone for children. Now you more expressive freedom and your version of the music will sound much more like the original. But, it also gives you an opportunity to make a mess of it, so your rendition might sound nothing like the music you've just heard. Thus, the instrument increases the difference between the best and the worst possible performance, so the variance of your performances (on how close they are to the original) also increases (higher variance of the deviance). A more flexible instrument will make the difference even bigger. Think violin or trombone which are not restricted to the scale, so you can play any sound in between and you can match the music you just heard exactly. Imagine that the music your just hear has an odd off-the-scale sounds. Was a defect of the turntable, which cannot go at constant speed, so overall pitch wobbles overtime (noise)? Or is it an experimental music piece designed to sound odd (signal)? If you do not know for sure, you will try to play as close to the original music your heard as possible, matching those off-scale sounds. And, because you can play any sound, your range of possible performance is even larger from one-to-one to ``please, have mercy and stop!'' (even larger variance of deviance).
+
+In short, variance of your performance (posterior divergence) reflects how flexible your instrument is. But why is it indicative of the \emph{effective} number of parameters? Here are regularizing priors in the world of music instrument metaphor. Imagine that in addition to the triangle, I also give you a rubber bell (it was used in a super-secret meeting in Stanislaw Lem's Eleventh Voyage of Ijon Tichy, so that no one would hear when they ring that bell!). Now, technically you have two instruments (your number of parameters is 2) but that bell does not affect your performance (we put very strong regularizing priors so that coefficients are zero or something very-very close to zero). Thus, your ability to play the song did not change and your variance of performance stays the same. Two actual instruments, but only one ``effective'' one. Or, I give you a piano but allow you to use only one octave and only white keys. Yes, you have a piano but with this regularization it is as complex as as kids' xylophone. The \emph{potential} number of notes you can play is great (AIC and BIC would be very impressed and slap a heavy penalty on you) but the actual ``effective'' range is small. Or, you regularize yourself to play scale only notes using violin (something you learn to do). In all of these cases, you deliberately restrict yourself. But why? Why not just play as you heard it (why not fit as well as you can?)? Because if the song you heard is short (sample is small), regularization based on your knowledge about real life helps you to ignore the noise that is always present. E.g., you know that song is for kids' xylophone, so even if you heard notes outside of a single octave that was probably a problem with recording. Or, you never heard that piece for violin but you do know other works of this composer and they always use scale-only notes, so you should not use my violin to play off-scale sounds.
+
+Multilevel models also limit the actual use of parameters. Imagine you heard a recording of a symphonic orchestra. Lots of violins but you figured out that most of them actually play the same melody. So you can get away with using one violin score (sample group average) and assume that most violins play like that (most participants are very close to group average). Any deviations from that group melody are probably mistakes by individual musicians, not the actual melody. Same goes if you hear a choir. Again, many people sing (lots of parameters!) but, mostly, in unison, so you do not need to create an individual score sheet (parameter) for each singer, just one per group of singers.
+
+Wrapping up the metaphor, the more flexible your instrument is, the more variable your performance can be, the easier it is for you to mimic noise and imperfections of the recording that have nothing to do with the piece itself. But when you play it next time, matching the recording with all its noise and distortions perfectly, people who know the piece will be puzzled or may not even recognize it (poor out-of-sample predictions). Adopting the melody for a more limited instrument may make it easier for others to recognize the song! Thus, higher variance in performance accuracy (higher variance of deviance) indicates that you can overfit easily with that instrument (model) and you should be extra careful (impose higher penalty for complexity).
+
+\hypertarget{deviance-information-criterion-dic-and-widely-applicable-information-criterion-waic}{%
+\section{Deviance information criterion (DIC) and widely-applicable information criterion (WAIC)}\label{deviance-information-criterion-dic-and-widely-applicable-information-criterion-waic}}
+
+The two are very similar, as both compute the model complexity based on posterior distribution of log likelihood. The key difference is that DIC sums the log likelihood for each model (sample) first and then computes the variance. WAIC computes variance of log likelihood per point and then sums those variances up. In the musical instrument metaphor, for DIC you perform the piece many times (generate many posterior samples), compute accuracy for each performance (deviance for a single sample), and then compute how variable they are. For WAIC, you go note by note (observation by observation). For each note you compute variance over all sample to see how consistent you are in playing it. Then, you sum this up.
+
+\[DIC = -2 \cdot \left( log(p(y|\Theta)) - var(\sum log(p(y|\Theta_i))) \right)\]
+\[WAIC = -2 \cdot \left( log(p(y|\Theta)) - \sum_i var(log(p(y_i|\Theta))) \right)\]
+
+The penalty replace \(k\) in AIC and, therefore, will go into the exponent inside the ratio. Again, same idea, that increase in variance of deviance (either per sample in DIC or per point in WAIC) leads to exponentially increasing estimate of complexity.
+
+WAIC is more stable mathematically and is mode widely applicable (that's what statisticians tell us). Moreover, its advantage is that it explicitly recognizes that not all data points in your sample are equal. Some (outliers) are much harder to predict than others. And it is variance of log likelihood for these points that determines how much your model can overfit. An inflexible model will make a poor but consistent job (triangles don't care about pitch!), whereas a complex model can do anything from spot-on to terrible (violins can do anything). In short, you should use WAIC yourself but recognize DIC when you see it and think of it as somewhat less reliable WAIC, which is still better than AIC or BIC when you use regularizing priors and/or hierarchical models.
+
+\hypertarget{importance-sampling}{%
+\section{Importance sampling}\label{importance-sampling}}
+
+Importance sampling is mentioned in the chapter but is never explained, so here is a brief description. The core idea is to pretend that you sample from a distribution you need (but have no access to) by sampling from another distribution (the one you have access to) and ``translating'' the probabilities via \emph{importance ratios}. What does this mean?
+
+Imagine that you want to know an average total score for a given die after you throw it ten times. The procedure is as simple as it gets: you toss the die ten times, record the number you get on each throw, sum them up at the end. Repeat the same toss-ten-times-and-sum-it-up as many times as you want and compute your average. But what if you do not have access to that die because it is \emph{the die} and is kept under lock in International Bureau of Weights and Measures? Well, you have \emph{a die} which you can toss and you have a list of \emph{importance ratios} for each number. These \emph{important ratios} tell you how much more likely is the number of \emph{the die} (the one you are after) compared to \emph{a die} you have in your hand. Let's say the importance ratio for \emph{1} (so, number 1 comes up on top) is \texttt{3.0}. This means that whenever \emph{your die} gives you \emph{1}, you assume that \emph{the die} came up \emph{1} on \textbf{three} throws. If the importance ratio for \emph{2} is 0.5, whenever you see \emph{2} on your die, you record only half the throw (\emph{2} comes up twice as rarely for real die than for your die, so two throws that give you \emph{2} amount to a single throw). This way you can toss your die and every toss equates to different number of throws that generated the same number for \emph{the die}. So, you sample your die but record outcomes for the other die. Funny thing is that you don't even need to know how fair your die is and what is the probability of individual sides. As long as you know the importance ratios, keep tossing it and translating the probabilities, you will get the samples for the die you are interested in.
+
+Note that if you toss your die ten times, the translated number of tosses for \emph{the die} does not need to add up to ten. Imagine that, just by chance, you got \emph{1} four times. Given the importance ratio of \texttt{3.0} that alone translates into twelve tosses. Solution? You \emph{normalize} your result by \emph{sum of importance ratios} and get back you ten tosses.
+
+The very obvious catch is, \emph{how do we know the importance ratios}? Well, that is situation specific. Sometimes, we can compute them because we know both distributions, it just that one is easier to sample than the target one (so, we optimize the use of computing power). Sometimes, as in case of PSIS/LOO below, we can use an approximation.
+
+\hypertarget{pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo}{%
+\section{Pareto-smoothed importance sampling / leave-one-out cross-validation (PSIS/LOO)}\label{pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo}}
+
+The importance sampling I've described above is the key to the PSIS/LOO. The idea is the same, we want to sample from the posterior of the model that was fitted \emph{without} a specific data point \(y_i\) (we write it as \(p(\Theta_{-i,s}|y_i)\)). But we do not really want to refit the model. Instead, we want to use what we already have, samples from the model that was fit on all the data, \emph{including} point \(y_i\). So, we pull of the same importance sampling trick, sampling from \(p(\Theta_s|y_i)\) and translating it to \(p(\Theta_{-i,s}|y_i)\). The only thing we need are importance factors\footnote{Unfortunately, I did not yet follow the derivation of this proportionality, so I cannot explain why this is the case mathematically.}
+\[r_i = \frac{p(\Theta_{-i,s}|y_i)}{p(\Theta_s|y_i)} \propto \frac{1}{p(y_i|\Theta_s)}\]
+
+The importance ratio tells you that decrease in your ability to predict an observation out-of-sample is proportional to difficulty of predicting in-sample. Here is an intuition behind this. \emph{Any} observation will be harder to predict, if it was not included into the data the model was trained on. This is because, in its absence the model will use its parameters to fit the data that is present, including fitting noise, if it has spare parameters. So, you expect that out-of-sample deviance (\(p(y_i|\Theta_{-i}\)) should be always worse than in-sample deviance for the same observation (\(p(y_i|\Theta\)). How much worse depends on how ``typical'' the observation is. If it is typical and ``easy'' for a model to predict, in its absence the model will still see many similar ``typical'' observations and will be well prepared to predict it. However, if the observations is atypical, an outlier, the model won't see too many observations that are alike and will concentrate more on typical points.
+
+I.e., assume that out-of-sample deviance is in-sample deviance squared (the importance ratio we use goes in that direction). Asume that our \emph{in-sample} deviance is 60, 40, and 50 in one case and 10, 10 and 130 in the other case. Both deviances sum up to 150, so from \emph{in-sample} point of view they are equal. However, approximating \emph{out-of-sample} deviance as a square of \emph{in-sample} deviance makes for a dramatic difference. For the first case, it jumps to 7700 but the second case to 17100, more than twice the difference. This is because in second case \emph{out-of-sample} deviance is dominanted by that single very difficult point, which will be terribly difficult out-of-sample.
+
+This explosive powerlaw-like scaling of expected out-of-sample deviance is the reason for warnings that LOO/PSIS generates. A single very difficult observation can be single-handedly responsible for most of the deviance, making it hard to understand whether the model is good or bad on the rest of observations. Thus, you should consider what this extreme outlier means for your understanding of the process. Is it so different because it was recorded wrongly (the responsible person pressed 1 instead of 7)? Is this an extreme response time because a participant was distracted on that trial and started paying attention to the task only 15 seconds after the trial began? Is it an important observations that indicates that you are ignoring a really important predictor? You should think carefully about it and decide on whether you treat that observation differently (e.g., allowing for larger uncertainty for that point because you think this is mostly noise) or you change your model to better account for it.
+
+\hypertarget{bayes-factor}{%
+\section{Bayes Factor}\label{bayes-factor}}
+
+Not an information criterion. However, it is a popular way to compare Bayesian models. Compared to information criteria, the logic is reversed. In case of the information criteria, we are asking which \textbf{model fits data} the best given the penalty we impose for its complexity. In case of Bayes Factor, we already have two models (could be different models with different number of parameters or just with different parameter values) and we are interested how well the \textbf{data matches models} we already have.
+
+Let's start with the Bayes theorem:
+\[Pr(M|D)=\frac {\Pr(D|M)\Pr(M)}{\Pr(D)}\]
+where, \emph{D} is data and \emph{M} is the model (hypothesis). The tricky part is the marginal probability (prior) of data \(Pr(D)\). We hardly ever know it for sure, making computing the ``correct'' value for \(Pr(M|D)\) problematic. When using posterior sampling, we side-step the issue by ignoring it and normalizing the posterior by the sum of the posterior distribution. Alternatively, when comparing two models, you can compute their ratio:
+\[{\frac {\Pr(D|M_{1})}{\Pr(D|M_{2})}}={\frac {\Pr(M_{1}|D)}{\Pr(M_{2}|D)}} \cdot {\frac {\Pr(M_{1})}{\Pr(M_{2})}}\]
+here \(\frac{\Pr(D|M_{1})}{\Pr(D|M_{2})}\) are \textbf{posterior odds}, \(\frac {\Pr(M_{1}|D)}{\Pr(M_{2}|D)}\) is \textbf{Bayes Factor}, and \(\frac {\Pr(M_{2})}{\Pr(M_{1})}\) are \textbf{prior odds}. The common \(Pr(D)\) nicely cancels out!
+
+If you assume that both hypotheses/models are equally likely (you have flat priors), the prior odds are 1:1 and your posterior odds are equal to Bayes Factor or, vice versa, Bayes Factor is equal to posterior odds. This means you can just pick their likelihoods from the posterior sampled distribution and compute the ratio.
+
+I am not a big fan of Bayes Factor for conceptual reasons. Although it can compare any two models (as long as the sample is the same), it looks a lot like a Bayesian version of a p-value and, therefore, lends itself naturally to the null-hypothesis testing. And, as far as my reading of literature in my field is concerned, this is how people most frequently use it, as a cooler Bayesian way of null-hypothesis testing. You have no worries about multiple comparisons (it is Bayesian, so no need for error correction!) and it can prove null hypothesis (it is the ratio, so flip it and see how much stronger \emph{H0} is)! There is nothing wrong with this per se but the advantage of Bayesian statistics and information criteria is that you do not \emph{need} to think in terms of null hypothesis testing and nested models. Adopting Bayes Factor may prevent you from seeing this and will allow you to continue doing same analysis just in a differently colored wrapper. Again, there is nothing wrong with exploratory analysis using null hypothesis testing until you can formulate a better model. But it should not be the \emph{only} way you approach modeling.
 
   \bibliography{book.bib}
 

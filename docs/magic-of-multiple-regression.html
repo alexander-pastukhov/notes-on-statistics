@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 4 Magic of multiple regression | Notes on and Solutions for Statistical Rethinking</title>
+  <meta name="description" content="Notes and exercise solutions for Statistical Rethinking book." />
+  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 4 Magic of multiple regression | Notes on and Solutions for Statistical Rethinking" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Notes and exercise solutions for Statistical Rethinking book." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 4 Magic of multiple regression | Notes on and Solutions for Statistical Rethinking" />
+  
+  <meta name="twitter:description" content="Notes and exercise solutions for Statistical Rethinking book." />
+  
+
+<meta name="author" content="Alexander Pastukhov" />
+
+
+<meta name="date" content="2020-12-21" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="directed-acyclic-graphs-and-causal-reasoning.html"/>
+<link rel="next" href="solutions-for-chapter-2.html"/>
+<script src="libs/header-attrs-2.5/header-attrs.js"></script>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Notes on Statistical Rethinking</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Precis</a></li>
+<li class="chapter" data-level="2" data-path="loss-functions.html"><a href="loss-functions.html"><i class="fa fa-check"></i><b>2</b> Loss functions</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="loss-functions.html"><a href="loss-functions.html#loss-function-the-concept"><i class="fa fa-check"></i><b>2.1</b> Loss function, the concept</a></li>
+<li class="chapter" data-level="2.2" data-path="loss-functions.html"><a href="loss-functions.html#l0-mode"><i class="fa fa-check"></i><b>2.2</b> L0 (mode)</a></li>
+<li class="chapter" data-level="2.3" data-path="loss-functions.html"><a href="loss-functions.html#l1-median"><i class="fa fa-check"></i><b>2.3</b> L1 (median)</a></li>
+<li class="chapter" data-level="2.4" data-path="loss-functions.html"><a href="loss-functions.html#l2-mean"><i class="fa fa-check"></i><b>2.4</b> L2 (mean)</a></li>
+<li class="chapter" data-level="2.5" data-path="loss-functions.html"><a href="loss-functions.html#l1-median-vs.-l2-mean"><i class="fa fa-check"></i><b>2.5</b> L1 (median) vs. L2 (mean)</a></li>
+<li class="chapter" data-level="2.6" data-path="loss-functions.html"><a href="loss-functions.html#choosing-a-likelihood"><i class="fa fa-check"></i><b>2.6</b> Choosing a likelihood</a></li>
+<li class="chapter" data-level="2.7" data-path="loss-functions.html"><a href="loss-functions.html#gaussian-in-frenquentist-versus-bayesian-statistics"><i class="fa fa-check"></i><b>2.7</b> Gaussian in frenquentist versus Bayesian statistics</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="directed-acyclic-graphs-and-causal-reasoning.html"><a href="directed-acyclic-graphs-and-causal-reasoning.html"><i class="fa fa-check"></i><b>3</b> Directed Acyclic Graphs and Causal Reasoning</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="directed-acyclic-graphs-and-causal-reasoning.html"><a href="directed-acyclic-graphs-and-causal-reasoning.html#peering-into-a-black-box"><i class="fa fa-check"></i><b>3.1</b> Peering into a black box</a></li>
+<li class="chapter" data-level="3.2" data-path="directed-acyclic-graphs-and-causal-reasoning.html"><a href="directed-acyclic-graphs-and-causal-reasoning.html#turning-unconditional-dependence-into-conditional-independence"><i class="fa fa-check"></i><b>3.2</b> Turning unconditional dependence into conditional independence</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="magic-of-multiple-regression.html"><a href="magic-of-multiple-regression.html"><i class="fa fa-check"></i><b>4</b> Magic of multiple regression</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="magic-of-multiple-regression.html"><a href="magic-of-multiple-regression.html#multicollinearity"><i class="fa fa-check"></i><b>4.1</b> Multicollinearity</a></li>
+<li class="chapter" data-level="4.2" data-path="magic-of-multiple-regression.html"><a href="magic-of-multiple-regression.html#back-to-spurious-association"><i class="fa fa-check"></i><b>4.2</b> Back to spurious association</a></li>
+<li class="chapter" data-level="4.3" data-path="magic-of-multiple-regression.html"><a href="magic-of-multiple-regression.html#chain-dag"><i class="fa fa-check"></i><b>4.3</b> Chain DAG</a></li>
+<li class="chapter" data-level="4.4" data-path="magic-of-multiple-regression.html"><a href="magic-of-multiple-regression.html#take-home-message"><i class="fa fa-check"></i><b>4.4</b> Take-home message</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="solutions-for-chapter-2.html"><a href="solutions-for-chapter-2.html"><i class="fa fa-check"></i><b>5</b> Solutions for Chapter 2</a></li>
+<li class="chapter" data-level="6" data-path="solutions-for-chapter-3.html"><a href="solutions-for-chapter-3.html"><i class="fa fa-check"></i><b>6</b> Solutions for Chapter 3</a></li>
+<li class="chapter" data-level="7" data-path="solutions-for-chapter-4.html"><a href="solutions-for-chapter-4.html"><i class="fa fa-check"></i><b>7</b> Solutions for Chapter 4</a></li>
+<li class="chapter" data-level="8" data-path="solutions-for-chapter-5.html"><a href="solutions-for-chapter-5.html"><i class="fa fa-check"></i><b>8</b> Solutions for Chapter 5</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Notes on and Solutions for Statistical Rethinking</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="magic-of-multiple-regression" class="section level1" number="4">
+<h1><span class="header-section-number">Chapter 4</span> Magic of multiple regression</h1>
+<p>This notes are on Chapter 5 “The Many Variables &amp; The Spurious Waffles”, specifically, on section 5.1 “Spurious association”. If you are to remember one thing from that chapter, it should be “doing multiple regression is easy, understanding and interpreting it is hard”. As you will see below, fully understanding relationship between variables is complicate even when we are working with a minimal multiple regression with just two predictors.</p>
+<p>When reading section 5.1 “Spurious association”, I found relationships between the <em>marriage age</em>, <em>marriage rate</em>, and <em>divorce rate</em> to be both clear and mysterious. On the one hand, everything is correlated with everything.</p>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>On the other hand, once we fit linear model to predict divorce rate based on both median age marriage and marriage rate, the latter is <em>clearly</em> irrelevant (output of code 5.11 shows that its coefficient is effectively zero, meaning that it is ignored) and, therefore, it has no causal influence on divorce rate.</p>
+<p>If you are like me<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>, you said “Huh! But how does the model know that?”. And, at least for me, explanations in the chapter did not help much. The key figure is 5.4, that shows that (omitting intercept and slope symbols) <code>median age marriage = marriage rate + *extra information* + noise</code> but <code>marriage rate = median age marriage + noise</code>. In a nutshell, both variables code the same information but marriage rate is a noisier version of it, so it is ignored. Unfortunately, the answer “but how?” still stands. The figure 5.4, which shows fits on residuals is illustrative, but we do not fit residuals, we fit both variables at the same time <em>without</em> fitting them on each other! Nowhere in the model 5.1.4 do we find <span class="math display">\[\mu^{M}_{i} = \alpha_{AM} + \beta_{AM} * A_i\]</span></p>
+<p>So, what’s going on? <em>How does it know?</em> To understand this, let us start with an issue of <em>multicollinearity</em>.</p>
+<div id="multicollinearity" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Multicollinearity</h2>
+<p>To make things easier to understand, let us use simulated data. Imagine that both marriage and divorce rate are both <em>caused by</em> marriage age and are almost perfectly linearly dependent it, so that <span class="math inline">\(D_i = \beta_A^{true} \cdot A_i\)</span> (for the sake of simplicity <span class="math inline">\(\beta_A^{true} = -1\)</span>) and <span class="math inline">\(M_i = -A_i\)</span>. The <em>causal</em> relationship that we are modeling is called a fork:
+<span class="math display">\[Marriage~rate~\leftarrow~Age~of~marriage~\rightarrow~Divorce~rate\]</span>.
+We pretend our variables are already standardized, so the plots would look something like this.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="magic-of-multiple-regression.html#cb3-1"></a><span class="kw">data</span>(<span class="st">&quot;WaffleDivorce&quot;</span>)</span>
+<span id="cb3-2"><a href="magic-of-multiple-regression.html#cb3-2"></a><span class="kw">set.seed</span>(<span class="dv">1212</span>)</span>
+<span id="cb3-3"><a href="magic-of-multiple-regression.html#cb3-3"></a>N &lt;-<span class="st"> </span><span class="kw">nrow</span>(WaffleDivorce)</span>
+<span id="cb3-4"><a href="magic-of-multiple-regression.html#cb3-4"></a>sim_waffles &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">MedianAgeMarriage =</span> <span class="kw">rnorm</span>(N),</span>
+<span id="cb3-5"><a href="magic-of-multiple-regression.html#cb3-5"></a>                      <span class="dt">Divorce =</span> <span class="op">-</span><span class="kw">rnorm</span>(N, MedianAgeMarriage, <span class="fl">0.1</span>),</span>
+<span id="cb3-6"><a href="magic-of-multiple-regression.html#cb3-6"></a>                      <span class="dt">Marriage =</span> <span class="op">-</span><span class="kw">rnorm</span>(N, MedianAgeMarriage, <span class="fl">0.01</span>))</span>
+<span id="cb3-7"><a href="magic-of-multiple-regression.html#cb3-7"></a></span>
+<span id="cb3-8"><a href="magic-of-multiple-regression.html#cb3-8"></a>MD_plot &lt;-<span class="st"> </span></span>
+<span id="cb3-9"><a href="magic-of-multiple-regression.html#cb3-9"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="dt">data=</span>sim_waffles, <span class="kw">aes</span>(<span class="dt">x=</span>Marriage, <span class="dt">y=</span>Divorce)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-10"><a href="magic-of-multiple-regression.html#cb3-10"></a><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method=</span><span class="st">&quot;lm&quot;</span>, <span class="dt">formula=</span>y<span class="op">~</span>x) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-11"><a href="magic-of-multiple-regression.html#cb3-11"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-12"><a href="magic-of-multiple-regression.html#cb3-12"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Marriage rate&quot;</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-13"><a href="magic-of-multiple-regression.html#cb3-13"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Divorce rate&quot;</span>)</span>
+<span id="cb3-14"><a href="magic-of-multiple-regression.html#cb3-14"></a></span>
+<span id="cb3-15"><a href="magic-of-multiple-regression.html#cb3-15"></a>AD_plot &lt;-<span class="st"> </span></span>
+<span id="cb3-16"><a href="magic-of-multiple-regression.html#cb3-16"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="dt">data=</span>sim_waffles, <span class="kw">aes</span>(<span class="dt">x=</span>MedianAgeMarriage, <span class="dt">y=</span>Divorce)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-17"><a href="magic-of-multiple-regression.html#cb3-17"></a><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method=</span><span class="st">&quot;lm&quot;</span>, <span class="dt">formula=</span>y<span class="op">~</span>x) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-18"><a href="magic-of-multiple-regression.html#cb3-18"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-19"><a href="magic-of-multiple-regression.html#cb3-19"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Median age marriage&quot;</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-20"><a href="magic-of-multiple-regression.html#cb3-20"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Divorce rate&quot;</span>)</span>
+<span id="cb3-21"><a href="magic-of-multiple-regression.html#cb3-21"></a></span>
+<span id="cb3-22"><a href="magic-of-multiple-regression.html#cb3-22"></a>AM_plot &lt;-<span class="st"> </span></span>
+<span id="cb3-23"><a href="magic-of-multiple-regression.html#cb3-23"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="dt">data=</span>sim_waffles, <span class="kw">aes</span>(<span class="dt">x=</span>MedianAgeMarriage, <span class="dt">y=</span>Marriage)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-24"><a href="magic-of-multiple-regression.html#cb3-24"></a><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method=</span><span class="st">&quot;lm&quot;</span>, <span class="dt">formula=</span>y<span class="op">~</span>x) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-25"><a href="magic-of-multiple-regression.html#cb3-25"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-26"><a href="magic-of-multiple-regression.html#cb3-26"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Median age marriage&quot;</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-27"><a href="magic-of-multiple-regression.html#cb3-27"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Marriage rate&quot;</span>)</span>
+<span id="cb3-28"><a href="magic-of-multiple-regression.html#cb3-28"></a></span>
+<span id="cb3-29"><a href="magic-of-multiple-regression.html#cb3-29"></a>MD_plot <span class="op">|</span><span class="st"> </span>AD_plot <span class="op">|</span><span class="st"> </span>AM_plot</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The relationship is the same as in the plots above but, as we assumed an almost perfect correlation, there is not much spread around the regression line. Still, by definition of <em>how we constructed the data</em>, both marriage and divorce rate are <em>caused</em> (computed from) median age and, importantly, marriage rate is <em>never</em> used to compute the divorce rate. What happens if we analyze this simulated data using the same model 5.1.3, will it be able to figure “marriage rate does not matter” again?</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="magic-of-multiple-regression.html#cb4-1"></a>sim_waffles &lt;-</span>
+<span id="cb4-2"><a href="magic-of-multiple-regression.html#cb4-2"></a><span class="st">  </span>sim_waffles <span class="op">%&gt;%</span></span>
+<span id="cb4-3"><a href="magic-of-multiple-regression.html#cb4-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">A =</span> MedianAgeMarriage,</span>
+<span id="cb4-4"><a href="magic-of-multiple-regression.html#cb4-4"></a>         <span class="dt">M =</span> Marriage,</span>
+<span id="cb4-5"><a href="magic-of-multiple-regression.html#cb4-5"></a>         <span class="dt">D =</span> Divorce)</span>
+<span id="cb4-6"><a href="magic-of-multiple-regression.html#cb4-6"></a></span>
+<span id="cb4-7"><a href="magic-of-multiple-regression.html#cb4-7"></a>sim_waffles_fit &lt;-<span class="st"> </span><span class="kw">quap</span>(</span>
+<span id="cb4-8"><a href="magic-of-multiple-regression.html#cb4-8"></a>  <span class="kw">alist</span>(</span>
+<span id="cb4-9"><a href="magic-of-multiple-regression.html#cb4-9"></a>    D <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(mu , sigma) ,</span>
+<span id="cb4-10"><a href="magic-of-multiple-regression.html#cb4-10"></a>    mu &lt;-<span class="st"> </span>a <span class="op">+</span><span class="st"> </span>bM<span class="op">*</span>M <span class="op">+</span><span class="st"> </span>bA<span class="op">*</span>A,</span>
+<span id="cb4-11"><a href="magic-of-multiple-regression.html#cb4-11"></a>    a <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">0</span>, <span class="fl">0.2</span>),</span>
+<span id="cb4-12"><a href="magic-of-multiple-regression.html#cb4-12"></a>    bA <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">0</span>, <span class="dv">10</span>),</span>
+<span id="cb4-13"><a href="magic-of-multiple-regression.html#cb4-13"></a>    bM <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">0</span>, <span class="dv">10</span>),</span>
+<span id="cb4-14"><a href="magic-of-multiple-regression.html#cb4-14"></a>    sigma <span class="op">~</span><span class="st"> </span><span class="kw">dexp</span>(<span class="dv">1</span>)</span>
+<span id="cb4-15"><a href="magic-of-multiple-regression.html#cb4-15"></a>  ), </span>
+<span id="cb4-16"><a href="magic-of-multiple-regression.html#cb4-16"></a>  <span class="dt">data =</span> sim_waffles,</span>
+<span id="cb4-17"><a href="magic-of-multiple-regression.html#cb4-17"></a>)</span>
+<span id="cb4-18"><a href="magic-of-multiple-regression.html#cb4-18"></a></span>
+<span id="cb4-19"><a href="magic-of-multiple-regression.html#cb4-19"></a><span class="kw">precis</span>(sim_waffles_fit)</span></code></pre></div>
+<pre><code>##              mean          sd        5.5%      94.5%
+## a     0.002034578 0.012914402 -0.01860513 0.02267429
+## bA    0.267403927 1.188973843 -1.63280591 2.16761377
+## bM    1.245792079 1.187211226 -0.65160076 3.14318492
+## sigma 0.090129176 0.008996557  0.07575094 0.10450741</code></pre>
+<p>Oh no, we broke it! <span class="math inline">\(\beta_M\)</span> is now about <code>1.25</code> rather than zero and <span class="math inline">\(\beta_A\)</span> is around <code>0.27</code> rather than <code>-1</code>, as it should. Also note the uncertainty associated with both values, as they both overlap heavily with zero<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>. So, the data generation process is the same (<code>Divorce rate ← Age → Marriage rate</code>) and the model is the same (changes to priors have no particular impact in this case) but the “magic” of inferring the lack an “causal arrow” <code>Divorce rate  → Marriage rate</code> is gone! The <em>only</em> difference between the two data sets is extra variance (noise) in marriage rate variable, so let us see how the absence of that extra noise in simulated data breaks the magic.</p>
+<p>When two variables, marriage age and rate in our case, are (almost) perfectly correlated (<span class="math inline">\(M = -A\)</span>), that means that you can substitute one for another. Thus, we can rewrite<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>
+<span class="math display">\[D = \beta_A \cdot A + \beta_M \cdot M \\
+D = \beta_A \cdot A + \beta_M \cdot (-A) \\
+D = (\beta_A - \beta_M) \cdot A \\
+D = \beta_A^{true} \cdot A\]</span>
+where
+<span class="math display">\[ \beta_A^{true} = (\beta_A - \beta_M)\]</span></p>
+<p>That last bit is the curse of multicollinearity, because if two variable have <em>the same</em> information, you are, effectively, fitting their <em>sum</em>! This is equivalent to fitting the sum<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a> of coefficients times one of the variables and does not matter which one, since they are identical. We used <code>A</code> because we know that it causes <code>M</code>. If you look at the precis output above, you will see that we did fit the <span class="math inline">\(\beta_A^{true}\)</span>! Since <code>bA = 0.27</code> and <code>bM = 1.25</code>, so plugging them in gives us
+<span class="math display">\[\beta_A^{true} = \beta_A - \beta_M = 0.27 - 1.25 = -0.98\]</span></p>
+<p>Hey, that is the slope that we used to construct divorce rate, so fitting does work! Moreover, we can see that there is very little uncertainty about <span class="math inline">\(\beta_A^{true}\)</span></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="magic-of-multiple-regression.html#cb6-1"></a>posterior_samples &lt;-<span class="st"> </span></span>
+<span id="cb6-2"><a href="magic-of-multiple-regression.html#cb6-2"></a><span class="st">  </span>rethinking<span class="op">::</span><span class="kw">extract.samples</span>(sim_waffles_fit) <span class="op">%&gt;%</span></span>
+<span id="cb6-3"><a href="magic-of-multiple-regression.html#cb6-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">bA_true =</span> bA <span class="op">-</span><span class="st"> </span>bM)</span>
+<span id="cb6-4"><a href="magic-of-multiple-regression.html#cb6-4"></a></span>
+<span id="cb6-5"><a href="magic-of-multiple-regression.html#cb6-5"></a><span class="kw">ggplot</span>(posterior_samples, <span class="kw">aes</span>(<span class="dt">x=</span>bA_true)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb6-6"><a href="magic-of-multiple-regression.html#cb6-6"></a><span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">bins=</span><span class="dv">100</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb6-7"><a href="magic-of-multiple-regression.html#cb6-7"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;bA_true = bA - bM&quot;</span>)</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p>But what about uncertainty for <em>individual</em> slopes? It stems directly from the fact that <span class="math inline">\(\beta_A^{true} = \beta_A - \beta_M = -1\)</span> (it is <code>-1</code> in our case, of course). There are infinite number of pairs of numbers whose difference would give -1: <span class="math inline">\(1-2\)</span>, <span class="math inline">\(2-3\)</span>, <span class="math inline">\((-200)-(-199)\)</span>, <span class="math inline">\(999.41-1000.41\)</span>, etc. All of them add up (subtract to) -1, so the fitting procedure cannot settle on any specific region for <em>each</em> parameter and any specific pair of values. Any number will do, as long as the <em>other one</em> differs by one.</p>
+</div>
+<div id="back-to-spurious-association" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Back to spurious association</h2>
+<p>Above, you have learned that if two variable have the same information, you can only fit <em>both</em> of them but cannot get individual slopes. But wasn’t that the case for real data we started with? Marriage age and rate <em>are</em> correlated, so why fitting used one (age) and not their sum? The answer is <em>extra noise</em> in marriage rate. In the real data marriage rate is age <em>plus some noise</em>: <span class="math inline">\(M = -A + \epsilon\)</span>, where <span class="math inline">\(\epsilon\)</span> is traditionally used to denote “some noise”. How does that extra noise change our linear model for divorce rate?
+<span class="math display">\[D = \beta_A \cdot A + \beta_M \cdot M \\
+D = \beta_A \cdot A + \beta_M (- A + \epsilon) \\
+D = (\beta_A  - \beta_M ) \cdot A + \beta_M \cdot \epsilon\]</span></p>
+<p>By definition, <span class="math inline">\(\epsilon\)</span> is <em>pure noise</em> and has zero predictive value with respect to divorce rate. Thus, if we would fit it <em>alone</em>, we would expect to get a slope near zero, that is “no significant relationship”.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="magic-of-multiple-regression.html#cb7-1"></a><span class="kw">set.seed</span>(<span class="dv">1231455</span>)</span>
+<span id="cb7-2"><a href="magic-of-multiple-regression.html#cb7-2"></a>sim_waffles &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">MedianAgeMarriage =</span> <span class="kw">rnorm</span>(N),</span>
+<span id="cb7-3"><a href="magic-of-multiple-regression.html#cb7-3"></a>                      <span class="dt">Divorce =</span> <span class="kw">rnorm</span>(N, MedianAgeMarriage, <span class="fl">0.1</span>),</span>
+<span id="cb7-4"><a href="magic-of-multiple-regression.html#cb7-4"></a>                      <span class="dt">Marriage =</span> <span class="op">-</span><span class="kw">rnorm</span>(N, MedianAgeMarriage, <span class="fl">0.01</span>),</span>
+<span id="cb7-5"><a href="magic-of-multiple-regression.html#cb7-5"></a>                      <span class="dt">epsilon =</span> <span class="kw">rnorm</span>(N))</span>
+<span id="cb7-6"><a href="magic-of-multiple-regression.html#cb7-6"></a></span>
+<span id="cb7-7"><a href="magic-of-multiple-regression.html#cb7-7"></a><span class="kw">ggplot</span>(sim_waffles, <span class="kw">aes</span>(<span class="dt">x=</span>epsilon, <span class="dt">y=</span>Divorce)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb7-8"><a href="magic-of-multiple-regression.html#cb7-8"></a><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method=</span><span class="st">&quot;lm&quot;</span>, <span class="dt">formula=</span>y<span class="op">~</span>x) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb7-9"><a href="magic-of-multiple-regression.html#cb7-9"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb7-10"><a href="magic-of-multiple-regression.html#cb7-10"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="kw">expression</span>(epsilon)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb7-11"><a href="magic-of-multiple-regression.html#cb7-11"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Marriage rate&quot;</span>)</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>But we are not fitting it alone, as the coefficient <span class="math inline">\(\beta_M\)</span> appears at <em>twice</em>:
+<span class="math display">\[D = (\beta_A  - \beta_M) \cdot A + \beta_M \cdot \epsilon\]</span>
+The latter part, <span class="math inline">\(\beta_M \cdot \epsilon\)</span>, pushes <span class="math inline">\(\beta_M\)</span> towards zero slope, which is the best solution for pure noise, as you saw in the plot above. But the former part, <span class="math inline">\(\beta_A - \beta_M\)</span> only needs to add up to <span class="math inline">\(\beta_A^{true}\)</span>, so however we fix <span class="math inline">\(\beta_M\)</span>, <span class="math inline">\(\beta_A\)</span> can accommodate. Thus the closer <span class="math inline">\(\beta_M\)</span> to zero, the closer is <span class="math inline">\(\beta_A\)</span> to <span class="math inline">\(\beta_A^{true}\)</span>. And that’s how the magic works! If one variable is other variable plus noise, that <em>plus noise</em> induces extra penalty (extra residuals) and the only way to reduce residuals is to ignore the <em>uncorrelated</em> noise by setting the slope to zero. Therefore, you ignore the variable as well, because it is merely a noisy twin of a better variable. You can see how added noise “disambiguates” the causal relationship<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="magic-of-multiple-regression.html#cb8-1"></a>simulate_waffles &lt;-<span class="st"> </span><span class="cf">function</span>(sigma_noise){</span>
+<span id="cb8-2"><a href="magic-of-multiple-regression.html#cb8-2"></a>  <span class="co"># generate same data but for noise in Marraige from Age relationship</span></span>
+<span id="cb8-3"><a href="magic-of-multiple-regression.html#cb8-3"></a>  <span class="kw">set.seed</span>(<span class="dv">169084</span>)</span>
+<span id="cb8-4"><a href="magic-of-multiple-regression.html#cb8-4"></a>  sim_df &lt;-<span class="st"> </span>sim_waffles &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">MedianAgeMarriage =</span> <span class="kw">rnorm</span>(N),</span>
+<span id="cb8-5"><a href="magic-of-multiple-regression.html#cb8-5"></a>                                  <span class="dt">Divorce =</span> <span class="kw">rnorm</span>(N, MedianAgeMarriage, <span class="fl">0.1</span>),</span>
+<span id="cb8-6"><a href="magic-of-multiple-regression.html#cb8-6"></a>                                  <span class="dt">Marriage =</span> <span class="op">-</span><span class="kw">rnorm</span>(N, MedianAgeMarriage, sigma_noise))</span>
+<span id="cb8-7"><a href="magic-of-multiple-regression.html#cb8-7"></a>  </span>
+<span id="cb8-8"><a href="magic-of-multiple-regression.html#cb8-8"></a>  <span class="co"># fit data using OLS and pulling out two slope coefficients</span></span>
+<span id="cb8-9"><a href="magic-of-multiple-regression.html#cb8-9"></a>  <span class="kw">lm</span>(Divorce <span class="op">~</span><span class="st"> </span>Marriage <span class="op">+</span><span class="st"> </span>MedianAgeMarriage, <span class="dt">data=</span>sim_df) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb8-10"><a href="magic-of-multiple-regression.html#cb8-10"></a><span class="st">    </span><span class="kw">summary</span>() <span class="op">%&gt;%</span></span>
+<span id="cb8-11"><a href="magic-of-multiple-regression.html#cb8-11"></a><span class="st">    </span>.<span class="op">$</span>coefficients <span class="op">%&gt;%</span></span>
+<span id="cb8-12"><a href="magic-of-multiple-regression.html#cb8-12"></a><span class="st">    </span><span class="kw">data.frame</span>() <span class="op">%&gt;%</span></span>
+<span id="cb8-13"><a href="magic-of-multiple-regression.html#cb8-13"></a><span class="st">    </span><span class="kw">rownames_to_column</span>(<span class="st">&quot;Variable&quot;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb8-14"><a href="magic-of-multiple-regression.html#cb8-14"></a><span class="st">    </span><span class="kw">slice</span>(<span class="op">-</span><span class="dv">1</span>) <span class="op">%&gt;%</span></span>
+<span id="cb8-15"><a href="magic-of-multiple-regression.html#cb8-15"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">LowerCI =</span> Estimate <span class="op">-</span><span class="st"> </span>Std..Error,</span>
+<span id="cb8-16"><a href="magic-of-multiple-regression.html#cb8-16"></a>           <span class="dt">UpperCI =</span> Estimate <span class="op">+</span><span class="st"> </span>Std..Error) <span class="op">%&gt;%</span></span>
+<span id="cb8-17"><a href="magic-of-multiple-regression.html#cb8-17"></a><span class="st">    </span><span class="kw">select</span>(Variable, Estimate, LowerCI, UpperCI)</span>
+<span id="cb8-18"><a href="magic-of-multiple-regression.html#cb8-18"></a>}</span>
+<span id="cb8-19"><a href="magic-of-multiple-regression.html#cb8-19"></a></span>
+<span id="cb8-20"><a href="magic-of-multiple-regression.html#cb8-20"></a>simulated_noise &lt;-<span class="st"> </span></span>
+<span id="cb8-21"><a href="magic-of-multiple-regression.html#cb8-21"></a><span class="st">  </span><span class="kw">tibble</span>(<span class="dt">epsilon =</span><span class="kw">exp</span>(<span class="kw">seq</span>(<span class="kw">log</span>(<span class="fl">0.001</span>), <span class="kw">log</span>(<span class="fl">0.3</span>), <span class="dt">length.out =</span> <span class="dv">100</span>))) <span class="op">%&gt;%</span></span>
+<span id="cb8-22"><a href="magic-of-multiple-regression.html#cb8-22"></a><span class="st">  </span><span class="kw">group_by</span>(epsilon) <span class="op">%&gt;%</span></span>
+<span id="cb8-23"><a href="magic-of-multiple-regression.html#cb8-23"></a><span class="st">  </span><span class="kw">do</span>(<span class="kw">simulate_waffles</span>(.<span class="op">$</span>epsilon))</span>
+<span id="cb8-24"><a href="magic-of-multiple-regression.html#cb8-24"></a></span>
+<span id="cb8-25"><a href="magic-of-multiple-regression.html#cb8-25"></a><span class="kw">ggplot</span>(simulated_noise, <span class="kw">aes</span>(<span class="dt">x=</span>epsilon, <span class="dt">y=</span>Estimate)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb8-26"><a href="magic-of-multiple-regression.html#cb8-26"></a><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="kw">aes</span>(<span class="dt">ymin=</span>LowerCI, <span class="dt">ymax=</span>UpperCI, <span class="dt">fill=</span>Variable), <span class="dt">alpha=</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb8-27"><a href="magic-of-multiple-regression.html#cb8-27"></a><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">color=</span>Variable)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb8-28"><a href="magic-of-multiple-regression.html#cb8-28"></a><span class="st">  </span><span class="kw">scale_x_log10</span>(<span class="dt">name=</span><span class="kw">expression</span>(epsilon)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb8-29"><a href="magic-of-multiple-regression.html#cb8-29"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Slope estimate  ± standard error&quot;</span>) <span class="op">+</span></span>
+<span id="cb8-30"><a href="magic-of-multiple-regression.html#cb8-30"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">subtitle =</span> <span class="kw">expression</span>(<span class="kw">paste</span>(<span class="st">&quot;Marriage = MedianAgeMarriage + Normal(0, &quot;</span>, epsilon, <span class="st">&quot;)&quot;</span>)))</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>The stripes show uncertainty (estimate ± standard error) and you can appreciate how quickly it is reduced as marriage rate becomes noisier and just how little noise is required for “magic” to start working and converge on the true causal relationship<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a>.</p>
+</div>
+<div id="chain-dag" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Chain DAG</h2>
+<p>So, a bit of noise will fix everything and we can <em>know</em> causal relationships between the three variables? Not necessarily! Consider another possible causal diagram:
+<span class="math display">\[Marriage~rate~\rightarrow~Age~of~marriage~\rightarrow~Divorce~rate\]</span>
+Now marriage rate causes age of marriage that, in turn, causes divorce rate. Again, let us use synthetic data, so that we can be sure what causes what. However, we will add a fair amount of noise to make it more like real data and avoid multicoliniarity.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="magic-of-multiple-regression.html#cb9-1"></a><span class="kw">data</span>(<span class="st">&quot;WaffleDivorce&quot;</span>)</span>
+<span id="cb9-2"><a href="magic-of-multiple-regression.html#cb9-2"></a><span class="kw">set.seed</span>(<span class="dv">8973791</span>)</span>
+<span id="cb9-3"><a href="magic-of-multiple-regression.html#cb9-3"></a>N &lt;-<span class="st"> </span><span class="kw">nrow</span>(WaffleDivorce)</span>
+<span id="cb9-4"><a href="magic-of-multiple-regression.html#cb9-4"></a>sim_waffles &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">Marriage =</span> <span class="kw">rnorm</span>(N),</span>
+<span id="cb9-5"><a href="magic-of-multiple-regression.html#cb9-5"></a>                      <span class="dt">MedianAgeMarriage =</span> <span class="op">-</span><span class="kw">rnorm</span>(N, Marriage, <span class="fl">0.2</span>),</span>
+<span id="cb9-6"><a href="magic-of-multiple-regression.html#cb9-6"></a>                      <span class="dt">Divorce =</span> <span class="op">-</span><span class="kw">rnorm</span>(N, MedianAgeMarriage, <span class="fl">0.2</span>))</span>
+<span id="cb9-7"><a href="magic-of-multiple-regression.html#cb9-7"></a></span>
+<span id="cb9-8"><a href="magic-of-multiple-regression.html#cb9-8"></a>MD_plot &lt;-<span class="st"> </span></span>
+<span id="cb9-9"><a href="magic-of-multiple-regression.html#cb9-9"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="dt">data=</span>sim_waffles, <span class="kw">aes</span>(<span class="dt">x=</span>Marriage, <span class="dt">y=</span>Divorce)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-10"><a href="magic-of-multiple-regression.html#cb9-10"></a><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method=</span><span class="st">&quot;lm&quot;</span>, <span class="dt">formula=</span>y<span class="op">~</span>x) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-11"><a href="magic-of-multiple-regression.html#cb9-11"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-12"><a href="magic-of-multiple-regression.html#cb9-12"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Marriage rate&quot;</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-13"><a href="magic-of-multiple-regression.html#cb9-13"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Divorce rate&quot;</span>)</span>
+<span id="cb9-14"><a href="magic-of-multiple-regression.html#cb9-14"></a></span>
+<span id="cb9-15"><a href="magic-of-multiple-regression.html#cb9-15"></a>AD_plot &lt;-<span class="st"> </span></span>
+<span id="cb9-16"><a href="magic-of-multiple-regression.html#cb9-16"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="dt">data=</span>sim_waffles, <span class="kw">aes</span>(<span class="dt">x=</span>MedianAgeMarriage, <span class="dt">y=</span>Divorce)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-17"><a href="magic-of-multiple-regression.html#cb9-17"></a><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method=</span><span class="st">&quot;lm&quot;</span>, <span class="dt">formula=</span>y<span class="op">~</span>x) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-18"><a href="magic-of-multiple-regression.html#cb9-18"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-19"><a href="magic-of-multiple-regression.html#cb9-19"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Median age marriage&quot;</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-20"><a href="magic-of-multiple-regression.html#cb9-20"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Divorce rate&quot;</span>)</span>
+<span id="cb9-21"><a href="magic-of-multiple-regression.html#cb9-21"></a></span>
+<span id="cb9-22"><a href="magic-of-multiple-regression.html#cb9-22"></a>AM_plot &lt;-<span class="st"> </span></span>
+<span id="cb9-23"><a href="magic-of-multiple-regression.html#cb9-23"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="dt">data=</span>sim_waffles, <span class="kw">aes</span>(<span class="dt">x=</span>MedianAgeMarriage, <span class="dt">y=</span>Marriage)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-24"><a href="magic-of-multiple-regression.html#cb9-24"></a><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method=</span><span class="st">&quot;lm&quot;</span>, <span class="dt">formula=</span>y<span class="op">~</span>x) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-25"><a href="magic-of-multiple-regression.html#cb9-25"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-26"><a href="magic-of-multiple-regression.html#cb9-26"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Median age marriage&quot;</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-27"><a href="magic-of-multiple-regression.html#cb9-27"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Marriage rate&quot;</span>)</span>
+<span id="cb9-28"><a href="magic-of-multiple-regression.html#cb9-28"></a></span>
+<span id="cb9-29"><a href="magic-of-multiple-regression.html#cb9-29"></a>MD_plot <span class="op">|</span><span class="st"> </span>AD_plot <span class="op">|</span><span class="st"> </span>AM_plot</span></code></pre></div>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The plots look very similar to those that we had before, so let us run the model.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="magic-of-multiple-regression.html#cb10-1"></a>sim_waffles &lt;-</span>
+<span id="cb10-2"><a href="magic-of-multiple-regression.html#cb10-2"></a><span class="st">  </span>sim_waffles <span class="op">%&gt;%</span></span>
+<span id="cb10-3"><a href="magic-of-multiple-regression.html#cb10-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">A =</span> MedianAgeMarriage,</span>
+<span id="cb10-4"><a href="magic-of-multiple-regression.html#cb10-4"></a>         <span class="dt">M =</span> Marriage,</span>
+<span id="cb10-5"><a href="magic-of-multiple-regression.html#cb10-5"></a>         <span class="dt">D =</span> Divorce)</span>
+<span id="cb10-6"><a href="magic-of-multiple-regression.html#cb10-6"></a></span>
+<span id="cb10-7"><a href="magic-of-multiple-regression.html#cb10-7"></a>sim_waffles_fit &lt;-<span class="st"> </span><span class="kw">quap</span>(</span>
+<span id="cb10-8"><a href="magic-of-multiple-regression.html#cb10-8"></a>  <span class="kw">alist</span>(</span>
+<span id="cb10-9"><a href="magic-of-multiple-regression.html#cb10-9"></a>    D <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(mu , sigma) ,</span>
+<span id="cb10-10"><a href="magic-of-multiple-regression.html#cb10-10"></a>    mu &lt;-<span class="st"> </span>a <span class="op">+</span><span class="st"> </span>bM<span class="op">*</span>M <span class="op">+</span><span class="st"> </span>bA<span class="op">*</span>A,</span>
+<span id="cb10-11"><a href="magic-of-multiple-regression.html#cb10-11"></a>    a <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">0</span>, <span class="fl">0.2</span>),</span>
+<span id="cb10-12"><a href="magic-of-multiple-regression.html#cb10-12"></a>    bA <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">0</span>, <span class="dv">10</span>),</span>
+<span id="cb10-13"><a href="magic-of-multiple-regression.html#cb10-13"></a>    bM <span class="op">~</span><span class="st"> </span><span class="kw">dnorm</span>(<span class="dv">0</span>, <span class="dv">10</span>),</span>
+<span id="cb10-14"><a href="magic-of-multiple-regression.html#cb10-14"></a>    sigma <span class="op">~</span><span class="st"> </span><span class="kw">dexp</span>(<span class="dv">1</span>)</span>
+<span id="cb10-15"><a href="magic-of-multiple-regression.html#cb10-15"></a>  ), </span>
+<span id="cb10-16"><a href="magic-of-multiple-regression.html#cb10-16"></a>  <span class="dt">data =</span> sim_waffles,</span>
+<span id="cb10-17"><a href="magic-of-multiple-regression.html#cb10-17"></a>)</span>
+<span id="cb10-18"><a href="magic-of-multiple-regression.html#cb10-18"></a></span>
+<span id="cb10-19"><a href="magic-of-multiple-regression.html#cb10-19"></a><span class="kw">precis</span>(sim_waffles_fit)</span></code></pre></div>
+<pre><code>##              mean         sd        5.5%       94.5%
+## a      0.01141493 0.02370058 -0.02646318  0.04929304
+## bA    -1.04399582 0.11019913 -1.22011532 -0.86787631
+## bM    -0.05011269 0.12299879 -0.24668851  0.14646313
+## sigma  0.16656407 0.01661272  0.14001374  0.19311440</code></pre>
+<p>The model fit is virtually identical to that for the real data and, effectively, for a noisy simulated fork DAG. Yet, remember, that the underlying causal relationship between marriage rate and marriage age are now <em>opposite</em>. In the fork DAG, age was causing marriage rate. Here, in the chain DAG, marriage rate for causing age. Moreover, the way we generated synthetic data, marriage rate causes divorce rate, although its effect is <em>mediated</em> via marriage age. Yet, looking at the parameter values for <span class="math inline">\(\beta_M\)</span> we might be tempted to conclude that marriage rate has no effect on divorce rate. To understand why, think about the relationship between marriage rate and age again. We designed it, so that <span class="math inline">\(A = -M + \epsilon\)</span> and <span class="math inline">\(D = -A\)</span> (we ignore the noise in the latter part for clarity). Substituting, we get <span class="math inline">\(D = M - \epsilon\)</span> or, since we designed noise to be symmetric, we can also write <span class="math inline">\(D = M + \epsilon\)</span>. To put it differently, divorce rate are based on <em>actual</em> values of age, which include noise. So, somewhat paradoxically, the cleaner version of the original variable is less correlated. If it still unclear, let me try with a metaphor. Imagine your friend sings you a song she heard. <span class="math inline">\(original \rightarrow friend \rightarrow you\)</span>. She remembered it wrong, so her version is somewhat different from the original. But because you are used to <em>her</em> version of the song, the original, once you finally hear it, sounds wrong, as it does not have the distortions introduced by your friend.</p>
+</div>
+<div id="take-home-message" class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> Take-home message</h2>
+<p>So, two DAGs, two <em>differently</em> generated data sets, yet, one statistical model. Both DAGs agree that there is a direct causal path between marriage age and divorce but have opposite assumptions about causal relationship between marriage age and rate. What should we conclude from this? That it might be impossible to understand causal relationships between all variables even for the simplest case of just two predictors. The only thing to do is to embrace this ambiguity and be aware of it whenever you interpret regression models. So, you should use DAGs exactly for this purpose of understanding in how many ways can you generate the observed data. I understand that a simple unambiguous story is far more appealing<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a> but as Jochen Braun of Magdeburg says: “Do not fall for your own propaganda!”. Selecting just one story / DAG does not make them true. Considering all possible DAGs will likely lead to insights based on predictions they make. Even if your current data cannot decide between them, their different predictions for future experiment will help to solve the puzzle eventually.</p>
+<p>Another take home message: Regression models cannot do magic. They can quantify correctional relationship and their signal-to-noise ratios but they do not know causality and they won’t tell you which model is the “true” model. Imagine that we never measured marriage age, we would model divorce rate from marriage rate and would be quite pleased with the results. And, given how noisy the real data is, we probably did not consider some other <em>very important</em> variables, those presence might render age as irrelevant as the marriage rate is now. Again, assuming the chain DAG
+<span class="math display">\[marriage~rate \rightarrow age \rightarrow variable~we~missed \rightarrow divorce~rate\]</span>
+Statistical models only work in a small world you created for them. Models are golems, they cannot and do not know about the large world. You do, so it is on you to understand both their limitations and power. Models can help you understand the process you are investigating but they won’t understand it for you!</p>
+
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="7">
+<li id="fn7"><p>Don’t be like me, be better!<a href="magic-of-multiple-regression.html#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>I’ve made priors for both betas broad, so that they are not pushed towards zero too aggressively and uncertainty about them is more evident<a href="magic-of-multiple-regression.html#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p>I’ve dropped likelihood and variance only to compress formulas and shed unimportant details. Adding them does not change the essence.<a href="magic-of-multiple-regression.html#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn10"><p>in our case, the difference, because we defined that <code>M = -A</code>.<a href="magic-of-multiple-regression.html#fnref10" class="footnote-back">↩︎</a></p></li>
+<li id="fn11"><p>I’ve used ordinary least squares just to make simulations faster. You will get the same result using Bayesian fittings procedures.<a href="magic-of-multiple-regression.html#fnref11" class="footnote-back">↩︎</a></p></li>
+<li id="fn12"><p>It is true only in a sense that it matches the processes of creating the data. It is <em>not</em> necessarily truly true for real data!<a href="magic-of-multiple-regression.html#fnref12" class="footnote-back">↩︎</a></p></li>
+<li id="fn13"><p>“Just tell me how things are!”<a href="magic-of-multiple-regression.html#fnref13" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="directed-acyclic-graphs-and-causal-reasoning.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="solutions-for-chapter-2.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["notes-on-statistical-rethinking.pdf", "notes-on-statistical-rethinking.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
