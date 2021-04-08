@@ -1,0 +1,22 @@
+# Bayesian versus Frequentist Statistics
+
+I suspect that many student who read "Statistical Rethinking" have a feeling that it is something completely different from what they have been learning in "traditional" statistics classes. That Bayesian approach is more "hands-on" and complicated, whereas "normal" statistics is simpler and easy to work with even it is "less powerful."^[Not really.] Thus, the purpose of this note is to walk you through a typical statistical analysis and focus on practical differences and, more importantly, similarity of the two approaches.
+
+## Choice of likelihood (both)
+The very first we do is to look at the data and decide which distribution we will use to model the data / residuals be it normal, binomial, Poisson, beta, etc. That is the very first line of our models that goes like this
+$$y_i \sim Normal(\mu_i, \sigma)$$
+
+This decision is neither Bayesian, nor frequentist. This is a decision about the model that best describes the data, so it is independent of the inference method you will use. This is a decision that you are making even if you are using "prepackaged" statistical tests like the t-test or ANOVA that assume normally distributed residuals^[Admittedly, in this case people often start with the statistical test and see whether data is suitable rather than the other way around.].
+
+## Linear model (both)
+Next, you decide on the deterministic part of the model that expresses how a parameter of the distribution you chose on the previous step is computed from various predictors. I.e., for the linear regression with normally distributed residuals, you decide which predictors do you use to predict the mean. It looks something like this
+$$\mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso $$
+
+Again, this is neither Bayesian, nor frequentist decision, it is a linear model decision. Chapters 4-6 and 8 concentrate on making this decision using directed-acyclic graphs (DAGs)  and introduce concepts of multicollinearity, colliders and bias they can produce, backdoor path, etc. They explained how you can make educated decision on which predictors to use based on your knowledge of the field or of the problem. At this stage you also decide on whether to normalize data, as it could make interpreting the model easier. 
+
+You always have to make this decision. For example, if you use the (repeated measures) ANOVA, you do need to decide which factors to use in , whether to include interactions, should you transform the data to make coefficients directly interpretable, etc. 
+
+## Priors (Bayesian)
+Priors are a Bayesian way to regularize the model, so this is something you do need to think about when doing Bayesian statistics^[Modern packages like _brms_ make it easy for you by deducing a set of optimal priors for you, although it is always a good idea to double-check them.]. And this is probably a decision that students worry about the most as it feels more subjective and arbitrary than other decisions, such as choice of the likelihood or predictors. Hence, "normal" statistics with its flat priors feels simpler but also more objective and, therefore, more trustworthy.
+
+In reality, flat priors are never good priors. If there is sufficient data then, in most cases, the priors (flat or not) do not matter much anyhow. However, if the data is limited then flat priors almost inevitably lead to overfitting as there is no additional information to counteract the effect of noise. This overfitting may feel more "objective" than a more conservative fit via strongly regulirizing priors but the latter is more likely to lead to better out-of-sample predictions. 
