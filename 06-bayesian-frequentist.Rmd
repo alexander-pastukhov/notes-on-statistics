@@ -26,7 +26,7 @@ $$
 
 This is probably a decision that students worry about the most as it feels more subjective and arbitrary than other decisions, such as choice of the likelihood or predictors. Chapter 4 through 7 gave you multiple examples that there is nothing particularly arbitrary about these choices and that you can come up with a set of justifiable priors based on what you know about the topic or based on how your pre-processed the data^[In my experience, people tend to worry about priors for data unseen. Some kind of data of which you know absolutely nothing, hence, have trouble deducing priors. In practice, you always know something about the topic and the data. If not, you should read on it instead of using flat priors!].
 
-Still, I think for a lot of people "normal" statistics with its flat priors feels simpler and also more objective and, therefore, more trustworthy ("we did not favor any specific range of values!"). If that is the case then use flat priors (but see the sidenote below) making Bayesian and frequentists models identical! For me, though, writing it down explicitly makes one realize that range $-\infty, +\infty$ is remarkably large to the point being an obvious overkill
+Still, I think for a lot of people "normal" statistics with its flat priors feels simpler and also more objective and, therefore, more trustworthy ("we did not favor any specific range of values!"). If that is the case then use flat priors (but see the sidenote below) making Bayesian and frequentists models identical! For me, though, writing it down explicitly makes one realize that range $-\infty, +\infty$ is remarkably large to the point of being an obvious overkill
 $$\alpha \sim Uniform(-\infty, +\infty) \\
 \beta_{x1} \sim Uniform(-\infty, +\infty) \\
 \cdots
@@ -45,7 +45,10 @@ This is the point where the two approach fundamentally diverge. In case of frenq
 These measures are conceptually different but tend to be interpreted similarly and mostly from Bayesian perspective. I think it is a good idea to compute and report all of them. Typically, they would be similar, making you more certain about the results. More importantly, whenever they diverge it serves as a warning to investigate the case and see how priors (in most cases) produce this difference.
 
 ## Model comparison via information criteria (both)
-Both approach use information criteria to compare models with Akaike and Bayesian/Schwarz information criteria being developed specifically for the case of flat priors of frenquetist models. Here, Bayesian approach holds an advantage as full posterior allows for more elaborate information criteria such as DIC, WAIC, or LOO. Still the core idea and the interpretation of the comparison results are the same.
+Both approaches use information criteria to compare models with Akaike and Bayesian/Schwarz information criteria being developed specifically for the case of flat priors of frenquetist models. Here, Bayesian approach holds an advantage as full posterior allows for more elaborate information criteria such as DIC, WAIC, or LOO. Still the core idea and the interpretation of the comparison results are the same.
+
+## Generating predictions (both)
+You generate predictions using the model definition which is the same for both approach. Hence, you are going to get same predictions, at least for the mean. As the two approach differ in how they infer uncertainty, uncertainty of predictions will be different but, typically, comparable.
 
 ## Conclusions
 As you can see, from _practical_ point of view, apart from Bayesian optional priors and different ways to quantify the uncertainty of estimates, the two approaches are the same. They require you making same decisions and the results are interpreted the same way. This lack of difference becomes even more apparent when you use software packages for running your statistical models. E.g., the way you specify your model in `lme4` (frenquetist) and `brms` (Bayesian) is very much the same to the point that in most cases you only need to change the function name (`lmer` to `brm` or vice versa) and leave the rest the same.
@@ -54,3 +57,16 @@ Thus, the point is that you should not be choosing between studying or doing fre
 
 ## Take home message
 We are not studying something completely different! We are merely approaching it from an unusual angle that leads to deeper understanding and interesting insights in the long run.
+=======
+Next, you decide on the deterministic part of the model that expresses how a parameter of the distribution you chose on the previous step is computed from various predictors. I.e., for the linear regression with normally distributed residuals, you decide which predictors do you use to predict the mean. It looks something like this
+$$\mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso $$
+
+Again, this is neither Bayesian, nor frequentist decision, it is a linear model decision. Chapters 4-6 and 8 concentrate on making this decision using directed-acyclic graphs (DAGs)  and introduce concepts of multicollinearity, colliders and bias they can produce, backdoor path, etc. They explained how you can make educated decision on which predictors to use based on your knowledge of the field or of the problem. At this stage you also decide on whether to normalize data, as it could make interpreting the model easier. 
+
+You always have to make this decision. For example, if you use the (repeated measures) ANOVA, you do need to decide which factors to use in , whether to include interactions, should you transform the data to make coefficients directly interpretable, etc. 
+
+## Priors (Bayesian)
+Priors are a Bayesian way to regularize the model, so this is something you do need to think about when doing Bayesian statistics^[Modern packages like _brms_ make it easy for you by deducing a set of optimal priors for you, although it is always a good idea to double-check them.]. And this is probably a decision that students worry about the most as it feels more subjective and arbitrary than other decisions, such as choice of the likelihood or predictors. Hence, "normal" statistics with its flat priors feels simpler but also more objective and, therefore, more trustworthy.
+
+In reality, flat priors are never good priors. If there is sufficient data then, in most cases, the priors (flat or not) do not matter much anyhow. However, if the data is limited then flat priors almost inevitably lead to overfitting as there is no additional information to counteract the effect of noise. This overfitting may feel more "objective" than a more conservative fit via strongly regulirizing priors but the latter is more likely to lead to better out-of-sample predictions. 
+
