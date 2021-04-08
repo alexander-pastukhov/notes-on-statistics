@@ -1,0 +1,56 @@
+# Bayesian versus Frequentist Statistics
+
+I suspect that many student who read "Statistical Rethinking" have a feeling that it is something completely different from what they have been learning in "traditional" statistics classes. That Bayesian approach is more "hands-on" and complicated, whereas "normal" statistics is simpler and easy to work with even it is "less powerful."^[Not really.] Thus, the purpose of this note is to walk you through a typical statistical analysis and focus on practical differences and, more importantly, similarity of the two approaches.
+
+## Choice of likelihood (both)
+The very first we do is to look at the data and decide which distribution we will use to model the data / residuals be it normal, binomial, Poisson, beta, etc. That is the very first line of our models that goes like this
+$$y_i \sim Normal(\mu_i, \sigma)$$
+
+This decision is neither Bayesian, nor frequentist. This is a decision about the model that best describes the data, so it is independent of the inference method you will use. This is a decision that you are making even if you are using "prepackaged" statistical tests like the t-test or ANOVA that assume normally distributed residuals^[Admittedly, in this case people often start with the statistical test and see whether data is suitable rather than the other way around.].
+
+## Linear model (both)
+Next, you decide on the deterministic part of the model that expresses how a parameter of the distribution you chose on the previous step is computed from various predictors. E.g., for the linear regression with normally distributed residuals, you decide which predictors do you use to compute the mean. It looks something like this
+$$\mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso $$
+
+Again, this is neither Bayesian, nor frequentist decision, it is a linear model decision. Chapters 4-6 and 8 concentrate on how to make this decision using directed-acyclic graphs (DAGs)  and introduce concepts of multicollinearity, colliders and bias they can produce, backdoor paths and how to identify them, etc. They explain how you can make educated decision on which predictors to use based on your knowledge of the field or of the problem. At this stage you also decide on whether to normalize data, as it could make interpreting the model easier. 
+
+You always have to make this decision. For example, if you use the (repeated measures) ANOVA, you do need to decide which factors to use, whether to include interactions, should you transform the data to make coefficients directly interpretable, do you use a link function, etc.^[However, you do see cases when one simply throws all factors and interactions into the pot with little regard for an underlying causal model or interpretability of the coefficients.] 
+
+## Priors (optional for Bayesian)
+Priors are a Bayesian way to regularize the model, so this is something you do need to think about when doing Bayesian statistics^[Modern packages like _brms_ make it easy for you by deducing a set of reasonable priors for you. However, it is always a good idea to double-check them.]. In a model this part would look something like this
+$$\alpha \sim Normal(0, 1) \\
+\beta_{x1} \sim Exponential(1) \\
+\cdots
+$$
+
+
+This is probably a decision that students worry about the most as it feels more subjective and arbitrary than other decisions, such as choice of the likelihood or predictors. Chapter 4 through 7 gave you multiple examples that there is nothing particularly arbitrary about these choices and that you can come up with a set of justifiable priors based on what you know about the topic or based on how your pre-processed the data^[In my experience, people tend to worry about priors for data unseen. Some kind of data of which you know absolutely nothing, hence, have trouble deducing priors. In practice, you always know something about the topic and the data. If not, you should read on it instead of using flat priors!].
+
+Still, I think for a lot of people "normal" statistics with its flat priors feels simpler and also more objective and, therefore, more trustworthy ("we did not favor any specific range of values!"). If that is the case then use flat priors (but see the sidenote below) making Bayesian and frequentists models identical! For me, though, writing it down explicitly makes one realize that range $-\infty, +\infty$ is remarkably large to the point being an obvious overkill
+$$\alpha \sim Uniform(-\infty, +\infty) \\
+\beta_{x1} \sim Uniform(-\infty, +\infty) \\
+\cdots
+$$
+
+In short, Bayesian inference gives you an _option_ to specify priors. You do not need to take on the option and can use flat frequentist's priors.
+
+_Sidenote._ In reality, flat priors are never good priors. If there is sufficient data then, in most cases, the priors (flat or not) do not matter much anyhow. However, if the data is limited then flat priors almost inevitably lead to overfitting as there is no additional information to counteract the effect of noise. This overfitting may feel more "objective" and "data-driven" than a more conservative underfitting of data via strongly regularizing priors but the latter is more likely to lead to better out-of-sample predictions and, therefore, are more likely to be replicated. 
+
+## Maximum-likelihood estimate (both)
+Once you fitted the model, you get estimates for each parameter you specified. If you opted for flat priors, these estimates will be same but for very minor differences due to sampling in Bayesian statistics. If you did specify regularizing priors then estimates will be different, although the magnitude of that difference will depend the amount of data: the more data you have, the smaller influence of the priors, we closer the estimates (see also the sidenote above). Importantly, both types of inferences will produce (very similar) estimates and you interpret them the same way.
+
+## Uncertainty about estimates (different but comparable)
+This is the point where the two approach fundamentally diverge. In case of frenquetists statistics you obtain confidence intervals and p-values based on appropriate statistics and degrees of freedom, whereas in case of Bayesian inference you obtain credible/compatibility intervals and can use posterior distribution for individual parameters to compute probability that they are strictly positive, negative, concentrated within a certain region around zero, etc. 
+
+These measures are conceptually different but tend to be interpreted similarly and mostly from Bayesian perspective. I think it is a good idea to compute and report all of them. Typically, they would be similar, making you more certain about the results. More importantly, whenever they diverge it serves as a warning to investigate the case and see how priors (in most cases) produce this difference.
+
+## Model comparison via information criteria (both)
+Both approach use information criteria to compare models with Akaike and Bayesian/Schwarz information criteria being developed specifically for the case of flat priors of frenquetist models. Here, Bayesian approach holds an advantage as full posterior allows for more elaborate information criteria such as DIC, WAIC, or LOO. Still the core idea and the interpretation of the comparison results are the same.
+
+## Conclusions
+As you can see, from _practical_ point of view, apart from Bayesian optional priors and different ways to quantify the uncertainty of estimates, the two approaches are the same. They require you making same decisions and the results are interpreted the same way. This lack of difference becomes even more apparent when you use software packages for running your statistical models. E.g., the way you specify your model in `lme4` (frenquetist) and `brms` (Bayesian) is very much the same to the point that in most cases you only need to change the function name (`lmer` to `brm` or vice versa) and leave the rest the same.
+
+Thus, the point is that you should not be choosing between studying or doing frenquetists or Bayesian statistic. I feel more comfortable with Bayesian, mostly because it makes it easier interpret statistical significance. However, my typical approach is to start with frenquetist statistics (fast, good for shooting from a hip), once I am certain about my decisions (likelihood, model) I re-impliement the same model in Bayesian using informative priors and see whether results match (with reason). Then, I report both sets of inferences. This costs me remarkably little time precisely because there is so little difference between the two approaches from practical point of view!
+
+## Take home message
+We are not studying something completely different! We are merely approaching it from an unusual angle that leads to deeper understanding and interesting insights in the long run.
