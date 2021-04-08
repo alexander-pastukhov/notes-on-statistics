@@ -24,15 +24,15 @@ The $2$ is there to facilitate significance testing for _nested_ models. Models 
 
 
 At this point, you might remember that the definition of deviance in the book was for a single model:
-$$D = -2 \cdot log(p(y|\Theta)$$
+$$D = -2 \cdot log(p(y|\Theta))$$
 
 Unfortunately, same term can be used both ways, to refer to a log likelihood of a single model or, technically more correctly, to the log-ratio you saw above. In reality, you will mostly see deviance defined as in the book because it is used to compare nested models via chi-square distribution as I've described above, with only difference that you compare any two nested models, not just to a saturated one. This is how nested models are frequently compared, for example, see [anova()](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/anova.html) function in R.
 
-Note that a deviance for a single model still expresses the same idea of goodness-of-fit but is merely not normalized. Thus deviance as in the book $D = -2 \cdot log(p(y|\Theta)$ corresponds to sum of residuals (absolute values mean nothing but you can use them to compare two models on the same data), whereas _total_ deviance corresponds to the $R^2$ (values are directly interpretable, theoretically, you can use them to compare models fit on different samples).
+Note that a deviance for a single model still expresses the same idea of goodness-of-fit but is merely not normalized. Thus deviance as in the book $D = -2 \cdot log(p(y|\Theta))$ corresponds to sum of residuals (absolute values mean nothing but you can use them to compare two models on the same data), whereas _total_ deviance corresponds to the $R^2$ (values are directly interpretable, theoretically, you can use them to compare models fit on different samples).
 
 ## General idea: information criteria as miles-per-gallon
 The general formula for all information criteria discussed below is
-$$-2\cdot log(\frac{goodness~of~fit}{model~complexity})$$
+$$-2\cdot log \left( \frac{goodness~of~fit}{model~complexity} \right)$$
 
 The goodness-of-fit in the numerator is the likelihood, the joint probability of observing the model given each data point $\prod_i p(\Theta|y_i)$. The denominator expresses model complexity, i.e., its flexibility in fitting the sample and, therefore, its tendency to overfit. Thus, the fraction itself is _goodness-of-fit per unit of model complexity_. This is like miles-per-gallon for car efficiency, so better models are more efficient models, churning out more goodness per complexity.
 
@@ -61,12 +61,12 @@ $$BIC = -2\cdot log(p(\Theta|y)) + log(n) k $$
 Let us do re-arranging again
 $$BIC = -2\cdot log(p(\Theta|y)) + log(n) k $$
  $$BIC = -2 \left( log(p(\Theta|y)) + log(n) \frac{k}{2} \right) $$
-$$BIC = -2 \left( log(p(\Theta|y)) + log \left(exp(log(n) \cdot \frac{k}{2} \right) \right) $$
+$$BIC = -2 \left( log(p(\Theta|y)) - log \left(exp(log(n) \cdot \frac{k}{2} \right) \right) $$
  
 For the complexity term, we need to keep in mind that $exp(a \cdot b) = exp(a)^b$. Thus, 
 $$exp \left(log(n) \cdot \frac{k}{2} \right)= exp(log(n)) ^ \frac{k}{2} = n^\frac{k}{2}$$
 Putting the complexity term back, we get
-$$BIC = -2 \left( log(p(\Theta|y)) + log \left(n^\frac{k}{2} \right) \right)$$
+$$BIC = -2 \left( log(p(\Theta|y)) - log \left(n^\frac{k}{2} \right) \right)$$
 $$BIC = -2 \cdot log \left(\frac{p(\Theta|y)}{n^\frac{k}{2}} \right)$$
 Thus, we end up with very similar power law complexity term which uses sample size instead of Euler's number as the base.
 
