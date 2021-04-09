@@ -4,8 +4,8 @@
 %
 \documentclass[
 ]{book}
+\usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
@@ -81,7 +81,8 @@
 \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
 \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
 \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\usepackage{longtable,booktabs}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
 \makeatletter
@@ -108,12 +109,15 @@
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{5}
 \usepackage{booktabs}
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
 \usepackage[]{natbib}
 \bibliographystyle{apalike}
 
 \title{Notes on and Solutions for Statistical Rethinking}
 \author{Alexander Pastukhov}
-\date{2021-02-01}
+\date{2021-04-09}
 
 \begin{document}
 \maketitle
@@ -263,36 +267,36 @@ Below, you will see how multiple regression can show conditional independence of
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{84321169}\NormalTok{)}
-\NormalTok{N \textless{}{-}}\StringTok{ }\DecValTok{180}
-\NormalTok{sigma\_noise \textless{}{-}}\StringTok{ }\FloatTok{0.5}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{84321169}\NormalTok{)}
+\NormalTok{N }\OtherTok{\textless{}{-}} \DecValTok{180}
+\NormalTok{sigma\_noise }\OtherTok{\textless{}{-}} \FloatTok{0.5}
 \CommentTok{\# we repeat each value of age 10 times to make filtering operation easier to see}
-\NormalTok{sim\_waffles \textless{}{-}}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{MedianAgeMarriage =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\OperatorTok{{-}}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DataTypeTok{length.out=}\DecValTok{9}\NormalTok{), }\DecValTok{20}\NormalTok{), }
-                      \DataTypeTok{Divorce =} \KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise),}
-                      \DataTypeTok{Marriage =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise))}
+\NormalTok{sim\_waffles }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{MedianAgeMarriage =} \FunctionTok{rep}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{9}\NormalTok{), }\DecValTok{20}\NormalTok{), }
+                      \AttributeTok{Divorce =} \FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise),}
+                      \AttributeTok{Marriage =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise))}
 
-\NormalTok{MD\_plot \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Marriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+\NormalTok{MD\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
   
-\NormalTok{AD\_plot \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+\NormalTok{AD\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
   
-\NormalTok{AM\_plot \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Marriage)) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
+\NormalTok{AM\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Marriage)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
 
-\NormalTok{MD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{AD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{AM\_plot}
+\NormalTok{MD\_plot }\SpecialCharTok{|}\NormalTok{ AD\_plot }\SpecialCharTok{|}\NormalTok{ AM\_plot}
 \end{Highlighting}
 \end{Shaded}
 
@@ -302,40 +306,40 @@ As you can see, all variables being dependent on each other, as in case of the o
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{MD\_plot \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Marriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x, }\DataTypeTok{alpha=}\FloatTok{0.1}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
-\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{!=}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{) }
-\NormalTok{AD\_plot \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
-\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{!=}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+\NormalTok{MD\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x, }\AttributeTok{alpha=}\FloatTok{0.1}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{==} \DecValTok{1}\NormalTok{), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{), }\AttributeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{) }
+\NormalTok{AD\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{==} \DecValTok{1}\NormalTok{), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{), }\AttributeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
   
-\NormalTok{AM\_plot \textless{}{-}}
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Marriage, }\DataTypeTok{y=}\NormalTok{MedianAgeMarriage)) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
-\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{!=}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }
+\NormalTok{AM\_plot }\OtherTok{\textless{}{-}}
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{MedianAgeMarriage)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{==} \DecValTok{1}\NormalTok{), }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{), }\AttributeTok{alpha=}\FloatTok{0.15}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }
 
-\NormalTok{MD\_A1\_plot \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(MedianAgeMarriage }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{), }
-         \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Marriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{geom\_point}\NormalTok{(}\DataTypeTok{color=}\StringTok{"red"}\NormalTok{) }\OperatorTok{+}
-\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{) }\OperatorTok{+}
-\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =} \StringTok{"Pr( |Mariage Age = 1)"}\NormalTok{)}
+\NormalTok{MD\_A1\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(MedianAgeMarriage }\SpecialCharTok{==} \DecValTok{1}\NormalTok{), }
+         \FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x, }\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{color=}\StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =} \StringTok{"Pr( |Mariage Age = 1)"}\NormalTok{)}
 
-\NormalTok{(AD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{MD\_plot) }\OperatorTok{/}
-\NormalTok{(MD\_A1\_plot }\OperatorTok{|}\NormalTok{AM\_plot)}
+\NormalTok{(AD\_plot }\SpecialCharTok{|}\NormalTok{ MD\_plot) }\SpecialCharTok{/}
+\NormalTok{(MD\_A1\_plot }\SpecialCharTok{|}\NormalTok{AM\_plot)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -369,35 +373,35 @@ We pretend our variables are already standardized, so the plots would look somet
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{data}\NormalTok{(}\StringTok{"WaffleDivorce"}\NormalTok{)}
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1212}\NormalTok{)}
-\NormalTok{N \textless{}{-}}\StringTok{ }\KeywordTok{nrow}\NormalTok{(WaffleDivorce)}
-\NormalTok{sim\_waffles \textless{}{-}}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{MedianAgeMarriage =} \KeywordTok{rnorm}\NormalTok{(N),}
-                      \DataTypeTok{Divorce =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
-                      \DataTypeTok{Marriage =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.01}\NormalTok{))}
+\FunctionTok{data}\NormalTok{(}\StringTok{"WaffleDivorce"}\NormalTok{)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1212}\NormalTok{)}
+\NormalTok{N }\OtherTok{\textless{}{-}} \FunctionTok{nrow}\NormalTok{(WaffleDivorce)}
+\NormalTok{sim\_waffles }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{MedianAgeMarriage =} \FunctionTok{rnorm}\NormalTok{(N),}
+                      \AttributeTok{Divorce =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
+                      \AttributeTok{Marriage =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.01}\NormalTok{))}
 
-\NormalTok{MD\_plot \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Marriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+\NormalTok{MD\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
 
-\NormalTok{AD\_plot \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+\NormalTok{AD\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
 
-\NormalTok{AM\_plot \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Marriage)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
+\NormalTok{AM\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Marriage)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
 
-\NormalTok{MD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{AD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{AM\_plot}
+\NormalTok{MD\_plot }\SpecialCharTok{|}\NormalTok{ AD\_plot }\SpecialCharTok{|}\NormalTok{ AM\_plot}
 \end{Highlighting}
 \end{Shaded}
 
@@ -407,25 +411,25 @@ The relationship is the same as in the plots above but, as we assumed an almost 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sim\_waffles \textless{}{-}}
-\StringTok{  }\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{A =}\NormalTok{ MedianAgeMarriage,}
-         \DataTypeTok{M =}\NormalTok{ Marriage,}
-         \DataTypeTok{D =}\NormalTok{ Divorce)}
+\NormalTok{sim\_waffles }\OtherTok{\textless{}{-}}
+\NormalTok{  sim\_waffles }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{A =}\NormalTok{ MedianAgeMarriage,}
+         \AttributeTok{M =}\NormalTok{ Marriage,}
+         \AttributeTok{D =}\NormalTok{ Divorce)}
 
-\NormalTok{sim\_waffles\_fit \textless{}{-}}\StringTok{ }\KeywordTok{quap}\NormalTok{(}
-  \KeywordTok{alist}\NormalTok{(}
-\NormalTok{    D }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(mu , sigma) ,}
-\NormalTok{    mu \textless{}{-}}\StringTok{ }\NormalTok{a }\OperatorTok{+}\StringTok{ }\NormalTok{bM}\OperatorTok{*}\NormalTok{M }\OperatorTok{+}\StringTok{ }\NormalTok{bA}\OperatorTok{*}\NormalTok{A,}
-\NormalTok{    a }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.2}\NormalTok{),}
-\NormalTok{    bA }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
-\NormalTok{    bM }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
-\NormalTok{    sigma }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\NormalTok{sim\_waffles\_fit }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
+  \FunctionTok{alist}\NormalTok{(}
+\NormalTok{    D }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu , sigma) ,}
+\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ bM}\SpecialCharTok{*}\NormalTok{M }\SpecialCharTok{+}\NormalTok{ bA}\SpecialCharTok{*}\NormalTok{A,}
+\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.2}\NormalTok{),}
+\NormalTok{    bA }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
+\NormalTok{    bM }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
+\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{)}
 \NormalTok{  ), }
-  \DataTypeTok{data =}\NormalTok{ sim\_waffles,}
+  \AttributeTok{data =}\NormalTok{ sim\_waffles,}
 \NormalTok{)}
 
-\KeywordTok{precis}\NormalTok{(sim\_waffles\_fit)}
+\FunctionTok{precis}\NormalTok{(sim\_waffles\_fit)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -454,13 +458,13 @@ Hey, that is the slope that we used to construct divorce rate, so fitting does w
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{posterior\_samples \textless{}{-}}\StringTok{ }
-\StringTok{  }\NormalTok{rethinking}\OperatorTok{::}\KeywordTok{extract.samples}\NormalTok{(sim\_waffles\_fit) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{bA\_true =}\NormalTok{ bA }\OperatorTok{{-}}\StringTok{ }\NormalTok{bM)}
+\NormalTok{posterior\_samples }\OtherTok{\textless{}{-}} 
+\NormalTok{  rethinking}\SpecialCharTok{::}\FunctionTok{extract.samples}\NormalTok{(sim\_waffles\_fit) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{bA\_true =}\NormalTok{ bA }\SpecialCharTok{{-}}\NormalTok{ bM)}
 
-\KeywordTok{ggplot}\NormalTok{(posterior\_samples, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{bA\_true)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{100}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"bA\_true = bA {-} bM"}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(posterior\_samples, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{bA\_true)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins=}\DecValTok{100}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"bA\_true = bA {-} bM"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -480,17 +484,17 @@ By definition, \(\epsilon\) is \emph{pure noise} and has zero predictive value w
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1231455}\NormalTok{)}
-\NormalTok{sim\_waffles \textless{}{-}}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{MedianAgeMarriage =} \KeywordTok{rnorm}\NormalTok{(N),}
-                      \DataTypeTok{Divorce =} \KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
-                      \DataTypeTok{Marriage =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.01}\NormalTok{),}
-                      \DataTypeTok{epsilon =} \KeywordTok{rnorm}\NormalTok{(N))}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1231455}\NormalTok{)}
+\NormalTok{sim\_waffles }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{MedianAgeMarriage =} \FunctionTok{rnorm}\NormalTok{(N),}
+                      \AttributeTok{Divorce =} \FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
+                      \AttributeTok{Marriage =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.01}\NormalTok{),}
+                      \AttributeTok{epsilon =} \FunctionTok{rnorm}\NormalTok{(N))}
 
-\KeywordTok{ggplot}\NormalTok{(sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{epsilon, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\KeywordTok{expression}\NormalTok{(epsilon)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
+\FunctionTok{ggplot}\NormalTok{(sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{epsilon, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\FunctionTok{expression}\NormalTok{(epsilon)) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -502,36 +506,36 @@ The latter part, \(\beta_M \cdot \epsilon\), pushes \(\beta_M\) towards zero slo
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{simulate\_waffles \textless{}{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(sigma\_noise)\{}
+\NormalTok{simulate\_waffles }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(sigma\_noise)\{}
   \CommentTok{\# generate same data but for noise in Marraige from Age relationship}
-  \KeywordTok{set.seed}\NormalTok{(}\DecValTok{169084}\NormalTok{)}
-\NormalTok{  sim\_df \textless{}{-}}\StringTok{ }\NormalTok{sim\_waffles \textless{}{-}}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{MedianAgeMarriage =} \KeywordTok{rnorm}\NormalTok{(N),}
-                                  \DataTypeTok{Divorce =} \KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
-                                  \DataTypeTok{Marriage =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise))}
+  \FunctionTok{set.seed}\NormalTok{(}\DecValTok{169084}\NormalTok{)}
+\NormalTok{  sim\_df }\OtherTok{\textless{}{-}}\NormalTok{ sim\_waffles }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{MedianAgeMarriage =} \FunctionTok{rnorm}\NormalTok{(N),}
+                                  \AttributeTok{Divorce =} \FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.1}\NormalTok{),}
+                                  \AttributeTok{Marriage =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, sigma\_noise))}
   
   \CommentTok{\# fit data using OLS and pulling out two slope coefficients}
-  \KeywordTok{lm}\NormalTok{(Divorce }\OperatorTok{\textasciitilde{}}\StringTok{ }\NormalTok{Marriage }\OperatorTok{+}\StringTok{ }\NormalTok{MedianAgeMarriage, }\DataTypeTok{data=}\NormalTok{sim\_df) }\OperatorTok{\%\textgreater{}\%}\StringTok{ }
-\StringTok{    }\KeywordTok{summary}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
-\StringTok{    }\NormalTok{.}\OperatorTok{$}\NormalTok{coefficients }\OperatorTok{\%\textgreater{}\%}
-\StringTok{    }\KeywordTok{data.frame}\NormalTok{() }\OperatorTok{\%\textgreater{}\%}
-\StringTok{    }\KeywordTok{rownames\_to\_column}\NormalTok{(}\StringTok{"Variable"}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{    }\KeywordTok{slice}\NormalTok{(}\OperatorTok{{-}}\DecValTok{1}\NormalTok{) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{    }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{LowerCI =}\NormalTok{ Estimate }\OperatorTok{{-}}\StringTok{ }\NormalTok{Std..Error,}
-           \DataTypeTok{UpperCI =}\NormalTok{ Estimate }\OperatorTok{+}\StringTok{ }\NormalTok{Std..Error) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{    }\KeywordTok{select}\NormalTok{(Variable, Estimate, LowerCI, UpperCI)}
+  \FunctionTok{lm}\NormalTok{(Divorce }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Marriage }\SpecialCharTok{+}\NormalTok{ MedianAgeMarriage, }\AttributeTok{data=}\NormalTok{sim\_df) }\SpecialCharTok{\%\textgreater{}\%} 
+    \FunctionTok{summary}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{    .}\SpecialCharTok{$}\NormalTok{coefficients }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{data.frame}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{rownames\_to\_column}\NormalTok{(}\StringTok{"Variable"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{slice}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{LowerCI =}\NormalTok{ Estimate }\SpecialCharTok{{-}}\NormalTok{ Std..Error,}
+           \AttributeTok{UpperCI =}\NormalTok{ Estimate }\SpecialCharTok{+}\NormalTok{ Std..Error) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{select}\NormalTok{(Variable, Estimate, LowerCI, UpperCI)}
 \NormalTok{\}}
 
-\NormalTok{simulated\_noise \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{epsilon =}\KeywordTok{exp}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\KeywordTok{log}\NormalTok{(}\FloatTok{0.001}\NormalTok{), }\KeywordTok{log}\NormalTok{(}\FloatTok{0.3}\NormalTok{), }\DataTypeTok{length.out =} \DecValTok{100}\NormalTok{))) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{group\_by}\NormalTok{(epsilon) }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{do}\NormalTok{(}\KeywordTok{simulate\_waffles}\NormalTok{(.}\OperatorTok{$}\NormalTok{epsilon))}
+\NormalTok{simulated\_noise }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{epsilon =}\FunctionTok{exp}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\FunctionTok{log}\NormalTok{(}\FloatTok{0.001}\NormalTok{), }\FunctionTok{log}\NormalTok{(}\FloatTok{0.3}\NormalTok{), }\AttributeTok{length.out =} \DecValTok{100}\NormalTok{))) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(epsilon) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{do}\NormalTok{(}\FunctionTok{simulate\_waffles}\NormalTok{(.}\SpecialCharTok{$}\NormalTok{epsilon))}
 
-\KeywordTok{ggplot}\NormalTok{(simulated\_noise, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{epsilon, }\DataTypeTok{y=}\NormalTok{Estimate)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_ribbon}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{ymin=}\NormalTok{LowerCI, }\DataTypeTok{ymax=}\NormalTok{UpperCI, }\DataTypeTok{fill=}\NormalTok{Variable), }\DataTypeTok{alpha=} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_line}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{color=}\NormalTok{Variable)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{scale\_x\_log10}\NormalTok{(}\DataTypeTok{name=}\KeywordTok{expression}\NormalTok{(epsilon)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Slope estimate  ± standard error"}\NormalTok{) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =} \KeywordTok{expression}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"Marriage = MedianAgeMarriage + Normal(0, "}\NormalTok{, epsilon, }\StringTok{")"}\NormalTok{)))}
+\FunctionTok{ggplot}\NormalTok{(simulated\_noise, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{epsilon, }\AttributeTok{y=}\NormalTok{Estimate)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{ymin=}\NormalTok{LowerCI, }\AttributeTok{ymax=}\NormalTok{UpperCI, }\AttributeTok{fill=}\NormalTok{Variable), }\AttributeTok{alpha=} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{color=}\NormalTok{Variable)) }\SpecialCharTok{+} 
+  \FunctionTok{scale\_x\_log10}\NormalTok{(}\AttributeTok{name=}\FunctionTok{expression}\NormalTok{(epsilon)) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Slope estimate  ± standard error"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =} \FunctionTok{expression}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Marriage = MedianAgeMarriage + Normal(0, "}\NormalTok{, epsilon, }\StringTok{")"}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -548,35 +552,35 @@ Now marriage rate causes age of marriage that, in turn, causes divorce rate. Aga
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{data}\NormalTok{(}\StringTok{"WaffleDivorce"}\NormalTok{)}
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{8973791}\NormalTok{)}
-\NormalTok{N \textless{}{-}}\StringTok{ }\KeywordTok{nrow}\NormalTok{(WaffleDivorce)}
-\NormalTok{sim\_waffles \textless{}{-}}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{Marriage =} \KeywordTok{rnorm}\NormalTok{(N),}
-                      \DataTypeTok{MedianAgeMarriage =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, Marriage, }\FloatTok{0.2}\NormalTok{),}
-                      \DataTypeTok{Divorce =} \OperatorTok{{-}}\KeywordTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.2}\NormalTok{))}
+\FunctionTok{data}\NormalTok{(}\StringTok{"WaffleDivorce"}\NormalTok{)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{8973791}\NormalTok{)}
+\NormalTok{N }\OtherTok{\textless{}{-}} \FunctionTok{nrow}\NormalTok{(WaffleDivorce)}
+\NormalTok{sim\_waffles }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{Marriage =} \FunctionTok{rnorm}\NormalTok{(N),}
+                      \AttributeTok{MedianAgeMarriage =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, Marriage, }\FloatTok{0.2}\NormalTok{),}
+                      \AttributeTok{Divorce =} \SpecialCharTok{{-}}\FunctionTok{rnorm}\NormalTok{(N, MedianAgeMarriage, }\FloatTok{0.2}\NormalTok{))}
 
-\NormalTok{MD\_plot \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Marriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+\NormalTok{MD\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Marriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
 
-\NormalTok{AD\_plot \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Divorce)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
+\NormalTok{AD\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Divorce)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Divorce rate"}\NormalTok{)}
 
-\NormalTok{AM\_plot \textless{}{-}}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sim\_waffles, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MedianAgeMarriage, }\DataTypeTok{y=}\NormalTok{Marriage)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"lm"}\NormalTok{, }\DataTypeTok{formula=}\NormalTok{y}\OperatorTok{\textasciitilde{}}\NormalTok{x) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{geom\_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
+\NormalTok{AM\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{sim\_waffles, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{MedianAgeMarriage, }\AttributeTok{y=}\NormalTok{Marriage)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Median age marriage"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Marriage rate"}\NormalTok{)}
 
-\NormalTok{MD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{AD\_plot }\OperatorTok{|}\StringTok{ }\NormalTok{AM\_plot}
+\NormalTok{MD\_plot }\SpecialCharTok{|}\NormalTok{ AD\_plot }\SpecialCharTok{|}\NormalTok{ AM\_plot}
 \end{Highlighting}
 \end{Shaded}
 
@@ -586,25 +590,25 @@ The plots look very similar to those that we had before, so let us run the model
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sim\_waffles \textless{}{-}}
-\StringTok{  }\NormalTok{sim\_waffles }\OperatorTok{\%\textgreater{}\%}
-\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{A =}\NormalTok{ MedianAgeMarriage,}
-         \DataTypeTok{M =}\NormalTok{ Marriage,}
-         \DataTypeTok{D =}\NormalTok{ Divorce)}
+\NormalTok{sim\_waffles }\OtherTok{\textless{}{-}}
+\NormalTok{  sim\_waffles }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{A =}\NormalTok{ MedianAgeMarriage,}
+         \AttributeTok{M =}\NormalTok{ Marriage,}
+         \AttributeTok{D =}\NormalTok{ Divorce)}
 
-\NormalTok{sim\_waffles\_fit \textless{}{-}}\StringTok{ }\KeywordTok{quap}\NormalTok{(}
-  \KeywordTok{alist}\NormalTok{(}
-\NormalTok{    D }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(mu , sigma) ,}
-\NormalTok{    mu \textless{}{-}}\StringTok{ }\NormalTok{a }\OperatorTok{+}\StringTok{ }\NormalTok{bM}\OperatorTok{*}\NormalTok{M }\OperatorTok{+}\StringTok{ }\NormalTok{bA}\OperatorTok{*}\NormalTok{A,}
-\NormalTok{    a }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.2}\NormalTok{),}
-\NormalTok{    bA }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
-\NormalTok{    bM }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
-\NormalTok{    sigma }\OperatorTok{\textasciitilde{}}\StringTok{ }\KeywordTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\NormalTok{sim\_waffles\_fit }\OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
+  \FunctionTok{alist}\NormalTok{(}
+\NormalTok{    D }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(mu , sigma) ,}
+\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ bM}\SpecialCharTok{*}\NormalTok{M }\SpecialCharTok{+}\NormalTok{ bA}\SpecialCharTok{*}\NormalTok{A,}
+\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.2}\NormalTok{),}
+\NormalTok{    bA }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
+\NormalTok{    bM }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
+\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dexp}\NormalTok{(}\DecValTok{1}\NormalTok{)}
 \NormalTok{  ), }
-  \DataTypeTok{data =}\NormalTok{ sim\_waffles,}
+  \AttributeTok{data =}\NormalTok{ sim\_waffles,}
 \NormalTok{)}
 
-\KeywordTok{precis}\NormalTok{(sim\_waffles\_fit)}
+\FunctionTok{precis}\NormalTok{(sim\_waffles\_fit)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -688,17 +692,17 @@ As \(p(y|\Theta)\) increases, the fraction inside get closer to 1. The \(log()\)
 The \(2\) is there to facilitate significance testing for \emph{nested} models. Models \(\Theta1\) and \(\Theta2\) are nested, if \(\Theta2\) has all predictors of \(\Theta1\) plus \emph{k} predictors. E.g., model \(Divorce = Marriage~Rate\) is nested inside \(Divorce = Marriage~Rate + Marriage~Age\) with later model having 1 more parameter. Your actual model \(\Theta\) is nested inside the saturated model \(\Theta_s\) that has \(k = n - k_{model}\) more parameters, where \(n\) is sample size and \(k_{model}\) is number of parameters in your model. It turns out that in this case, you can determine whether the difference in goodness-of-fit between two models is significant using chi-squared distribution with \emph{k} degrees of freedom. The only catch is that log-ratio is half the magnitude, so you need that \(2\) to match things up\footnote{I did not follow the derivation of that correspondence yet, so I cannot comment on how and why.}.
 
 At this point, you might remember that the definition of deviance in the book was for a single model:
-\[D = -2 \cdot log(p(y|\Theta)\]
+\[D = -2 \cdot log(p(y|\Theta))\]
 
 Unfortunately, same term can be used both ways, to refer to a log likelihood of a single model or, technically more correctly, to the log-ratio you saw above. In reality, you will mostly see deviance defined as in the book because it is used to compare nested models via chi-square distribution as I've described above, with only difference that you compare any two nested models, not just to a saturated one. This is how nested models are frequently compared, for example, see \href{https://stat.ethz.ch/R-manual/R-patched/library/stats/html/anova.html}{anova()} function in R.
 
-Note that a deviance for a single model still expresses the same idea of goodness-of-fit but is merely not normalized. Thus deviance as in the book \(D = -2 \cdot log(p(y|\Theta)\) corresponds to sum of residuals (absolute values mean nothing but you can use them to compare two models on the same data), whereas \emph{total} deviance corresponds to the \(R^2\) (values are directly interpretable, theoretically, you can use them to compare models fit on different samples).
+Note that a deviance for a single model still expresses the same idea of goodness-of-fit but is merely not normalized. Thus deviance as in the book \(D = -2 \cdot log(p(y|\Theta))\) corresponds to sum of residuals (absolute values mean nothing but you can use them to compare two models on the same data), whereas \emph{total} deviance corresponds to the \(R^2\) (values are directly interpretable, theoretically, you can use them to compare models fit on different samples).
 
 \hypertarget{general-idea-information-criteria-as-miles-per-gallon}{%
 \section{General idea: information criteria as miles-per-gallon}\label{general-idea-information-criteria-as-miles-per-gallon}}
 
 The general formula for all information criteria discussed below is
-\[-2\cdot log(\frac{goodness~of~fit}{model~complexity})\]
+\[-2\cdot log \left( \frac{goodness~of~fit}{model~complexity} \right)\]
 
 The goodness-of-fit in the numerator is the likelihood, the joint probability of observing the model given each data point \(\prod_i p(\Theta|y_i)\). The denominator expresses model complexity, i.e., its flexibility in fitting the sample and, therefore, its tendency to overfit. Thus, the fraction itself is \emph{goodness-of-fit per unit of model complexity}. This is like miles-per-gallon for car efficiency, so better models are more efficient models, churning out more goodness per complexity.
 
@@ -730,12 +734,12 @@ A.k.a. Schwarz information criterion (SIC, SBC, SBIC). The motivation is the sam
 Let us do re-arranging again
 \[BIC = -2\cdot log(p(\Theta|y)) + log(n) k \]
 \[BIC = -2 \left( log(p(\Theta|y)) + log(n) \frac{k}{2} \right) \]
-\[BIC = -2 \left( log(p(\Theta|y)) + log \left(exp(log(n) \cdot \frac{k}{2} \right) \right) \]
+\[BIC = -2 \left( log(p(\Theta|y)) - log \left(exp(log(n) \cdot \frac{k}{2} \right) \right) \]
 
 For the complexity term, we need to keep in mind that \(exp(a \cdot b) = exp(a)^b\). Thus,
 \[exp \left(log(n) \cdot \frac{k}{2} \right)= exp(log(n)) ^ \frac{k}{2} = n^\frac{k}{2}\]
 Putting the complexity term back, we get
-\[BIC = -2 \left( log(p(\Theta|y)) + log \left(n^\frac{k}{2} \right) \right)\]
+\[BIC = -2 \left( log(p(\Theta|y)) - log \left(n^\frac{k}{2} \right) \right)\]
 \[BIC = -2 \cdot log \left(\frac{p(\Theta|y)}{n^\frac{k}{2}} \right)\]
 Thus, we end up with very similar power law complexity term which uses sample size instead of Euler's number as the base.
 
@@ -812,6 +816,102 @@ here \(\frac{\Pr(D|M_{1})}{\Pr(D|M_{2})}\) are \textbf{posterior odds}, \(\frac 
 If you assume that both hypotheses/models are equally likely (you have flat priors), the prior odds are 1:1 and your posterior odds are equal to Bayes Factor or, vice versa, Bayes Factor is equal to posterior odds. This means you can just pick their likelihoods from the posterior sampled distribution and compute the ratio.
 
 I am not a big fan of Bayes Factor for conceptual reasons. Although it can compare any two models (as long as the sample is the same), it looks a lot like a Bayesian version of a p-value and, therefore, lends itself naturally to the null-hypothesis testing. And, as far as my reading of literature in my field is concerned, this is how people most frequently use it, as a cooler Bayesian way of null-hypothesis testing. You have no worries about multiple comparisons (it is Bayesian, so no need for error correction!) and it can prove null hypothesis (it is the ratio, so flip it and see how much stronger \emph{H0} is)! There is nothing wrong with this per se but the advantage of Bayesian statistics and information criteria is that you do not \emph{need} to think in terms of null hypothesis testing and nested models. Adopting Bayes Factor may prevent you from seeing this and will allow you to continue doing same analysis just in a differently colored wrapper. Again, there is nothing wrong with exploratory analysis using null hypothesis testing until you can formulate a better model. But it should not be the \emph{only} way you approach modeling.
+
+\hypertarget{bayesian-versus-frequentist-statistics}{%
+\chapter{Bayesian versus Frequentist Statistics}\label{bayesian-versus-frequentist-statistics}}
+
+I suspect that many student who read ``Statistical Rethinking'' have a feeling that it is something completely different from what they have been learning in ``traditional'' statistics classes. That Bayesian approach is more ``hands-on'' and complicated, whereas ``normal'' statistics is simpler and easy to work with even it is ``less powerful.''\footnote{Not really.} Thus, the purpose of this note is to walk you through a typical statistical analysis and focus on practical differences and, more importantly, similarity of the two approaches.
+
+\hypertarget{choice-of-likelihood-both}{%
+\section{Choice of likelihood (both)}\label{choice-of-likelihood-both}}
+
+The very first we do is to look at the data and decide which distribution we will use to model the data / residuals be it normal, binomial, Poisson, beta, etc. That is the very first line of our models that goes like this
+\[
+\color{red}{y_i \sim Normal(\mu_i, \sigma)} \\
+\mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso \\
+\alpha \sim Normal(0, 1) \\
+\beta_{x1} \sim Exponential(1) \\
+\cdots \\
+\sigma \sim Exponential(1)
+\]
+
+This decision is neither Bayesian, nor frequentist. This is a decision about the model that best describes the data, so it is independent of the inference method you will use. This is a decision that you are making even if you are using ``prepackaged'' statistical tests like the t-test or ANOVA that assume normally distributed residuals\footnote{Admittedly, in this case people often start with the statistical test and see whether data is suitable rather than the other way around.}.
+
+\hypertarget{linear-model-both}{%
+\section{Linear model (both)}\label{linear-model-both}}
+
+Next, you decide on the deterministic part of the model that expresses how a parameter of the distribution you chose on the previous step is computed from various predictors. E.g., for the linear regression with normally distributed residuals, you decide which predictors do you use to compute the mean. The model line would look something like this
+\[
+y_i \sim Normal(\mu_i, \sigma) \\
+\color{red}{\mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso} \\
+\alpha \sim Normal(0, 1) \\
+\beta_{x1} \sim Exponential(1) \\
+\cdots
+\]
+Again, this is neither Bayesian, nor frequentist decision, it is a linear model decision. Chapters 4-6 and 8 concentrate on how to make this decision using directed-acyclic graphs (DAGs) and introduce concepts of multicollinearity, colliders and bias they can produce, backdoor paths and how to identify them, etc. They explain how you can make educated decision on which predictors to use based on your knowledge of the field or of the problem. At this stage you also decide on whether to normalize data, as it could make interpreting the model easier.
+
+You always have to make this decision. For example, if you use the (repeated measures) ANOVA, you do need to decide which factors to use, whether to include interactions, should you transform the data to make coefficients directly interpretable, do you use a link function, etc.\footnote{However, you do see cases when one simply throws all factors and interactions into the pot with little regard for an underlying causal model or interpretability of the coefficients.}
+
+\hypertarget{priors-optional-for-bayesian}{%
+\section{Priors (optional for Bayesian)}\label{priors-optional-for-bayesian}}
+
+Priors are a Bayesian way to regularize the model, so this is something you do need to think about when doing Bayesian statistics\footnote{Modern packages like \emph{brms} make it easy for you by deducing a set of reasonable priors for you. However, it is always a good idea to double-check them.}. In a model this part would look something like this
+\[
+y_i \sim Normal(\mu_i, \sigma) \\
+\mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso \\
+\color{red}{\alpha \sim Normal(0, 1) \\
+\beta_{x1} \sim Exponential(1) \\
+\cdots}
+\]
+
+This is probably a decision that students worry about the most as it feels more subjective and arbitrary than other decisions, such as choice of the likelihood or predictors. Chapter 4 through 7 gave you multiple examples that there is nothing particularly arbitrary about these choices and that you can come up with a set of justifiable priors based on what you know about the topic or based on how your pre-processed the data\footnote{In my experience, people tend to worry about priors for data unseen. Some kind of data of which you know absolutely nothing, hence, have trouble deducing priors. In practice, you always know something about the topic and the data. If not, you should read on it instead of using flat priors!}.
+
+Still, I think for a lot of people ``normal'' statistics with its flat priors feels simpler and also more objective and, therefore, more trustworthy (``we did not favor any specific range of values!''). If that is the case then use flat priors (but see the side note below) making Bayesian and frequentists models identical! For me, though, writing it down explicitly makes one realize that range \(-\infty, +\infty\) is remarkably large to the point of being an obvious overkill
+\[
+y_i \sim Normal(\mu_i, \sigma) \\
+\mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso \\
+\color{red}{\alpha \sim Uniform(-\infty, +\infty) \\
+\beta_{x1} \sim Uniform(-\infty, +\infty) \\
+\cdots}
+\]
+
+In short, Bayesian inference gives you an \emph{option} to specify priors. You do not need to take on the option and can use flat frequentist's priors.
+
+\emph{Side note.} In reality, flat priors are never good priors. If there is sufficient data then, in most cases, the priors (flat or not) do not have much influence. However, if the data is limited then flat priors almost inevitably lead to overfitting as there is no additional information to counteract the effect of noise. This overfitting may feel more ``objective'' and ``data-driven'' than a more conservative underfitting of data via strongly regularizing priors but the latter is more likely to lead to better out-of-sample predictions and, therefore, are more likely to be replicated.
+
+\hypertarget{maximum-likelihood-estimate-both}{%
+\section{Maximum-likelihood estimate (both)}\label{maximum-likelihood-estimate-both}}
+
+Once you fitted the model, you get estimates for each parameter you specified. If you opted for flat priors, these estimates will be the same but for very minor differences due to sampling in Bayesian statistics. If you did specify regularizing priors then estimates will be different, although the magnitude of that difference will depend the amount of data: the more data you have, the smaller the influence of the priors, we closer the estimates will be (see also the side note above). Importantly, both types of inferences will produce (very similar) estimates and you interpret them the same way.
+
+\hypertarget{uncertainty-about-estimates-different-but-comparable}{%
+\section{Uncertainty about estimates (different but comparable)}\label{uncertainty-about-estimates-different-but-comparable}}
+
+This is the point where the two approach fundamentally diverge. In case of frenquetists statistics you obtain confidence intervals and p-values based on appropriate statistics and degrees of freedom, whereas in case of Bayesian inference you obtain credible/compatibility intervals and can use posterior distribution for individual parameters to compute probability that they are strictly positive, negative, concentrated within a certain region around zero, etc.
+
+These measures are conceptually different but tend to be interpreted similarly and mostly from Bayesian perspective. I think it is a good idea to compute and report all of them. Typically, they would be close, making you more certain about the results. More importantly, whenever they diverge it serves as a warning to investigate the case and what can cause this difference.
+
+\hypertarget{model-comparison-via-information-criteria-both}{%
+\section{Model comparison via information criteria (both)}\label{model-comparison-via-information-criteria-both}}
+
+Both approaches use information criteria to compare models with Akaike and Bayesian/Schwarz information criteria being developed specifically for the case of flat priors of frenquetist models. Here, Bayesian approach holds an advantage as the full posterior allows for more elaborate information criteria such as DIC, WAIC, or LOO. Still the core idea and the interpretation of the comparison results are the same.
+
+\hypertarget{generating-predictions-both}{%
+\section{Generating predictions (both)}\label{generating-predictions-both}}
+
+You generate predictions using the model definition which is the same for both approach. Hence, you are going to get same predictions, at least for the mean. As the two approach differ in how they characterize uncertainty, the uncertainty of predictions will be different but, typically, comparable.
+
+\hypertarget{conclusions}{%
+\section{Conclusions}\label{conclusions}}
+
+As you can see, from \emph{practical} point of view, apart from optional Bayesian priors and different ways to quantify the uncertainty of estimates, the two approaches are the same. They require you making same decisions and the results are interpreted the same way. This lack of difference becomes even more apparent when you use software packages for running your statistical models. E.g., the way you specify your model in \texttt{lme4} (frenquetist) and \texttt{brms} (Bayesian) is very much the same to the point that in most cases you only need to change the function name (\texttt{lmer} to \texttt{brm} or vice versa) and leave the rest the same.
+
+Thus, the point is that you should not be choosing between studying or doing frenquetists or Bayesian statistic. I feel more comfortable with Bayesian, mostly because it makes it easier interpret statistical significance. However, my typical approach is to start with frenquetist statistics (fast, good for shooting from a hip), once I am certain about my decisions (likelihood, model) I re-impliement the same model in Bayesian using informative priors and see whether results match (with reason). Then, I report both sets of inferences. This costs me remarkably little time precisely because there is so little difference between the two approaches from practical point of view!
+
+\hypertarget{take-home-message-1}{%
+\section{Take home message}\label{take-home-message-1}}
+
+We are not studying something completely different! We are merely approaching it from an unusual angle that leads to deeper understanding and interesting insights in the long run.
 
   \bibliography{book.bib}
 

@@ -24,7 +24,7 @@
 <meta name="author" content="Alexander Pastukhov" />
 
 
-<meta name="date" content="2021-02-01" />
+<meta name="date" content="2021-04-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,8 +32,8 @@
   
   
 <link rel="prev" href="the-haunted-dag.html"/>
-
-<script src="libs/header-attrs-2.5/header-attrs.js"></script>
+<link rel="next" href="bayesian-versus-frequentist-statistics.html"/>
+<script src="libs/header-attrs-2.7/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -51,15 +51,13 @@
 
 
 
-<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
-<link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
@@ -173,6 +171,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.9" data-path="information-criteria.html"><a href="information-criteria.html#pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo"><i class="fa fa-check"></i><b>6.9</b> Pareto-smoothed importance sampling / leave-one-out cross-validation (PSIS/LOO)</a></li>
 <li class="chapter" data-level="6.10" data-path="information-criteria.html"><a href="information-criteria.html#bayes-factor"><i class="fa fa-check"></i><b>6.10</b> Bayes Factor</a></li>
 </ul></li>
+<li class="chapter" data-level="7" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html"><i class="fa fa-check"></i><b>7</b> Bayesian versus Frequentist Statistics</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#choice-of-likelihood-both"><i class="fa fa-check"></i><b>7.1</b> Choice of likelihood (both)</a></li>
+<li class="chapter" data-level="7.2" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#linear-model-both"><i class="fa fa-check"></i><b>7.2</b> Linear model (both)</a></li>
+<li class="chapter" data-level="7.3" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#priors-optional-for-bayesian"><i class="fa fa-check"></i><b>7.3</b> Priors (optional for Bayesian)</a></li>
+<li class="chapter" data-level="7.4" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#maximum-likelihood-estimate-both"><i class="fa fa-check"></i><b>7.4</b> Maximum-likelihood estimate (both)</a></li>
+<li class="chapter" data-level="7.5" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#uncertainty-about-estimates-different-but-comparable"><i class="fa fa-check"></i><b>7.5</b> Uncertainty about estimates (different but comparable)</a></li>
+<li class="chapter" data-level="7.6" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#model-comparison-via-information-criteria-both"><i class="fa fa-check"></i><b>7.6</b> Model comparison via information criteria (both)</a></li>
+<li class="chapter" data-level="7.7" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#generating-predictions-both"><i class="fa fa-check"></i><b>7.7</b> Generating predictions (both)</a></li>
+<li class="chapter" data-level="7.8" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#conclusions"><i class="fa fa-check"></i><b>7.8</b> Conclusions</a></li>
+<li class="chapter" data-level="7.9" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#take-home-message-1"><i class="fa fa-check"></i><b>7.9</b> Take home message</a></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -195,7 +205,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="information-criteria" class="section level1" number="6">
 <h1><span class="header-section-number">Chapter 6</span> Information Criteria</h1>
-<p>These are notes on information criteria, presented in chapter 7 of the Statistical Rethinking book. The purpose of this note is to provide some intuition about the information criteria presented in the “Statistical Rethinking” book. I deliberately oversimplified and overgeneralized certain aspects to paint a “bigger picture”.</p>
+<p>These are notes on information criteria, presented in chapter 7 of the Statistical Rethinking book. The purpose of this note is to provide some intuition about the information criteria presented in the “Statistical Rethinking” book. I deliberately oversimplified and overgeneralized certain aspects to paint a “bigger picture.”</p>
 <div id="deviance" class="section level2" number="6.1">
 <h2><span class="header-section-number">6.1</span> Deviance</h2>
 <p>In the chapter, deviance is introduced as a an estimate for KL-divergence, which in turn is a relative entropy, i.e., the difference between cross-entropy and actual entropy of events. Keep that in mind but you could look at deviance itself as a straightforward goodness-of-fit measure, similar to squared residuals and coefficient of determination <span class="math inline">\(R^2\)</span>. In both cases, you have difference between model prediction (the regression line) and an actual data point. In ordinary least squares (OLS) approach, you quantify this imperfection of prediction by squaring residuals. You sum up all residuals to get the sum of squared residuals (<span class="math inline">\(SS_{res}\)</span>) and then you can compute <span class="math inline">\(R^2\)</span> by comparing it to the total sum of residuals in the data (<span class="math inline">\(SS_{total}\)</span>):
@@ -208,14 +218,14 @@ As <span class="math inline">\(p(y|\Theta)\)</span> increases, the fraction insi
 <img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
 <p>The <span class="math inline">\(2\)</span> is there to facilitate significance testing for <em>nested</em> models. Models <span class="math inline">\(\Theta1\)</span> and <span class="math inline">\(\Theta2\)</span> are nested, if <span class="math inline">\(\Theta2\)</span> has all predictors of <span class="math inline">\(\Theta1\)</span> plus <em>k</em> predictors. E.g., model <span class="math inline">\(Divorce = Marriage~Rate\)</span> is nested inside <span class="math inline">\(Divorce = Marriage~Rate + Marriage~Age\)</span> with later model having 1 more parameter. Your actual model <span class="math inline">\(\Theta\)</span> is nested inside the saturated model <span class="math inline">\(\Theta_s\)</span> that has <span class="math inline">\(k = n - k_{model}\)</span> more parameters, where <span class="math inline">\(n\)</span> is sample size and <span class="math inline">\(k_{model}\)</span> is number of parameters in your model. It turns out that in this case, you can determine whether the difference in goodness-of-fit between two models is significant using chi-squared distribution with <em>k</em> degrees of freedom. The only catch is that log-ratio is half the magnitude, so you need that <span class="math inline">\(2\)</span> to match things up<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a>.</p>
 <p>At this point, you might remember that the definition of deviance in the book was for a single model:
-<span class="math display">\[D = -2 \cdot log(p(y|\Theta)\]</span></p>
+<span class="math display">\[D = -2 \cdot log(p(y|\Theta))\]</span></p>
 <p>Unfortunately, same term can be used both ways, to refer to a log likelihood of a single model or, technically more correctly, to the log-ratio you saw above. In reality, you will mostly see deviance defined as in the book because it is used to compare nested models via chi-square distribution as I’ve described above, with only difference that you compare any two nested models, not just to a saturated one. This is how nested models are frequently compared, for example, see <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/anova.html">anova()</a> function in R.</p>
-<p>Note that a deviance for a single model still expresses the same idea of goodness-of-fit but is merely not normalized. Thus deviance as in the book <span class="math inline">\(D = -2 \cdot log(p(y|\Theta)\)</span> corresponds to sum of residuals (absolute values mean nothing but you can use them to compare two models on the same data), whereas <em>total</em> deviance corresponds to the <span class="math inline">\(R^2\)</span> (values are directly interpretable, theoretically, you can use them to compare models fit on different samples).</p>
+<p>Note that a deviance for a single model still expresses the same idea of goodness-of-fit but is merely not normalized. Thus deviance as in the book <span class="math inline">\(D = -2 \cdot log(p(y|\Theta))\)</span> corresponds to sum of residuals (absolute values mean nothing but you can use them to compare two models on the same data), whereas <em>total</em> deviance corresponds to the <span class="math inline">\(R^2\)</span> (values are directly interpretable, theoretically, you can use them to compare models fit on different samples).</p>
 </div>
 <div id="general-idea-information-criteria-as-miles-per-gallon" class="section level2" number="6.2">
 <h2><span class="header-section-number">6.2</span> General idea: information criteria as miles-per-gallon</h2>
 <p>The general formula for all information criteria discussed below is
-<span class="math display">\[-2\cdot log(\frac{goodness~of~fit}{model~complexity})\]</span></p>
+<span class="math display">\[-2\cdot log \left( \frac{goodness~of~fit}{model~complexity} \right)\]</span></p>
 <p>The goodness-of-fit in the numerator is the likelihood, the joint probability of observing the model given each data point <span class="math inline">\(\prod_i p(\Theta|y_i)\)</span>. The denominator expresses model complexity, i.e., its flexibility in fitting the sample and, therefore, its tendency to overfit. Thus, the fraction itself is <em>goodness-of-fit per unit of model complexity</em>. This is like miles-per-gallon for car efficiency, so better models are more efficient models, churning out more goodness per complexity.</p>
 <p>The numerator is the same for all information criteria discussed below and they differ only in how they compute the model complexity.</p>
 </div>
@@ -240,11 +250,11 @@ where <span class="math inline">\(n\)</span> is the sample size. I won’t do it
 <p>Let us do re-arranging again
 <span class="math display">\[BIC = -2\cdot log(p(\Theta|y)) + log(n) k \]</span>
 <span class="math display">\[BIC = -2 \left( log(p(\Theta|y)) + log(n) \frac{k}{2} \right) \]</span>
-<span class="math display">\[BIC = -2 \left( log(p(\Theta|y)) + log \left(exp(log(n) \cdot \frac{k}{2} \right) \right) \]</span></p>
+<span class="math display">\[BIC = -2 \left( log(p(\Theta|y)) - log \left(exp(log(n) \cdot \frac{k}{2} \right) \right) \]</span></p>
 <p>For the complexity term, we need to keep in mind that <span class="math inline">\(exp(a \cdot b) = exp(a)^b\)</span>. Thus,
 <span class="math display">\[exp \left(log(n) \cdot \frac{k}{2} \right)= exp(log(n)) ^ \frac{k}{2} = n^\frac{k}{2}\]</span>
 Putting the complexity term back, we get
-<span class="math display">\[BIC = -2 \left( log(p(\Theta|y)) + log \left(n^\frac{k}{2} \right) \right)\]</span>
+<span class="math display">\[BIC = -2 \left( log(p(\Theta|y)) - log \left(n^\frac{k}{2} \right) \right)\]</span>
 <span class="math display">\[BIC = -2 \cdot log \left(\frac{p(\Theta|y)}{n^\frac{k}{2}} \right)\]</span>
 Thus, we end up with very similar power law complexity term which uses sample size instead of Euler’s number as the base.</p>
 </div>
@@ -299,27 +309,6 @@ here <span class="math inline">\(\frac{\Pr(D|M_{1})}{\Pr(D|M_{2})}\)</span> are 
 
 </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="footnotes">
 <hr />
 <ol start="15">
@@ -332,8 +321,8 @@ here <span class="math inline">\(\frac{\Pr(D|M_{1})}{\Pr(D|M_{2})}\)</span> are 
           </div>
         </div>
       </div>
-<a href="the-haunted-dag.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="the-haunted-dag.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="bayesian-versus-frequentist-statistics.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
