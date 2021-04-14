@@ -12,4 +12,4 @@ description: "Notes and exercise solutions for Statistical Rethinking book."
 
 # Precis
 
-This is a collection of notes that attempt to provide further details and intuition for some topics, such as loss functions, information theory, information criteria, MCMC algorithms, etc.
+This is a collection of notes that attempt to provide further details and intuition for some topics, such as loss functions, information theory, information criteria, MCMC algorithms, etc. This material is **free to use** and is licensed under the [Creative Commons Attribution-NonCommercial-NoDerivatives V4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).

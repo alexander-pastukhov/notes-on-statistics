@@ -2,10 +2,11 @@ bookdown::gitbook:
   css: style.css
   config:
     toc:
+      collapse: section
       before: |
         <li><a href="./">Notes on Statistical Rethinking</a></li>
       after: |
-        <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+        <li><a href="https://alexander-pastukhov.github.io/">Alexander (Sasha) Pastukhov</li>
     download: ["pdf", "epub"]
 bookdown::pdf_book:
   includes:
