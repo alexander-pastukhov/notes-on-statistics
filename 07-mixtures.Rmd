@@ -1,0 +1,102 @@
+# Mixtures
+
+
+```{r imports, include=FALSE}
+library(rethinking)
+library(tidyverse)
+```
+
+## Beta Binomial
+
+Beta binomial is defined as a product of binomial and beta distributions.
+$$BetaBinomial(k|N, p, \theta) = Binomial(k|N,p) \cdot Beta(p|\beta_1, \beta_2),$$
+where $k$ is number of successes (e.g., "heads" in a coin toss), $N$ is total number of trials/draws, and $p$ is the probability of success), and $\beta_1$ and $\beta_2$ determine the shape of the beta distribution. The book uses reparametrized version of the beta distribution, sometimes called _beta proportion_:
+$$BetaBinomial(k|N, p, \theta) = Binomial(k|N,p) \cdot Beta(p|p, \theta),$$
+where $\theta$ is precision parameter. $p$ and $\theta$ can be computed from $\beta_1$ and $\beta_2$ as
+$$
+p = \frac{\beta_1}{\beta_1 + \beta_2}\\
+\theta = \beta_1 + \beta_2
+$$
+The latter form makes it more intuitive but if you look at the code of `dbetabinom()`, you will see that you can use `shape1` and `shape2` parameters instead of `probe` and `theta`. 
+
+Recall the (unnormalized) Bayes rule ($p$ is probability, $y$ is an outcome, $...$ parameters of the prior distribution):
+$$
+Pr(p | y) = Pr(y | p) \cdot Pr(p | ...)
+$$
+Examine the formula again and you can see that you can think about beta binomial as a posterior distribution for a binomial likelihood with the beta distribution as prior for parameter $p'$ of the binomial distribution:
+
+$$BetaBinomial(N, p, \theta | k) = Binomial(k|N,p) \cdot Beta(p| p_{mode}, \theta)$$
+
+Thus, beta binomial is a combination of _all_ binomial distributions weighted by a beta distribution that has its mode at $p_{mode}$ and its width is determined by $\theta$. In other words, when we use binomial distribution alone, we state that we can _compute_ the probability directly as $p = \text{some linear model}$. Here, we state that our knowledge is incomplete and, _at best_, we can predict mode of the beta distribution from which this probability comes from and we let data determine variance/precision ($\theta$) of that distribution. Thus, our posterior will reflect _two_ uncertainties based on two loss functions: one about the number of observed events (many counts are compatible with a given $p$ but with different probabilities), as for the binomial,  plus another one about $p$ itself (many values of $p$ are compatible with given $p_{mode}$ and $\theta$). This allows model to compute a trade-off by considering values of $p$ that are less likely from prior point of view (they are away from $p_{mode}$) but that result in higher probability of $k$ given that chosen $p$. We will see the same trick again later in the book, when we will use it to incorporate uncertainty about measured value (i.e., at best, we can say that the actual observed value comes from a distribution with that mean and standard deviation).
+
+In practical terms, this means that parameter $\theta$ controls the width of the distribution (see plots below). As $\theta$ approaches positive infinity, our prior uncertainty about $p$ is reduced to zero, which means that we now consider only one binomial distribution, where $p' = p$, which is equivalent to the simple binomial distribution. Thus, beta binomial _at most_ is as narrow as the binomial distribution.
+
+
+```{r beta-binomial, echo=FALSE}
+df <-
+  tibble(p = c(0.2, 0.2, 0.6, 0.6),
+         Ntotal= c(20, 200, 20, 200)) %>%
+  group_by(p, Ntotal) %>%
+  
+  # add variable Theta
+  summarise(Theta = c(3, 10, 50, 200, 1000), 
+            Label = glue::glue("p={p}, Ntotal={Ntotal}"),
+            .groups="drop") %>%
+  # add N=s
+  group_by(p, Ntotal, Label, Theta) %>%
+  summarise(N = 0:Ntotal, .groups="drop") %>%
+  ungroup() %>%
+  mutate(theta = factor(Theta))
+  
+# compute beta binomial
+beta_binomial_df <-
+  df %>%
+  mutate(ppred = rethinking::dbetabinom(N, Ntotal, p, theta=Theta))
+
+binomial_df <-
+  df %>%
+  mutate(ppred = dbinom(N, Ntotal, p))
+  
+
+ggplot(beta_binomial_df, aes(x=N, y=ppred, color=theta)) + 
+  geom_line() + 
+  geom_line(data=binomial_df, color="black", linetype="dashed") +
+  facet_wrap(.~Label, scales="free") + 
+  labs(subtitle = "Beta binomial (color) vs. binomial (black dashed)")
+```
+
+## Negative binomial, a.k.a. Gamma Poisson
+
+The idea is the same: We do not have enough information to compute the rate of events, so instead, we compute the mean of the Gamma distribution rates come from and let data determine its variance (scale). Again, in practical terms this means that for the smallest scale our uncertainty about the rate is minimal and distribution matches the Poisson processes with a fixed rate. Any increase in uncertainty (larger values for scale parameter), mean broader distribution that is capable to account for more extreme values.
+
+```{r beta-binomial, echo=FALSE}
+df <-
+  tibble(rate = c(2, 20)) %>%
+  mutate(Label = glue::glue("rate={rate}")) %>%
+  group_by(rate, Label) %>%
+  
+  # add variable Theta
+  summarise(scale = c(0.001, 0.1, 1, 2, 5), .groups="drop") %>%
+            
+  # add N=s
+  group_by(rate, Label, scale) %>%
+  summarise(N = 0:(rate * 3), .groups="drop") %>%
+  ungroup() %>%
+  mutate(Scale = factor(scale))
+  
+# compute beta binomial
+gam_pois_df <-
+  df %>%
+  mutate(ppred = rethinking::dgampois(N, mu=rate, scale=scale))
+
+pois_df <-
+  df %>%
+  mutate(ppred = dpois(N, rate))
+  
+
+ggplot(gam_pois_df, aes(x=N, y=ppred, color=Scale)) + 
+  geom_line() + 
+  geom_line(data=pois_df, color="black", linetype="dashed") +
+  facet_wrap(.~Label, scales="free") + 
+  labs(subtitle = "Gamma Poisson (color) vs. Poisson (black dashed)")
+```
