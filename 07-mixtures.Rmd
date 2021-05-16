@@ -4,6 +4,7 @@
 ```{r imports, include=FALSE}
 library(rethinking)
 library(tidyverse)
+library(ungeviz)
 ```
 
 ## Beta Binomial
@@ -99,4 +100,62 @@ ggplot(gam_pois_df, aes(x=N, y=ppred, color=Scale)) +
   geom_line(data=pois_df, color="black", linetype="dashed") +
   facet_wrap(.~Label, scales="free") + 
   labs(subtitle = "Gamma Poisson (color) vs. Poisson (black dashed)")
+```
+
+## Ordered categorical
+
+From log odds to logit link.
+$$
+log(\frac{Pr(y_i \leq k)}{1 - Pr(y_i \leq k)}) = \alpha_k \\
+\frac{Pr(y_i \leq k)}{1 - Pr(y_i \leq k)} = e^{\alpha_k} \\
+Pr(y_i \leq k) = e^{\alpha_k} \cdot ( 1 - Pr(y_i \leq k)) \\
+Pr(y_i \leq k) \cdot ( 1 + e^{\alpha_k}) = e^{\alpha_k} \\
+Pr(y_i \leq k) = \frac{e^{\alpha_k}}{1 + e^{\alpha_k}}
+$$
+
+```{r}
+df_p <-
+  tibble(alpha = seq(-10, 10, length.out=100)) %>%
+  mutate(p = exp(alpha) / (1 + exp(alpha)))
+
+ggplot(df_p, aes(x=alpha, y=p)) + 
+  geom_line()
+```
+
+
+```{r}
+equal_probability <- log(((1:6) / 7) /  (1 - (1:6) / 7))
+  
+df_ord_cat <- 
+  tibble(Response = 1:7, 
+         p = rethinking::dordlogit(1:7, 0, equal_probability),
+         Label = "Equal probability") %>%
+  bind_rows(tibble(Response = 1:7, 
+         p = rethinking::dordlogit(1:7, 0, equal_probability - 1),
+         Label = "Beta = 1")) %>%
+  bind_rows(tibble(Response = 1:7, 
+         p = rethinking::dordlogit(1:7, 0, equal_probability + 2),
+         Label = "Beta = -2"))
+
+df_cuts <-
+  tibble(Response = 1:6, 
+         K = equal_probability,
+         Label = "Equal probability") %>%
+  bind_rows(tibble(Response = 1:6, 
+         K = equal_probability - 1,
+         Label = "Beta = 1")) %>%
+  bind_rows(tibble(Response = 1:6, 
+         K = equal_probability + 2,
+         Label = "Beta = -2"))
+  
+
+ggplot(data=df_cuts, aes(x=Response, y=K, color=Label)) + 
+  geom_point() + 
+  geom_line() + 
+  ylab("Log odds ratio")
+
+prob_plot <- 
+  ggplot(data=df_ord_cat, aes(x=Response, y=p, color=Label)) + 
+  geom_point() + 
+  geom_line()
 ```
