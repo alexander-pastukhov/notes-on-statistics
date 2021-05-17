@@ -2,9 +2,9 @@
 
 
 ```{r imports, include=FALSE}
+library(patchwork)
 library(rethinking)
 library(tidyverse)
-library(ungeviz)
 ```
 
 ## Beta Binomial
@@ -70,7 +70,7 @@ ggplot(beta_binomial_df, aes(x=N, y=ppred, color=theta)) +
 
 The idea is the same: We do not have enough information to compute the rate of events, so instead, we compute the mean of the Gamma distribution rates come from and let data determine its variance (scale). Again, in practical terms this means that for the smallest scale our uncertainty about the rate is minimal and distribution matches the Poisson processes with a fixed rate. Any increase in uncertainty (larger values for scale parameter), mean broader distribution that is capable to account for more extreme values.
 
-```{r beta-binomial, echo=FALSE}
+```{r, echo=FALSE}
 df <-
   tibble(rate = c(2, 20)) %>%
   mutate(Label = glue::glue("rate={rate}")) %>%
@@ -135,7 +135,8 @@ df_ord_cat <-
          Label = "Beta = 1")) %>%
   bind_rows(tibble(Response = 1:7, 
          p = rethinking::dordlogit(1:7, 0, equal_probability + 2),
-         Label = "Beta = -2"))
+         Label = "Beta = -2")) %>%
+  mutate(Label = factor(Label, levels = c("Beta = 1", "Equal probability", "Beta = -2")))
 
 df_cuts <-
   tibble(Response = 1:6, 
@@ -146,16 +147,23 @@ df_cuts <-
          Label = "Beta = 1")) %>%
   bind_rows(tibble(Response = 1:6, 
          K = equal_probability + 2,
-         Label = "Beta = -2"))
+         Label = "Beta = -2")) %>%
+  mutate(Label = factor(Label, levels = c("Beta = 1", "Equal probability", "Beta = -2")))
   
 
-ggplot(data=df_cuts, aes(x=Response, y=K, color=Label)) + 
-  geom_point() + 
-  geom_line() + 
-  ylab("Log odds ratio")
+cuts_plot <-
+  ggplot(data=df_cuts,) + 
+  geom_vline(aes(xintercept = K, color=Label), show.legend = FALSE) +
+  facet_grid(Label~.) +
+  scale_x_continuous("Odds ratio")
 
 prob_plot <- 
   ggplot(data=df_ord_cat, aes(x=Response, y=p, color=Label)) + 
   geom_point() + 
   geom_line()
+
+cuts_plot + prob_plot
+```
+```{r}
+
 ```

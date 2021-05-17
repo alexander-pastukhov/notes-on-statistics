@@ -117,7 +117,7 @@
 
 \title{Notes on and Solutions for Statistical Rethinking}
 \author{Alexander Pastukhov}
-\date{2021-04-14}
+\date{2021-05-17}
 
 \begin{document}
 \maketitle
@@ -912,6 +912,115 @@ Thus, the point is that you should not be choosing between studying or doing fre
 \section{Take home message}\label{take-home-message-1}}
 
 We are not studying something completely different! We are merely approaching it from an unusual angle that leads to deeper understanding and interesting insights in the long run.
+
+\hypertarget{mixtures}{%
+\chapter{Mixtures}\label{mixtures}}
+
+\hypertarget{beta-binomial}{%
+\section{Beta Binomial}\label{beta-binomial}}
+
+Beta binomial is defined as a product of binomial and beta distributions.
+\[BetaBinomial(k|N, p, \theta) = Binomial(k|N,p) \cdot Beta(p|\beta_1, \beta_2),\]
+where \(k\) is number of successes (e.g., ``heads'' in a coin toss), \(N\) is total number of trials/draws, and \(p\) is the probability of success), and \(\beta_1\) and \(\beta_2\) determine the shape of the beta distribution. The book uses reparametrized version of the beta distribution, sometimes called \emph{beta proportion}:
+\[BetaBinomial(k|N, p, \theta) = Binomial(k|N,p) \cdot Beta(p|p, \theta),\]
+where \(\theta\) is precision parameter. \(p\) and \(\theta\) can be computed from \(\beta_1\) and \(\beta_2\) as
+\[
+p = \frac{\beta_1}{\beta_1 + \beta_2}\\
+\theta = \beta_1 + \beta_2
+\]
+The latter form makes it more intuitive but if you look at the code of \texttt{dbetabinom()}, you will see that you can use \texttt{shape1} and \texttt{shape2} parameters instead of \texttt{probe} and \texttt{theta}.
+
+Recall the (unnormalized) Bayes rule (\(p\) is probability, \(y\) is an outcome, \(...\) parameters of the prior distribution):
+\[
+Pr(p | y) = Pr(y | p) \cdot Pr(p | ...)
+\]
+Examine the formula again and you can see that you can think about beta binomial as a posterior distribution for a binomial likelihood with the beta distribution as prior for parameter \(p'\) of the binomial distribution:
+
+\[BetaBinomial(N, p, \theta | k) = Binomial(k|N,p) \cdot Beta(p| p_{mode}, \theta)\]
+
+Thus, beta binomial is a combination of \emph{all} binomial distributions weighted by a beta distribution that has its mode at \(p_{mode}\) and its width is determined by \(\theta\). In other words, when we use binomial distribution alone, we state that we can \emph{compute} the probability directly as \(p = \text{some linear model}\). Here, we state that our knowledge is incomplete and, \emph{at best}, we can predict mode of the beta distribution from which this probability comes from and we let data determine variance/precision (\(\theta\)) of that distribution. Thus, our posterior will reflect \emph{two} uncertainties based on two loss functions: one about the number of observed events (many counts are compatible with a given \(p\) but with different probabilities), as for the binomial, plus another one about \(p\) itself (many values of \(p\) are compatible with given \(p_{mode}\) and \(\theta\)). This allows model to compute a trade-off by considering values of \(p\) that are less likely from prior point of view (they are away from \(p_{mode}\)) but that result in higher probability of \(k\) given that chosen \(p\). We will see the same trick again later in the book, when we will use it to incorporate uncertainty about measured value (i.e., at best, we can say that the actual observed value comes from a distribution with that mean and standard deviation).
+
+In practical terms, this means that parameter \(\theta\) controls the width of the distribution (see plots below). As \(\theta\) approaches positive infinity, our prior uncertainty about \(p\) is reduced to zero, which means that we now consider only one binomial distribution, where \(p' = p\), which is equivalent to the simple binomial distribution. Thus, beta binomial \emph{at most} is as narrow as the binomial distribution.
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/beta-binomial-1.pdf}
+
+\hypertarget{negative-binomial-a.k.a.-gamma-poisson}{%
+\section{Negative binomial, a.k.a. Gamma Poisson}\label{negative-binomial-a.k.a.-gamma-poisson}}
+
+The idea is the same: We do not have enough information to compute the rate of events, so instead, we compute the mean of the Gamma distribution rates come from and let data determine its variance (scale). Again, in practical terms this means that for the smallest scale our uncertainty about the rate is minimal and distribution matches the Poisson processes with a fixed rate. Any increase in uncertainty (larger values for scale parameter), mean broader distribution that is capable to account for more extreme values.
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-25-1.pdf}
+
+\hypertarget{ordered-categorical}{%
+\section{Ordered categorical}\label{ordered-categorical}}
+
+From log odds to logit link.
+\[
+log(\frac{Pr(y_i \leq k)}{1 - Pr(y_i \leq k)}) = \alpha_k \\
+\frac{Pr(y_i \leq k)}{1 - Pr(y_i \leq k)} = e^{\alpha_k} \\
+Pr(y_i \leq k) = e^{\alpha_k} \cdot ( 1 - Pr(y_i \leq k)) \\
+Pr(y_i \leq k) \cdot ( 1 + e^{\alpha_k}) = e^{\alpha_k} \\
+Pr(y_i \leq k) = \frac{e^{\alpha_k}}{1 + e^{\alpha_k}}
+\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_p }\OtherTok{\textless{}{-}}
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{alpha =} \FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{10}\NormalTok{, }\DecValTok{10}\NormalTok{, }\AttributeTok{length.out=}\DecValTok{100}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{p =} \FunctionTok{exp}\NormalTok{(alpha) }\SpecialCharTok{/}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{+} \FunctionTok{exp}\NormalTok{(alpha)))}
+
+\FunctionTok{ggplot}\NormalTok{(df\_p, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{alpha, }\AttributeTok{y=}\NormalTok{p)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-26-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{equal\_probability }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(((}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{) }\SpecialCharTok{/} \DecValTok{7}\NormalTok{) }\SpecialCharTok{/}\NormalTok{  (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{) }\SpecialCharTok{/} \DecValTok{7}\NormalTok{))}
+  
+\NormalTok{df\_ord\_cat }\OtherTok{\textless{}{-}} 
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{Response =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{7}\NormalTok{, }
+         \AttributeTok{p =}\NormalTok{ rethinking}\SpecialCharTok{::}\FunctionTok{dordlogit}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{7}\NormalTok{, }\DecValTok{0}\NormalTok{, equal\_probability),}
+         \AttributeTok{Label =} \StringTok{"Equal probability"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{bind\_rows}\NormalTok{(}\FunctionTok{tibble}\NormalTok{(}\AttributeTok{Response =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{7}\NormalTok{, }
+         \AttributeTok{p =}\NormalTok{ rethinking}\SpecialCharTok{::}\FunctionTok{dordlogit}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{7}\NormalTok{, }\DecValTok{0}\NormalTok{, equal\_probability }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{),}
+         \AttributeTok{Label =} \StringTok{"Beta = 1"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{bind\_rows}\NormalTok{(}\FunctionTok{tibble}\NormalTok{(}\AttributeTok{Response =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{7}\NormalTok{, }
+         \AttributeTok{p =}\NormalTok{ rethinking}\SpecialCharTok{::}\FunctionTok{dordlogit}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{7}\NormalTok{, }\DecValTok{0}\NormalTok{, equal\_probability }\SpecialCharTok{+} \DecValTok{2}\NormalTok{),}
+         \AttributeTok{Label =} \StringTok{"Beta = {-}2"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Label =} \FunctionTok{factor}\NormalTok{(Label, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Beta = 1"}\NormalTok{, }\StringTok{"Equal probability"}\NormalTok{, }\StringTok{"Beta = {-}2"}\NormalTok{)))}
+
+\NormalTok{df\_cuts }\OtherTok{\textless{}{-}}
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{Response =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{, }
+         \AttributeTok{K =}\NormalTok{ equal\_probability,}
+         \AttributeTok{Label =} \StringTok{"Equal probability"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{bind\_rows}\NormalTok{(}\FunctionTok{tibble}\NormalTok{(}\AttributeTok{Response =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{, }
+         \AttributeTok{K =}\NormalTok{ equal\_probability }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,}
+         \AttributeTok{Label =} \StringTok{"Beta = 1"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{bind\_rows}\NormalTok{(}\FunctionTok{tibble}\NormalTok{(}\AttributeTok{Response =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{, }
+         \AttributeTok{K =}\NormalTok{ equal\_probability }\SpecialCharTok{+} \DecValTok{2}\NormalTok{,}
+         \AttributeTok{Label =} \StringTok{"Beta = {-}2"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Label =} \FunctionTok{factor}\NormalTok{(Label, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Beta = 1"}\NormalTok{, }\StringTok{"Equal probability"}\NormalTok{, }\StringTok{"Beta = {-}2"}\NormalTok{)))}
+  
+
+\NormalTok{cuts\_plot }\OtherTok{\textless{}{-}}
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{df\_cuts,) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_vline}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ K, }\AttributeTok{color=}\NormalTok{Label), }\AttributeTok{show.legend =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{facet\_grid}\NormalTok{(Label}\SpecialCharTok{\textasciitilde{}}\NormalTok{.) }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\StringTok{"Odds ratio"}\NormalTok{)}
+
+\NormalTok{prob\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{df\_ord\_cat, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Response, }\AttributeTok{y=}\NormalTok{p, }\AttributeTok{color=}\NormalTok{Label)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{()}
+
+\NormalTok{cuts\_plot }\SpecialCharTok{+}\NormalTok{ prob\_plot}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-27-1.pdf}
 
   \bibliography{book.bib}
 

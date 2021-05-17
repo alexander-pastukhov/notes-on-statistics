@@ -37,3 +37,7 @@ model-comparison-via-information-criteria-both
 generating-predictions-both
 conclusions
 take-home-message-1
+mixtures
+beta-binomial
+negative-binomial-a.k.a.-gamma-poisson
+ordered-categorical
