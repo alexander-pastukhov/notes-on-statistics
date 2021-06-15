@@ -41,3 +41,4 @@ mixtures
 beta-binomial
 negative-binomial-a.k.a.-gamma-poisson
 ordered-categorical
+instrumental-variables

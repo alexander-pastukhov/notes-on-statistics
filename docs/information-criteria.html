@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 6 Information Criteria | Notes on and Solutions for Statistical Rethinking</title>
   <meta name="description" content="Notes and exercise solutions for Statistical Rethinking book." />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 6 Information Criteria | Notes on and Solutions for Statistical Rethinking" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Alexander Pastukhov" />
 
 
-<meta name="date" content="2021-05-17" />
+<meta name="date" content="2021-06-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="the-haunted-dag.html"/>
 <link rel="next" href="bayesian-versus-frequentist-statistics.html"/>
-<script src="libs/header-attrs-2.7/header-attrs.js"></script>
+<script src="libs/header-attrs-2.8/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -51,6 +51,8 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 
 
 <style type="text/css">
@@ -117,6 +119,7 @@ code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
+
 
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
@@ -188,6 +191,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8.1" data-path="mixtures.html"><a href="mixtures.html#beta-binomial"><i class="fa fa-check"></i><b>8.1</b> Beta Binomial</a></li>
 <li class="chapter" data-level="8.2" data-path="mixtures.html"><a href="mixtures.html#negative-binomial-a.k.a.-gamma-poisson"><i class="fa fa-check"></i><b>8.2</b> Negative binomial, a.k.a. Gamma Poisson</a></li>
 <li class="chapter" data-level="8.3" data-path="mixtures.html"><a href="mixtures.html#ordered-categorical"><i class="fa fa-check"></i><b>8.3</b> Ordered categorical</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="instrumental-variables.html"><a href="instrumental-variables.html"><i class="fa fa-check"></i><b>9</b> Instrumental Variables</a>
+<ul>
+<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#disclaimer"><i class="fa fa-check"></i>Disclaimer</a></li>
+<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#can-we-estimate-an-effect-of-military-experience-on-wages"><i class="fa fa-check"></i>Can we estimate an effect of military experience on wages</a></li>
+<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#draft-as-an-instrumental-variable"><i class="fa fa-check"></i>Draft as an instrumental variable</a></li>
+<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#two-stage-least-squares"><i class="fa fa-check"></i>Two-stage least squares</a></li>
+<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#covarying-residuals"><i class="fa fa-check"></i>Covarying residuals</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://alexander-pastukhov.github.io/">Alexander (Sasha) Pastukhov</li>
@@ -351,6 +362,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {

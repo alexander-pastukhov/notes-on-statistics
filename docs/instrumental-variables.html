@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 7 Bayesian versus Frequentist Statistics | Notes on and Solutions for Statistical Rethinking</title>
+  <title>Chapter 9 Instrumental Variables | Notes on and Solutions for Statistical Rethinking</title>
   <meta name="description" content="Notes and exercise solutions for Statistical Rethinking book." />
   <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 7 Bayesian versus Frequentist Statistics | Notes on and Solutions for Statistical Rethinking" />
+  <meta property="og:title" content="Chapter 9 Instrumental Variables | Notes on and Solutions for Statistical Rethinking" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 7 Bayesian versus Frequentist Statistics | Notes on and Solutions for Statistical Rethinking" />
+  <meta name="twitter:title" content="Chapter 9 Instrumental Variables | Notes on and Solutions for Statistical Rethinking" />
   
   <meta name="twitter:description" content="Notes and exercise solutions for Statistical Rethinking book." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="information-criteria.html"/>
-<link rel="next" href="mixtures.html"/>
+<link rel="prev" href="mixtures.html"/>
+
 <script src="libs/header-attrs-2.8/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -220,102 +220,93 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="bayesian-versus-frequentist-statistics" class="section level1" number="7">
-<h1><span class="header-section-number">Chapter 7</span> Bayesian versus Frequentist Statistics</h1>
-<p>I suspect that many student who read “Statistical Rethinking” have a feeling that it is something completely different from what they have been learning in “traditional” statistics classes. That Bayesian approach is more “hands-on” and complicated, whereas “normal” statistics is simpler and easy to work with even it is “less powerful.”<a href="#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a> Thus, the purpose of this note is to walk you through a typical statistical analysis and focus on practical differences and, more importantly, similarity of the two approaches.</p>
-<div id="choice-of-likelihood-both" class="section level2" number="7.1">
-<h2><span class="header-section-number">7.1</span> Choice of likelihood (both)</h2>
-<p>The very first we do is to look at the data and decide which distribution we will use to model the data / residuals be it normal, binomial, Poisson, beta, etc. That is the very first line of our models that goes like this
-<span class="math display">\[
-\color{red}{y_i \sim Normal(\mu_i, \sigma)} \\
-\mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso \\
-\alpha \sim Normal(0, 1) \\
-\beta_{x1} \sim Exponential(1) \\
-\cdots \\
-\sigma \sim Exponential(1)
+<div id="instrumental-variables" class="section level1" number="9">
+<h1><span class="header-section-number">Chapter 9</span> Instrumental Variables</h1>
+<div id="disclaimer" class="section level2 unnumbered">
+<h2>Disclaimer</h2>
+<p>My understanding is that instrumental variables are unicorns. They are immensely powerful and can magic turn an observational study into, effectively, a randomize experiment enabling you to infer causality. But they are rare, perhaps, even rarer than unicorns themselves, which is why most example you find are based on the same (or very similar) data.They are also often described as a source of “natural randomization,” yet, the best examples I have found (effect of military experience on career/wages, effect of studying in a charter school on math skills) involved <em>deliberate</em> randomization in a form of lottery that you can conveniently use.</p>
+</div>
+<div id="can-we-estimate-an-effect-of-military-experience-on-wages" class="section level2 unnumbered">
+<h2>Can we estimate an effect of military experience on wages</h2>
+<p>One of the examples, which you can find online, is an effect of military experience on wages. Conceptually, everything is simple, you just want to know a direct effect of military experience on wages.</p>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>However, in practice both a decision to join military <em>and</em> choices of career can be cause by the same set of unobserved factors. If you come from a family with military background, this will affect both your decision join military and the kind of career you want to pursue. If you are patriotic and want to serve the country, you might opt for both military and lower-earning career in public sector. Conversely, if you are interested in becoming a successful lawyer, going into military might be more of a hindrance than of help. In short, we have a backdoor path through unobserved variables and we have no easy way to close it.</p>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-32-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="draft-as-an-instrumental-variable" class="section level2 unnumbered">
+<h2>Draft as an instrumental variable</h2>
+<p>If we would be able to perform a <em>randomized</em> experiment, things would be easy: Take similar people and randomly send / not send them to military, observe the effect of this on their career and wages. Now, <em>we</em> cannot do it but, perhaps, we can find a situation it was actually done and use it for our advantage. This makes the whole situation a sort of a hybrid: we <em>observe</em> an outcome of <em>randomization</em> that someone else did for their own purposes</p>
+<p>In this case, during the Vietnam war people were drafted based on their assigned draft numbers. The latter were determined by your date of birth but the relationship between the birth day within a year and the draft number was <a href="https://en.wikipedia.org/wiki/Draft_lottery_(1969)">randomized through the lottery</a>. In addition, the order <em>within</em> a day was randomized through lottery of initials. The purpose was to create a perfect randomization where any background (apart from you being male and being eligible for military service) had no effect on whether or not your were drafted. And, although the lottery was created to address inequalities, it created an almost perfect randomized experiment for us to use. Almost, because some people with early numbers avoided being drafted through various means, whereas some people with later draft numbers volunteered and were enlisted.</p>
+<p>The DAG it creates is the following</p>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>As you can see, we are still not able to close the backdoor path between <em>military experience</em> and <em>wages</em> because the randomization is not perfect. You will see how we can still overcome this problem using two-stage least squares (the default approach you find almost everywhere, referred to as “two-stage worst squares” by McElreath) and using covariance of residuals (as in the book).</p>
+</div>
+<div id="two-stage-least-squares" class="section level2 unnumbered">
+<h2>Two-stage least squares</h2>
+<p>The main idea is two split our DAG into two halves and estimated the effects one by one, hence, “two-stage.” First, use draft number to <em>predict</em> the military experience.</p>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-34-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The linear model is
+<span class="math display">\[ME \sim Normal(\widehat{ME}, \sigma_{ME})\\
+\widehat{ME} = \alpha_{ME} + \beta_{DN} \cdot DN\]</span></p>
+<p>where <span class="math inline">\(\alpha_M\)</span> is an arbitrary intercept term, <span class="math inline">\(\beta_{DN}\)</span> encode the main effect of draft number, and <span class="math inline">\(\sigma\)</span> is the standard deviation of residuals. You can also write <em>the same</em> model in a different format, which you are likely to encounter in other tutorials and lectures:
+<span class="math display">\[\widehat{ME} = \alpha_{ME} + \beta_{DN} \cdot DN + \epsilon_{ME}\]</span>
+Here, the difference between the <em>predicted</em> military experience (note the hat above <span class="math inline">\(\widehat{ME}\)</span>) and the actual one is described by <span class="math inline">\(\epsilon_{ME}\)</span>: residuals that come from a normal distribution that is centered at 0 with standard deviation of <span class="math inline">\(sigma_{ME}\)</span>, which is implicit in this format. Note that <em>both</em> versions express same variables and encode the same dependence but differ in whether the residuals (<span class="math inline">\(epsilon\)</span>) or the standard deviation of the distribution they come from (<span class="math inline">\(sigma\)</span>) are implicit or explicit.</p>
+<p>As draft number is independent from unobserved variables due to the lottery, the <em>predicted</em> military experience is <em>also</em> independent from them. All the dependence gets transferred to the <em>residuals</em> instead, because residuals are variance that our <em>signal</em> cannot explain (that point will become important later on).</p>
+<p>Now, for the second stage, we use <em>predicted</em> military experience, as it is independent of the unobserved variables and, therefore, we do not need to close the backdoor path!</p>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The model is, again, simple but do note that in two-stage least squares we are using <em>predicted</em> military experience <span class="math inline">\(\widehat{ME}\)</span>!
+<span class="math display">\[CW \sim Normal(\widehat{CW}, \sigma_{CW})\\
+\widehat{CW} = \alpha_{CW} + \beta_{ME} \cdot \widehat{CW}\\
+or\\
+\widehat{CW} = \alpha_{CW} + \beta_{ME} \cdot \widehat{ME} + \epsilon_{CW}
 \]</span></p>
-<p>This decision is neither Bayesian, nor frequentist. This is a decision about the model that best describes the data, so it is independent of the inference method you will use. This is a decision that you are making even if you are using “prepackaged” statistical tests like the t-test or ANOVA that assume normally distributed residuals<a href="#fn18" class="footnote-ref" id="fnref18"><sup>18</sup></a>.</p>
+<p>Again, all the dependence between unobserved variables and career/wages gets offloaded into the residuals <span class="math inline">\(\epsilon_{CW}\)</span> and you get you nice and clean <em>direct</em> effect of <em>predicted</em> military experience. Importantly, for you interpretation you <em>equate</em> the effect of the predicted military experience with an effect of an actual one. This is, of course, one big elephant in the room because you need to be certain that <span class="math inline">\(\widehat{ME}\)</span> is indeed accurate. Unfortunately, if it is not, your inferences are incorrect and you are back to square one.</p>
 </div>
-<div id="linear-model-both" class="section level2" number="7.2">
-<h2><span class="header-section-number">7.2</span> Linear model (both)</h2>
-<p>Next, you decide on the deterministic part of the model that expresses how a parameter of the distribution you chose on the previous step is computed from various predictors. E.g., for the linear regression with normally distributed residuals, you decide which predictors do you use to compute the mean. The model line would look something like this
-<span class="math display">\[
-y_i \sim Normal(\mu_i, \sigma) \\
-\color{red}{\mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso} \\
-\alpha \sim Normal(0, 1) \\
-\beta_{x1} \sim Exponential(1) \\
-\cdots
-\]</span>
-Again, this is neither Bayesian, nor frequentist decision, it is a linear model decision. Chapters 4-6 and 8 concentrate on how to make this decision using directed-acyclic graphs (DAGs) and introduce concepts of multicollinearity, colliders and bias they can produce, backdoor paths and how to identify them, etc. They explain how you can make educated decision on which predictors to use based on your knowledge of the field or of the problem. At this stage you also decide on whether to normalize data, as it could make interpreting the model easier.</p>
-<p>You always have to make this decision. For example, if you use the (repeated measures) ANOVA, you do need to decide which factors to use, whether to include interactions, should you transform the data to make coefficients directly interpretable, do you use a link function, etc.<a href="#fn19" class="footnote-ref" id="fnref19"><sup>19</sup></a></p>
-</div>
-<div id="priors-optional-for-bayesian" class="section level2" number="7.3">
-<h2><span class="header-section-number">7.3</span> Priors (optional for Bayesian)</h2>
-<p>Priors are a Bayesian way to regularize the model, so this is something you do need to think about when doing Bayesian statistics<a href="#fn20" class="footnote-ref" id="fnref20"><sup>20</sup></a>. In a model this part would look something like this
-<span class="math display">\[
-y_i \sim Normal(\mu_i, \sigma) \\
-\mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso \\
-\color{red}{\alpha \sim Normal(0, 1) \\
-\beta_{x1} \sim Exponential(1) \\
-\cdots}
-\]</span></p>
-<p>This is probably a decision that students worry about the most as it feels more subjective and arbitrary than other decisions, such as choice of the likelihood or predictors. Chapter 4 through 7 gave you multiple examples that there is nothing particularly arbitrary about these choices and that you can come up with a set of justifiable priors based on what you know about the topic or based on how your pre-processed the data<a href="#fn21" class="footnote-ref" id="fnref21"><sup>21</sup></a>.</p>
-<p>Still, I think for a lot of people “normal” statistics with its flat priors feels simpler and also more objective and, therefore, more trustworthy (“we did not favor any specific range of values!”). If that is the case then use flat priors (but see the side note below) making Bayesian and frequentists models identical! For me, though, writing it down explicitly makes one realize that range <span class="math inline">\(-\infty, +\infty\)</span> is remarkably large to the point of being an obvious overkill
-<span class="math display">\[
-y_i \sim Normal(\mu_i, \sigma) \\
-\mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso \\
-\color{red}{\alpha \sim Uniform(-\infty, +\infty) \\
-\beta_{x1} \sim Uniform(-\infty, +\infty) \\
-\cdots}
-\]</span></p>
-<p>In short, Bayesian inference gives you an <em>option</em> to specify priors. You do not need to take on the option and can use flat frequentist’s priors.</p>
-<p><em>Side note.</em> In reality, flat priors are never good priors. If there is sufficient data then, in most cases, the priors (flat or not) do not have much influence. However, if the data is limited then flat priors almost inevitably lead to overfitting as there is no additional information to counteract the effect of noise. This overfitting may feel more “objective” and “data-driven” than a more conservative underfitting of data via strongly regularizing priors but the latter is more likely to lead to better out-of-sample predictions and, therefore, are more likely to be replicated.</p>
-</div>
-<div id="maximum-likelihood-estimate-both" class="section level2" number="7.4">
-<h2><span class="header-section-number">7.4</span> Maximum-likelihood estimate (both)</h2>
-<p>Once you fitted the model, you get estimates for each parameter you specified. If you opted for flat priors, these estimates will be the same but for very minor differences due to sampling in Bayesian statistics. If you did specify regularizing priors then estimates will be different, although the magnitude of that difference will depend the amount of data: the more data you have, the smaller the influence of the priors, we closer the estimates will be (see also the side note above). Importantly, both types of inferences will produce (very similar) estimates and you interpret them the same way.</p>
-</div>
-<div id="uncertainty-about-estimates-different-but-comparable" class="section level2" number="7.5">
-<h2><span class="header-section-number">7.5</span> Uncertainty about estimates (different but comparable)</h2>
-<p>This is the point where the two approach fundamentally diverge. In case of frenquetists statistics you obtain confidence intervals and p-values based on appropriate statistics and degrees of freedom, whereas in case of Bayesian inference you obtain credible/compatibility intervals and can use posterior distribution for individual parameters to compute probability that they are strictly positive, negative, concentrated within a certain region around zero, etc.</p>
-<p>These measures are conceptually different but tend to be interpreted similarly and mostly from Bayesian perspective. I think it is a good idea to compute and report all of them. Typically, they would be close, making you more certain about the results. More importantly, whenever they diverge it serves as a warning to investigate the case and what can cause this difference.</p>
-</div>
-<div id="model-comparison-via-information-criteria-both" class="section level2" number="7.6">
-<h2><span class="header-section-number">7.6</span> Model comparison via information criteria (both)</h2>
-<p>Both approaches use information criteria to compare models with Akaike and Bayesian/Schwarz information criteria being developed specifically for the case of flat priors of frenquetist models. Here, Bayesian approach holds an advantage as the full posterior allows for more elaborate information criteria such as DIC, WAIC, or LOO. Still the core idea and the interpretation of the comparison results are the same.</p>
-</div>
-<div id="generating-predictions-both" class="section level2" number="7.7">
-<h2><span class="header-section-number">7.7</span> Generating predictions (both)</h2>
-<p>You generate predictions using the model definition which is the same for both approach. Hence, you are going to get same predictions, at least for the mean. As the two approach differ in how they characterize uncertainty, the uncertainty of predictions will be different but, typically, comparable.</p>
-</div>
-<div id="conclusions" class="section level2" number="7.8">
-<h2><span class="header-section-number">7.8</span> Conclusions</h2>
-<p>As you can see, from <em>practical</em> point of view, apart from optional Bayesian priors and different ways to quantify the uncertainty of estimates, the two approaches are the same. They require you making same decisions and the results are interpreted the same way. This lack of difference becomes even more apparent when you use software packages for running your statistical models. E.g., the way you specify your model in <code>lme4</code> (frenquetist) and <code>brms</code> (Bayesian) is very much the same to the point that in most cases you only need to change the function name (<code>lmer</code> to <code>brm</code> or vice versa) and leave the rest the same.</p>
-<p>Thus, the point is that you should not be choosing between studying or doing frenquetists or Bayesian statistic. I feel more comfortable with Bayesian, mostly because it makes it easier interpret statistical significance. However, my typical approach is to start with frenquetist statistics (fast, good for shooting from a hip), once I am certain about my decisions (likelihood, model) I re-impliement the same model in Bayesian using informative priors and see whether results match (with reason). Then, I report both sets of inferences. This costs me remarkably little time precisely because there is so little difference between the two approaches from practical point of view!</p>
-</div>
-<div id="take-home-message-1" class="section level2" number="7.9">
-<h2><span class="header-section-number">7.9</span> Take home message</h2>
-<p>We are not studying something completely different! We are merely approaching it from an unusual angle that leads to deeper understanding and interesting insights in the long run.</p>
+<div id="covarying-residuals" class="section level2 unnumbered">
+<h2>Covarying residuals</h2>
+<p>This is the approach presented in the book that allows you to use <em>actual</em> military experience as a predictor and still solve the problem of the backdoor path. The initial idea is the same: Let us use our instrumental variable to compute a “pure” military experience, uncontaminated by unobserved variables.</p>
+<p><span class="math display">\[\widehat{ME} = \alpha_{ME} + \beta_{DN} \cdot DN + \epsilon_{ME}\]</span></p>
+<p>Again, all the variance due to unobserved variables is accumulated by residuals (<span class="math inline">\(\epsilon_{ME}\)</span>), which are <em>correlated with them</em>. The latter part is trivially true because residuals are <em>always</em> correlated with “noise,” precisely because we defined it as influence of unobserved variables we did not measure and, therefore, cannot explicitly account for. If we could measure and include them, we would observe <em>same correlation</em> explicitly. Alas, we did not measure them and, therefore, in our typical model the fact that residuals are correlated with unobserved variables is of no immediate practical value (beyond checking for their exchangeability).</p>
+<p>Now, imagine that we <em>could</em> compute not just a prediction from our first stage but a <em>pure randomized</em> military experience that is not correlated with unobserved variables. Obviously, we cannot, otherwise we would not worry about the backdoor path, but what do we know about a linear model that includes that magic <em>pure randomized</em> military experience as a predictor? That its <em>true</em> direct effect on career/wages will be <em>independent</em> from unobserved variables and, therefore, all their influence will be offloaded into residuals (<span class="math inline">\(\epsilon_{\widehat{CW}}\)</span>, note the hat that differentiates them the residuals that you get if you use observed military experience), which will be correlated with those unobserved variables. Just like the residuals of our <em>first stage model</em> (<span class="math inline">\(\epsilon_{ME}\)</span>)! But if both sets of residuals are correlated with unobserved variables (<span class="math inline">\(\epsilon_{ME} \propto UV\)</span> and <span class="math inline">\(\epsilon_{\widehat{CW}} \propto UV\)</span>), the two sets of residuals are <em>also</em> correlated: <span class="math inline">\(\epsilon_{ME} \propto \epsilon_{\widehat{CW}}\)</span>.</p>
+<p>These correlated residuals sound wonderfully entertaining but why should we care about them given that <span class="math inline">\(\epsilon_{\widehat{CW}}\)</span> are <em>hypothetical</em> residuals given the <em>hypothetical</em> randomized military experience that we do not have access to? Because we can make them real by using their covariance with <span class="math inline">\(\epsilon_{ME}\)</span> that we <em>can</em> compute! Here is the idea: let us use two simple linear models to predict military experience from draft number and career/wages from <em>actual</em> military experience but allow the residuals of two models to be correlated. Again, given that <span class="math inline">\(\epsilon_{ME} \propto UV\)</span>, if we make <span class="math inline">\(\epsilon_{ME} \propto \epsilon_{CW}\)</span>, therefore, <span class="math inline">\(\epsilon_{CW} \propto UV\)</span>. In other words, <span class="math inline">\(\epsilon_{CW} \approx \epsilon_{\widehat{CW}}\)</span>. But this means that since <span class="math inline">\(\epsilon_{CW}\)</span> accounts for the variance due to unobserved variables, it must not be accounted for by <em>other</em> terms of the linear model and our effect of military experience (<span class="math inline">\(\beta^{true}_{ME}\)</span>) expresses just the direct path:
+<span class="math display">\[\widehat{CW} = \alpha_{CW} + \beta^{true}_{ME} \cdot ME + \epsilon_{\widehat{CW}}\]</span></p>
+<p>This is a very elegant trick: We do not know what the correlation between residuals and unobserved variables is but we do know that it must be the same (very similar) and we account for it by enforcing the correlation between the residuals that we deduced must exist. On the one hand, there is an obvious elephant in the room in that the whole thing works well only if the assumption that residuals are correlated is true. On the other hand, because we are fitting the covariance matrix as part of the model, we can check whether our assumption about that correlation was supported by data. If it was not, our instrumental variable was probably not as good as hoped for.</p>
 
 </div>
 </div>
-<div class="footnotes">
-<hr />
-<ol start="17">
-<li id="fn17"><p>Not really.<a href="bayesian-versus-frequentist-statistics.html#fnref17" class="footnote-back">↩︎</a></p></li>
-<li id="fn18"><p>Admittedly, in this case people often start with the statistical test and see whether data is suitable rather than the other way around.<a href="bayesian-versus-frequentist-statistics.html#fnref18" class="footnote-back">↩︎</a></p></li>
-<li id="fn19"><p>However, you do see cases when one simply throws all factors and interactions into the pot with little regard for an underlying causal model or interpretability of the coefficients.<a href="bayesian-versus-frequentist-statistics.html#fnref19" class="footnote-back">↩︎</a></p></li>
-<li id="fn20"><p>Modern packages like <em>brms</em> make it easy for you by deducing a set of reasonable priors for you. However, it is always a good idea to double-check them.<a href="bayesian-versus-frequentist-statistics.html#fnref20" class="footnote-back">↩︎</a></p></li>
-<li id="fn21"><p>In my experience, people tend to worry about priors for data unseen. Some kind of data of which you know absolutely nothing, hence, have trouble deducing priors. In practice, you always know something about the topic and the data. If not, you should read on it instead of using flat priors!<a href="bayesian-versus-frequentist-statistics.html#fnref21" class="footnote-back">↩︎</a></p></li>
-</ol>
-</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             </section>
 
           </div>
         </div>
       </div>
-<a href="information-criteria.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="mixtures.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="mixtures.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
