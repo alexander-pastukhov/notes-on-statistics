@@ -6,7 +6,7 @@ library(tidyverse)
 ```
 
 ## Disclaimer {-}
-My understanding is that instrumental variables are unicorns. They are immensely powerful and can magic turn an observational study into, effectively, a randomize experiment enabling you to infer causality. But they are rare, perhaps, even rarer than unicorns themselves, which is why most example you find are based on the same (or very similar) data.They are also often described as a source of "natural randomization", yet, the best examples I have found (effect of military experience on career/wages, effect of studying in a charter school on math skills) involved _deliberate_ randomization in a form of lottery that you can conveniently use.
+My understanding is that instrumental variables are unicorns. They are immensely powerful and can magically turn an observational study into, effectively, a randomize experiment enabling you to infer causality. But they are rare, perhaps, even rarer than unicorns themselves, which is why most example you find are based on the same (or very similar) data.They are also often described as a source of "natural randomization", yet, the best examples I have found (effect of military experience on career/wages, effect of studying in a charter school on math skills) involved _deliberate_ randomization in a form of lottery that you can conveniently use.
 
 ## Can we estimate an effect of military experience on wages {-}
 One of the examples, which you can find online, is an effect of military experience on wages. Conceptually, everything is simple, you just want to know a direct effect of military experience on wages.
