@@ -1,10 +1,44 @@
 # Parameters: combining information from an individual with population
 
-```{r }
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(patchwork)
+library(rethinking)
+library(tidyverse)
+```
+
 
 When we infer values of parameters, we must decide on how to combine information available for an individual "random effect" entry (e.g., participant) and information about the distribution of values for this parameter in the sample in general or in some group within that sample. The former --- data for an individual --- describes an individual itself but is, necessarily, noisy. The latter --- data for the entire sample --- has better signal-to-noise ratio, as it pools information across all individuals, but is informative about averages not individuals. 
 
 Below I list various strategies that were used throughout the book. The main purpose is to show that they differ primarily in the relative contribution of the two sources and how individuals are used to compute averages. I will talk primarily about intercepts, as this is the most often varied parameter, but the same logic is applicable to _any_ free parameter in the model.
+
+```{r fig.align='center', echo=FALSE}
+pop_mean <- 178
+pop_sd <- 9.5
+
+df <- 
+  tibble(h = seq(round(pop_mean * 0.5), round(pop_mean * 1.5), length.out=100)) %>%
+  # tibble(h = seq(-2, 2, length.out=100)) %>%
+  mutate(p = dnorm(h, pop_mean, pop_sd), 
+         pt = dstudent(h, nu=1, mu=pop_mean, sigma=pop_sd))
+
+set.seed(190)
+individuals <- 
+  tibble(height = rstudent(n=20, nu=1, mu=pop_mean, sigma=pop_sd)) %>%
+  mutate(id = 1:n())
+
+# 
+# ggplot(df, aes(x=h, y=p)) + 
+#   geom_line() + 
+#   geom_line(aes(y=pt), color="red")
+# 
+# ggplot() + 
+#   geom_histogram(aes(x=height), bins=10)
+
+ggplot(individuals, aes(x=height, y=id)) + 
+  geom_point()
+
+```
+
 
 ## Everyone is the same
 The very first strategy that we used was to employ just a single intercept parameter in the model. This is an extreme case of when we ignore the fact that people (monkeys, countries, etc.) are different and, effectively, model everyone as a single typical average meta-individual. 
