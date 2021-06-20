@@ -24,7 +24,7 @@
 <meta name="author" content="Alexander Pastukhov" />
 
 
-<meta name="date" content="2021-06-14" />
+<meta name="date" content="2021-06-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,8 +32,8 @@
   
   
 <link rel="prev" href="mixtures.html"/>
-
-<script src="libs/header-attrs-2.8/header-attrs.js"></script>
+<link rel="next" href="parameters-combining-information-from-an-individual-with-population.html"/>
+<script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -200,6 +200,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#two-stage-least-squares"><i class="fa fa-check"></i>Two-stage least squares</a></li>
 <li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#covarying-residuals"><i class="fa fa-check"></i>Covarying residuals</a></li>
 </ul></li>
+<li class="chapter" data-level="10" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html"><i class="fa fa-check"></i><b>10</b> Parameters: combining information from an individual with population</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#everyone-is-the-same-single-parameter"><i class="fa fa-check"></i><b>10.1</b> Everyone is the same (single parameter)</a></li>
+<li class="chapter" data-level="10.2" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#everyone-is-unique-independent-parameters"><i class="fa fa-check"></i><b>10.2</b> Everyone is unique (independent parameters)</a></li>
+<li class="chapter" data-level="10.3" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-different-but-belong-to-a-population-pooled-parameters"><i class="fa fa-check"></i><b>10.3</b> People are different but belong to a population (pooled parameters)</a></li>
+<li class="chapter" data-level="10.4" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-different-but-belong-to-a-group-within-a-population-multilevel-clusters-of-pooled-parameters"><i class="fa fa-check"></i><b>10.4</b> People are different but belong to a group within a population (multilevel clusters of pooled parameters)</a></li>
+<li class="chapter" data-level="10.5" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-similar-to-some-but-different-to-others-gaussian-process"><i class="fa fa-check"></i><b>10.5</b> People are similar to some but different to others (Gaussian process)</a></li>
+<li class="chapter" data-level="10.6" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-different-but-belong-to-a-population-in-which-parameters-are-correlated-correlated-pooled-parameters"><i class="fa fa-check"></i><b>10.6</b> People are different but belong to a population in which parameters are correlated (correlated pooled parameters)</a></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://alexander-pastukhov.github.io/">Alexander (Sasha) Pastukhov</li>
 
@@ -224,7 +233,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1><span class="header-section-number">Chapter 9</span> Instrumental Variables</h1>
 <div id="disclaimer" class="section level2 unnumbered">
 <h2>Disclaimer</h2>
-<p>My understanding is that instrumental variables are unicorns. They are immensely powerful and can magic turn an observational study into, effectively, a randomize experiment enabling you to infer causality. But they are rare, perhaps, even rarer than unicorns themselves, which is why most example you find are based on the same (or very similar) data.They are also often described as a source of “natural randomization,” yet, the best examples I have found (effect of military experience on career/wages, effect of studying in a charter school on math skills) involved <em>deliberate</em> randomization in a form of lottery that you can conveniently use.</p>
+<p>My understanding is that instrumental variables are unicorns. They are immensely powerful and can magically turn an observational study into, effectively, a randomize experiment enabling you to infer causality. But they are rare, perhaps, even rarer than unicorns themselves, which is why most example you find are based on the same (or very similar) data.They are also often described as a source of “natural randomization,” yet, the best examples I have found (effect of military experience on career/wages, effect of studying in a charter school on math skills) involved <em>deliberate</em> randomization in a form of lottery that you can conveniently use.</p>
 </div>
 <div id="can-we-estimate-an-effect-of-military-experience-on-wages" class="section level2 unnumbered">
 <h2>Can we estimate an effect of military experience on wages</h2>
@@ -274,39 +283,13 @@ or\\
 
 </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             </section>
 
           </div>
         </div>
       </div>
-<a href="mixtures.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="mixtures.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="parameters-combining-information-from-an-individual-with-population.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

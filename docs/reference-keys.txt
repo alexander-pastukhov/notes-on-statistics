@@ -42,3 +42,10 @@ beta-binomial
 negative-binomial-a.k.a.-gamma-poisson
 ordered-categorical
 instrumental-variables
+parameters-combining-information-from-an-individual-with-population
+everyone-is-the-same-single-parameter
+everyone-is-unique-independent-parameters
+people-are-different-but-belong-to-a-population-pooled-parameters
+people-are-different-but-belong-to-a-group-within-a-population-multilevel-clusters-of-pooled-parameters
+people-are-similar-to-some-but-different-to-others-gaussian-process
+people-are-different-but-belong-to-a-population-in-which-parameters-are-correlated-correlated-pooled-parameters

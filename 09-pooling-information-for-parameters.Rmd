@@ -12,37 +12,337 @@ When we infer values of parameters, we must decide on how to combine information
 Below I list various strategies that were used throughout the book. The main purpose is to show that they differ primarily in the relative contribution of the two sources and how individuals are used to compute averages. I will talk primarily about intercepts, as this is the most often varied parameter, but the same logic is applicable to _any_ free parameter in the model.
 
 ```{r fig.align='center', echo=FALSE}
-pop_mean <- 178
-pop_sd <- 9.5
+# generating random individuals from student distribution
 
-df <- 
-  tibble(h = seq(round(pop_mean * 0.5), round(pop_mean * 1.5), length.out=100)) %>%
-  # tibble(h = seq(-2, 2, length.out=100)) %>%
-  mutate(p = dnorm(h, pop_mean, pop_sd), 
-         pt = dstudent(h, nu=1, mu=pop_mean, sigma=pop_sd))
+pop_mean <- c(176, 163)
+pop_sd <- c(7.4, 7)
 
-set.seed(190)
+# set.seed(195)
+# set.seed(199)
+set.seed(202)
 individuals <- 
-  tibble(height = rstudent(n=20, nu=1, mu=pop_mean, sigma=pop_sd)) %>%
+  tibble(height = rstudent(n=20, nu=1, mu=pop_mean, sigma=pop_sd),
+         sex = rep(c("male", "female"), 10)) %>%
   mutate(id = 1:n())
 
-# 
-# ggplot(df, aes(x=h, y=p)) + 
-#   geom_line() + 
-#   geom_line(aes(y=pt), color="red")
-# 
-# ggplot() + 
-#   geom_histogram(aes(x=height), bins=10)
+# fitting a normal distribution to the data
+best_fit <- MASS::fitdistr(individuals$height, "normal")
+the_normal <- 
+  tibble(height = 140:240) %>%
+  mutate(p = dnorm(height, best_fit$estimate['mean'], best_fit$estimate['sd']),
+         p = max(individuals$id) * p / max(p))
+```
 
-ggplot(individuals, aes(x=height, y=id)) + 
-  geom_point()
+## Everyone is the same (single parameter)
+The very first strategy that we used was to employ just a single intercept parameter in the model.
 
+$$height_i \sim \alpha\\
+\alpha \sim Normal(178, 9.5)$$
+
+This is an extreme case of when we ignore the fact that people (monkeys, countries, etc.) are different and, effectively, model everyone as a single typical average meta-individual. The information about variance within the sample is discarded. 
+
+In the plot below, measurement for each individual (distinguished by their position on y-axis) is plotted on x-axis (black circles). But using a single intercept (vertical line) in the model, means all of them get an average height (blue open circles).
+
+```{r fig.align='center', echo=FALSE}
+ggplot(individuals, aes(x=height, y=id)) +
+  geom_point() + 
+  geom_vline(xintercept = best_fit$estimate['mean'], color="blue") +
+  geom_segment(aes(x=height, y=id, yend=id), xend=best_fit$estimate['mean'], color="blue") +
+  geom_point(x=  best_fit$estimate['mean'], color="blue", shape=21, fill="white") + 
+  scale_x_continuous(name = "Measured height (black filled) and estimated height by model (blue open)") + ylab("Participant")
+  # geom_line(data=the_normal, aes(x=height, y=p), color="black")
+```
+
+Another way to view the same data is by plotting raw data (y-axis) vs. used estimates (x-axis). The vertical line denotes the population mean, whereas the diagonal line implies that estimates are equal to the data.
+
+```{r fig.align='center', echo=FALSE}
+individuals$Estimate <- best_fit$estimate['mean']
+ggplot(individuals, aes(y=height, x=Estimate)) +
+  geom_vline(xintercept = best_fit$estimate['mean'], color="green") +
+  geom_segment(aes(x=height, y=height, xend=Estimate, yend=height), arrow = arrow(length = unit(0.2,"cm")), color="blue") + 
+  geom_segment(x=145, y=145, xend=220, yend=220, linetype="dashed") + 
+  geom_point() + 
+  coord_equal() + 
+  xlim(145, 220) + 
+  ylim(145, 220) + 
+  ylab("Measured height") + 
+  xlab("Estimate")
+```
+
+## Everyone is unique (independent parameters)
+The other extreme is to assume that everyone is unique and should be judged (estimated) using only their own data. Here, the information about the population is discarded.
+
+$$height_i \sim \alpha_i\\
+\alpha_i \sim Normal(178, 9.5)$$
+
+This is the approach taken by paired t-test and repeated measures ANOVA. Note that it is likely to overfit the data, as we allow limited and noisy data to fully determine intercepts. Use of weak or flat priors (as in frequentist approach) is likely to make out-of-sample performance even worse.
+
+In the plot below, measurement for each individual (distinguished by their position on y-axis) is plotted on x-axis (black circles). You cannot see black circles because they are covered by open blue circles --- the estimates used by the model.
+
+```{r fig.align='center', echo=FALSE}
+ggplot(individuals, aes(x=height, y=id)) +
+  geom_point() + 
+  geom_point(color="blue", shape=21, fill="white") + 
+  scale_x_continuous(name = "Measured height (black filled) and estimated height by model (blue open)") + 
+  ylab("Participant")
+  # geom_line(data=the_normal, aes(x=height, y=p), color="black")
+```
+
+Here is another representation of the same data with all dots lying on the diagonal (estimate is equal to data). The vertical blue line still denotes the population mean this information is not used for estimates.
+
+```{r fig.align='center', echo=FALSE}
+individuals$Estimate <- individuals$height
+ggplot(individuals, aes(y=height, x=Estimate)) +
+  geom_point() + 
+  geom_vline(xintercept = best_fit$estimate['mean'], color="green") +
+  geom_segment(x=145, y=145, xend=220, yend=220, linetype="dashed") + 
+  coord_equal() + 
+  xlim(145, 220) + 
+  ylim(145, 220) + 
+  ylab("Measured height") + 
+  xlab("Estimate")
+```
+
+## People are different but belong to a population (pooled parameters)
+A more balanced approach is to combine data from an individual and population. This is a two level (multilevel) approach, where an individual parameter value comes from a population (group) level distribution. 
+
+$$height_i \sim \alpha_i\\
+\alpha_i \sim Normal(\alpha^{pop}, \sigma^{\alpha})\\
+\alpha^{pop} \sim Normal(178, 9.5)\\
+\sigma^{\alpha} \sim Exponential(1)$$
+
+The basic idea is the "regression to the mean", so that unusual-looking individuals are probably more average than they appear. In other words, they are so unusual because of the noise during that particular measurement. During a next measurement the noise will be different, probably not so extreme, and the individual will appear to be more normal. The pull of extreme observations toward the mean is the same as one from a static prior. The main difference is that we use _adaptive_ priors and determine how typical/unusual an observation is based on all observations themselves, _including_ the extreme ones. As with "normal" priors, the influence of adaptive prior is most pronounced for extreme, unreliable observations, or observations with small amount of data. They are easier to overfit and, hence, benefit most from regularizing priors.
+
+```{r fig.align='center', echo=FALSE}
+individuals <- 
+  individuals %>%
+  mutate(zscore = (height - best_fit$estimate['mean'])/ best_fit$estimate['sd'],
+         Estimate = height - 0.02 * height * zscore)
+
+ggplot(individuals, aes(x=height, y=id)) +
+  geom_line(data=the_normal, aes(x=height, y=p), color="green") +
+  geom_segment(aes(x=height, y=id, yend=id, xend=Estimate), color="blue", arrow = arrow(length = unit(0.2,"cm"))) +
+  geom_vline(xintercept = best_fit$estimate['mean'], color="green") +
+  geom_point() + 
+  geom_point(aes(x= Estimate), color="blue", shape=21, fill="white") + 
+  scale_x_continuous(name = "Measured height (black filled) and estimated height by model (blue open)") + 
+  ylab("Participant")
+```
+
+```{r fig.align='center', echo=FALSE}
+ggplot(individuals, aes(y=height, x=Estimate)) +
+  geom_segment(aes(x=height, y=height, xend=Estimate, yend=height), arrow = arrow(length = unit(0.2,"cm")), color="blue") +
+  geom_point() + 
+  geom_vline(xintercept = best_fit$estimate['mean'], color="blue") +
+  geom_segment(aes(x=145, y=145, xend=220, yend=220), linetype="dashed") + 
+  coord_equal() + 
+  xlim(145, 220) + 
+  ylim(145, 220) + 
+  ylab("Measured height") + 
+  xlab("Estimate")
+```
+
+## People are different but belong to a group within a population (multilevel clusters of pooled parameters)
+
+A logical extension of a two-level approach is to extended it with more levels: An individual belongs to a group (cluster) which, in turn, belongs to a population.
+
+$$height_i \sim \alpha_i\\
+\alpha_i \sim Normal(\alpha^{group}_i, \sigma^{group})\\
+alpha^{group} \sim Normal(\alpha^{pop}, \sigma^{pop}) \\
+\alpha^{pop} \sim Normal(178, 9.5)\\
+\sigma^{\alpha}, \sigma^{group} \sim Exponential(1)$$
+
+For an individual, it allows to pool information across a  more relevant group. For example, males tend to be taller than females, so it would make more sense to use female sub-population/group/cluster to decide on just how typical a given female is. Same goes for other types of clusters: e.g., students from a particular school are probably more similar in their knowledge on a particular subject (such as math) as compared to students from other schools. At the same time, we can still pull information across clusters, making our inferences about them more reliable as well. And, of course, you are not limited in the number of levels you can create: students within a school, schools within a district, districts within a city, etc.
+
+In the plots below, notice that sex cluster distributions are tighter than a single population distribution above. Also notice how individual observers are pulled toward the group mean and, again, the pull is proportional to how atypical a value is.
+
+
+```{r fig.align='center', echo=FALSE}
+gender_fit <-
+  individuals %>%
+  group_by(sex) %>%
+  nest() %>%
+  mutate(Fit = purrr::map(data, ~as_tibble(t(MASS::fitdistr(.$height, "normal")$estimate)))) %>%
+  select(-data) %>%
+  unnest(Fit)
+
+gender_individuals <- 
+  left_join(individuals, gender_fit, by="sex") %>%
+   mutate(zscore = (height - mean)/ sd,
+          Estimate = height - 0.02 * height * zscore)
+  
+gender_normal <-
+  gender_fit %>%
+  group_by(sex) %>%
+  summarize(height = 140:240,
+            p = dnorm(height, mean, sd),
+            .groups="keep") %>%
+  ungroup() %>%
+  group_by(sex) %>%
+  mutate(p = max(individuals$id) * p / max(p))
+
+
+ggplot(gender_individuals, aes(x=height, y=id)) +
+  geom_line(data=gender_normal, aes(x=height, y=p, color=sex)) + 
+  geom_segment(aes(x=height, y=id, yend=id, xend=Estimate, color=sex), arrow = arrow(length = unit(0.2,"cm")), show.legend = FALSE) + 
+  geom_vline(data=gender_fit, aes(xintercept = mean, color=sex), show.legend = FALSE) +
+  geom_point() + 
+  geom_point(aes(x= Estimate, color=sex), shape=21, fill="white")
+```
+
+```{r fig.align='center', echo=FALSE}
+ggplot(gender_individuals, aes(y=height, x=Estimate, color=sex)) +
+  geom_segment(aes(x=height, y=height, xend=Estimate, yend=height, color=sex), arrow = arrow(length = unit(0.2,"cm")), show.legend = FALSE) +
+  geom_point()  +
+  geom_vline(data=gender_fit, aes(xintercept = mean, color=sex), show.legend = FALSE) +
+  geom_segment(aes(x=145, y=145, xend=220, yend=220), color="black", linetype="dashed") + 
+  coord_equal() + 
+  xlim(145, 220) + 
+  ylim(145, 220) + 
+  ylab("Measured height") + 
+  xlab("Estimate")
+```
+
+## People are similar to some but different to others (Gaussian process)
+Multilevel approach with clusters is very useful but it works only if you have well-defined discrete cluster: sex, school a student belongs to, occupation, etc. However, sometimes there are no such clear boundaries. Rather, you can presume that similarity in a property that you are interested in (height, in our case) could be proportional to another well defined measure of similarity / distance between the individuals. For example, one could, perhaps naively, assume that individuals that are more similar in their genes have more similar height. In that case, we can compute distance between their genetic sequences and use that distance to define a population _relative_ to an individual.
+
+$$height_i \sim \alpha^{pop} + \alpha_i\\
+\begin{pmatrix} \alpha_1 \\ \alpha_2 \\ \dots \\ \alpha_N \end{pmatrix} \sim MVNormal(
+ \begin{pmatrix}0, 0, \dots, 0 \end{pmatrix}, K)\\
+K_{ij} = = \eta^2 exp(−\rho^2D^2_{ij}) + \delta_{ij}\sigma^2 \\
+\alpha^{pop} \sim Normal(178, 9.5)$$
+
+where $D_{ij}$ is the distance between individuals (see the book for further details on the formula and Gaussian process in general). 
+
+Generally speaking, the idea is that contribution of observations is proportional to their distance to the individual in question. It also means that there are no discrete cluster. Rather, each observation gets its own distance-based population distribution which it is judged against. Note, however, that parameter $\rho$ adjusts the effect of the distance making it more or less relevant. Thus, the distance can be ignored by the model (via smaller value of $\rho$) meaning that all observations/individuals contribute equally to the population distribution (relative to an individual), i.e., a given intercept is correlated with everybody else. Conversely, larger values of $\rho$ mean that only nearest neighbors are taken into account.
+
+```{r fig.align='center', echo=FALSE}
+df <- expand_grid(Distance = seq(0, 10, length.out=100),
+                  rho = c(0.001, 0.1, 1, 10)) %>%
+  mutate(K = exp(-(rho * Distance)^2),
+         rho = factor(rho))
+
+ggplot(df, aes(x=Distance, y=K, color=rho)) + 
+  geom_line()
+```
+
+In the example below, the distance between individuals is determined by the distance on the vertical axis. The first plot use $\rho=1$ that samples most observations (dot size reflect the $K$ used in the MVNormal). It produces a fairly broad population distribution and shift the first participant to the _right_.
+
+```{r fig.align='center', echo=FALSE}
+set.seed(856)
+gp_individuals <- 
+  individuals %>%
+  mutate(D = (id - id[1]) / 19)
 ```
 
 
-## Everyone is the same
-The very first strategy that we used was to employ just a single intercept parameter in the model. This is an extreme case of when we ignore the fact that people (monkeys, countries, etc.) are different and, effectively, model everyone as a single typical average meta-individual. 
+```{r fig.align='center', echo=FALSE}
+rho <- 1
+gp_individuals <- 
+  gp_individuals %>%
+   mutate(K = exp(-(rho * D)^2))
 
+pseudo_pop <- 
+  gp_individuals %>%
+  group_by(id) %>%
+  summarise(height = rep(height, round(100 * K)), .groups="keep")
 
-## Everyone is unique
-The other extreme is to 
+gp_fit <- MASS::fitdistr(pseudo_pop$height, "normal")$estimate
+
+gp_normal <- 
+  tibble(height = 140:240) %>%
+  mutate(p = dnorm(height, gp_fit['mean'], gp_fit['sd'])) %>%
+  mutate(p = max(individuals$id) * p / max(p))
+
+gp_individuals <-
+  gp_individuals %>%
+  mutate(zscore = (height - gp_fit['mean'])/ gp_fit['sd'],
+         Estimate = height - 0.02 * height * zscore)
+
+ggplot(gp_individuals, aes(x=height, y=id)) +
+  geom_line(data=gp_normal, aes(x=height, y=p), color="green") + 
+  geom_vline(xintercept = gp_fit['mean'], show.legend = FALSE) +
+  geom_point(aes(size = K)) +
+  geom_point(data=NULL, x= gp_individuals$Estimate[1], y=gp_individuals$id[1], shape=21, fill="white", color="blue", size=6) + 
+  labs(title="Rho=1") + 
+    geom_segment(x=gp_individuals$height[1], y=gp_individuals$id[1], yend=gp_individuals$id[1], xend=gp_individuals$Estimate[1], arrow = arrow(length = unit(0.2,"cm")), color="blue") 
+
+```
+
+The second plot uses the same distance measure but $\rho=10$ meaning that it is the close neighbors that affect the estimate. Here, the population distribution is much tighter and the estimate for the first participant is shifted to the _left_.
+
+```{r fig.align='center', echo=FALSE}
+rho <- 10
+gp_individuals <- 
+  gp_individuals %>%
+   mutate(K = exp(-(rho * D)^2))
+
+pseudo_pop <- 
+  gp_individuals %>%
+  group_by(id) %>%
+  summarise(height = rep(height, round(100 * K)), .groups="keep")
+
+gp_fit <- MASS::fitdistr(pseudo_pop$height, "normal")$estimate
+
+gp_normal <- 
+  tibble(height = 140:240) %>%
+  mutate(p = dnorm(height, gp_fit['mean'], gp_fit['sd'])) %>%
+  mutate(p = max(individuals$id) * p / max(p))
+
+gp_individuals <-
+  gp_individuals %>%
+  mutate(zscore = (height - gp_fit['mean'])/ gp_fit['sd'],
+         Estimate = height - 0.02 * height * zscore)
+
+ggplot(gp_individuals, aes(x=height, y=id)) +
+  geom_line(data=gp_normal, aes(x=height, y=p), color="green") + 
+  geom_vline(xintercept = gp_fit['mean'], show.legend = FALSE) +
+  geom_point(aes(size = K)) +
+  geom_point(data=NULL, x= gp_individuals$Estimate[1], y=gp_individuals$id[1], shape=21, fill="white", color="blue", size=6) +
+    geom_segment(x=gp_individuals$height[1], y=gp_individuals$id[1], yend=gp_individuals$id[1], xend=gp_individuals$Estimate[1], arrow = arrow(length = unit(0.2,"cm")), color="blue", show.legend = FALSE) +
+  labs(title="Rho=10") 
+```
+
+## People are different but belong to a population in which parameters are correlated (correlated pooled parameters)
+
+The idea is that if two (or more) parameters are correlated within the population --- e.g., taller people (intercept) grow more if they drink milk (slope, effect of the milk) --- then you can pool information across both parameters and use each to evaluate the other one.
+
+$$height_i \sim \alpha^{pop} + \alpha_i + \beta_i \cdot Milk\\
+\begin{pmatrix} \alpha_i \\ \beta_i \\ \dots \\ \alpha_N \end{pmatrix} \sim MVNormal(
+ \begin{pmatrix}0, 0 \end{pmatrix}, K) \\
+\alpha^{pop} \sim Normal(178, 9.5)$$
+
+```{r eval=FALSE, include=FALSE}
+library(ellipse)
+
+a <-mean(individuals$height) 
+b <- 1  
+sigma_a <- sd(individuals$height)
+sigma_b <-0.5
+rho <-0.7
+
+Mu <-c(a,b)
+cov_ab <-sigma_a*sigma_b*rho
+Sigma <-matrix(c(sigma_a^2,cov_ab,cov_ab,sigma_b^2),ncol=2)
+
+N_cafes  <-20
+library(MASS)
+set.seed(55) 
+vary_effects <-mvrnorm(N_cafes,Mu,Sigma)
+
+a_cafe <-vary_effects[,1]
+b_cafe <- vary_effects[,2]
+
+plot(a_cafe,b_cafe,col=rangi2,
+xlab="intercept (baseline height)",ylab="slope (effect of milk)")
+
+for (l in c(0.1,0.3,0.5,0.8,0.99)) {
+  lines(ellipse(Sigma,centre=Mu,level=l),col=col.alpha("black",0.2))
+  }
+```
+
+Here, the pulling forces are a bit more complicated than during a single parameter situation. Namely, parameters are not necessarily pulled towards the center of the distribution (population averages) but orthogonal to isolines, so that they are adjusted relative to each other. In the plot below, a black filled dot is average with respect to the slop but has a higher than average intercept. This means that, one the one hand, its intercept is too high for its average slope. One the other hand, its slope is too average for such a high slope. Both parameters pull on each other at the same time, which us why the intercept becomes more normal but the slope becomes higher (a more bit more extreme). The advantage is that you can use both parameters to judge them against the population.
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("images/pooled-correlated-parameters.png")
+```
