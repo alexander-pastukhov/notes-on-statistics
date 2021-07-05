@@ -117,7 +117,7 @@
 
 \title{Notes on and Solutions for Statistical Rethinking}
 \author{Alexander Pastukhov}
-\date{2021-06-20}
+\date{2021-07-05}
 
 \begin{document}
 \maketitle
@@ -1221,6 +1221,18 @@ The idea is that if two (or more) parameters are correlated within the populatio
 Here, the pulling forces are a bit more complicated than during a single parameter situation. Namely, parameters are not necessarily pulled towards the center of the distribution (population averages) but orthogonal to isolines, so that they are adjusted relative to each other. In the plot below, a black filled dot is average with respect to the slop but has a higher than average intercept. This means that, one the one hand, its intercept is too high for its average slope. One the other hand, its slope is too average for such a high slope. Both parameters pull on each other at the same time, which us why the intercept becomes more normal but the slope becomes higher (a more bit more extreme). The advantage is that you can use both parameters to judge them against the population.
 
 \begin{center}\includegraphics[width=22.11in]{images/pooled-correlated-parameters} \end{center}
+
+\hypertarget{incorporating-measurement-error-a-rubber-band-metaphor}{%
+\chapter{Incorporating measurement error: a rubber band metaphor}\label{incorporating-measurement-error-a-rubber-band-metaphor}}
+
+One way to think about \protect\hyperlink{loss-functions}{loss functions} is as if they are rubber bands\footnote{As Hook's law is a first-order linear approximation, this metaphor works fully only if we assume L1 distance, i.e., that error increases / probability decreases linearly with distance. Still you could imagine a better rubber band whose force will be proportional to the squared (L2) distance, as for the normal likelihood.} (black vertical segments) connecting observations (white dots) with its corresponding mean (red dots) on the regression line. Each band tries to pull the mean and, therefore, the regression line towards the observation and the final estimate is simply a minimal energy state: The total sum of pulling forces is minimal, so that any movement of the regression line would decrease the stretch for sum dots but will produce way more pulling for other dots, increasing the overall force. This is the ``usual'' way that we performed the regression analysis assuming that \emph{same} rubber bands connect every dot with the regression line.
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-52-1.pdf}
+Within this metaphor, measurement error is incorporated as additional inferred value (blue dots, true value of a measurement) that is connected to the observed value via a \emph{custom} rubber band (colored) whose strength depends on the measurement error. I.e., large measurement errors make for a very weak stretchable bands, whereas high certainty leads to very small and strong bands. Note the connectivity pattern: observed value --- (via custom rubber band) --- (estimated) true value --- (via common rubber band) --- mean on the regression line. Here, dots with smaller measurement error will pull the regression line much stronger towards the observed value, whereas dots with large error will tolerate having regression line even very far away.
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-53-1.pdf}
+
+Note that in some cases, information about measurement error is incorporated directly. For example, in binomial likelihood the number of successes and the total number of observations determine not only the proportion of success but also confidence about that value.
 
   \bibliography{book.bib}
 

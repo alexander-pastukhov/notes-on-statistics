@@ -49,3 +49,4 @@ people-are-different-but-belong-to-a-population-pooled-parameters
 people-are-different-but-belong-to-a-group-within-a-population-multilevel-clusters-of-pooled-parameters
 people-are-similar-to-some-but-different-to-others-gaussian-process
 people-are-different-but-belong-to-a-population-in-which-parameters-are-correlated-correlated-pooled-parameters
+incorporating-measurement-error-a-rubber-band-metaphor
