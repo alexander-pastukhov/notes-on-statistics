@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 5 The haunted DAG | Notes on and Solutions for Statistical Rethinking</title>
+  <title>Chapter 11 Incorporating measurement error: a rubber band metaphor | Notes on and Solutions for Statistical Rethinking</title>
   <meta name="description" content="Notes and exercise solutions for Statistical Rethinking book." />
   <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 5 The haunted DAG | Notes on and Solutions for Statistical Rethinking" />
+  <meta property="og:title" content="Chapter 11 Incorporating measurement error: a rubber band metaphor | Notes on and Solutions for Statistical Rethinking" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 5 The haunted DAG | Notes on and Solutions for Statistical Rethinking" />
+  <meta name="twitter:title" content="Chapter 11 Incorporating measurement error: a rubber band metaphor | Notes on and Solutions for Statistical Rethinking" />
   
   <meta name="twitter:description" content="Notes and exercise solutions for Statistical Rethinking book." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="collider-bias.html"/>
-<link rel="next" href="information-criteria.html"/>
+<link rel="prev" href="parameters-combining-information-from-an-individual-with-population.html"/>
+
 <script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -230,37 +230,46 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="the-haunted-dag" class="section level1" number="5">
-<h1><span class="header-section-number">Chapter 5</span> The haunted DAG</h1>
-<p>These are notes on section <strong>6.3.2 The haunted DAG</strong> that demonstrates how collider bias can arise, if one of the variables is unobserved and we do not realize that the have a collider in our DAG. The DAG itself is below, I’ve only changed <code>Unobserved</code> into <code>Neighborhood</code>.</p>
-<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
-<p>The example in the book shows that if we include <code>Grandparents</code> while “controlling for” influence of <code>Parents</code> but ignore influence of the <code>Neighborhood</code>, the influence of <code>Grandparents</code> is <em>negative</em> rather than <em>zero</em>. It is zero in the book but it can originally be positive or negative, point is it is different from what is inferred by the model. And, importantly, an estimated effect of <code>Parents</code> is also different from its true value. The book shows it visually but I found that in this case algebra is helpful to understand it at the level of “how does a regression model know.”</p>
-<p>Let us start with a <em>full</em> model. For the sake of simplicity, we will ignore coefficients for computing <code>Parents</code> variable from <code>Grandparents</code> and <code>Neighborhood</code> but this does not change the general picture.</p>
-<p><span class="math display">\[ P = G + N\]</span>
-Thus, the linear model for child education is
-<span class="math display">\[C = \beta_P P + \beta_G G + \beta_N N\]</span></p>
-<p>Substituting $ P = G + N$ gives us
-<span class="math display">\[C = \beta_P (G + N) + \beta_G G + \beta_N N\]</span></p>
-<p>Rearranging terms a little
-<span class="math display">\[C = (\beta_P + \beta_G) G + (\beta_P  + \beta_N) N\]</span></p>
-<p>Note that this means that we do not fit individual coefficients, in both cases we fit a <em>sum</em> of two. And, as with multicollinearity, individual coefficients can be in a wrong place and unreliable as long as they add up to the “true” coefficient value. Thus, ignoring the noise and concealing the effect of <code>Parents</code>, we might as well fit
-<span class="math display">\[C = \beta_G^\prime G + \beta_N^\prime N\]</span>
-where, <span class="math inline">\(\beta_G^\prime = \beta_P + \beta_G\)</span> and <span class="math inline">\(\beta_N^\prime = \beta_P + \beta_N\)</span> are the total effect of grandparents and neighborhood of child education.</p>
-<p>What if we ignore <code>Neighborhood</code>? This means that we explicitly set <span class="math inline">\(\beta_N = 0\)</span> and that is the point when the sum of coefficients starts causing us problems. Recall that the model fits <span class="math inline">\(\beta_P + \beta_N\)</span> and not each term separately. Thus, setting one of them to 0 does not upset the model, as it can always compensate with the <em>other</em> coefficient. Here, that <em>other</em> coefficient is <span class="math inline">\(\beta_P\)</span>, so its value now is that of the “true” sum: <span class="math inline">\(\beta_P = \beta_P^{true} + \beta_N^{true}\)</span>.</p>
-<p>Unfortunately for us, <span class="math inline">\(\beta_P\)</span> appears at <em>two</em> places, as it is also used to quantify effect of grandparents:
-<span class="math display">\[(\beta_P + \beta_G) G\]</span></p>
-<p>Originally, it reflected only the influence of parents, so it was not a problem. But now it is artificially inflated<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a> as it stands for influence of both parents <em>and</em> neighborhood. Problem? Not for a model that fits a <em>sum</em>. How do you make sure that <em>the sum</em> still adds up? You change <em>other</em> coefficients! Here, we can still wiggle <span class="math inline">\(\beta_G\)</span> so that everything adds up. Given that
-<span class="math display">\[\beta_P = \beta_P^{true} + \beta_N^{true}\]</span>
-model just needs to subtract that same <span class="math inline">\(\beta_N^{true}\)</span> and get our sum back. So
-<span class="math display">\[\beta_P + \beta_G = (\beta_P^{true} + \beta_N^{true}) + (\beta_G^{true} - \beta_N^{true})\]</span></p>
-<p>Thus, if we do not explicitly model the effect of neighborhood, it sneaks in nonetheless, hiding inside <em>both</em> parent and grandparent coefficients. What makes it really problematic and confusing is that the effect is <em>opposite</em> for the two terms: if we <em>add</em> <span class="math inline">\(\beta_N^{true}\)</span> at one place, we must <em>subtract</em> it at the other.</p>
-<p>So, what are you supposed to do with this new knowledge? You do not take fitted model coefficients at their face value. You always have a fine-print “Only assuming that my small world is correct and it probably is not” at the back of your head. You think of several models and think of ways to tease out the true relationship. DAGs and statistical models can help you, but they cannot do magic and tell the “real truth” by themselves.</p>
+<div id="incorporating-measurement-error-a-rubber-band-metaphor" class="section level1" number="11">
+<h1><span class="header-section-number">Chapter 11</span> Incorporating measurement error: a rubber band metaphor</h1>
+<p>One way to think about <a href="loss-functions.html#loss-functions">loss functions</a> is as if they are rubber bands<a href="#fn22" class="footnote-ref" id="fnref22"><sup>22</sup></a> (black vertical segments) connecting observations (white dots) with its corresponding mean (red dots) on the regression line. Each band tries to pull the mean and, therefore, the regression line towards the observation and the final estimate is simply a minimal energy state: The total sum of pulling forces is minimal, so that any movement of the regression line would decrease the stretch for sum dots but will produce way more pulling for other dots, increasing the overall force. This is the “usual” way that we performed the regression analysis assuming that <em>same</em> rubber bands connect every dot with the regression line.</p>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-52-1.png" width="672" />
+Within this metaphor, measurement error is incorporated as additional inferred value (blue dots, true value of a measurement) that is connected to the observed value via a <em>custom</em> rubber band (colored) whose strength depends on the measurement error. I.e., large measurement errors make for a very weak stretchable bands, whereas high certainty leads to very small and strong bands. Note the connectivity pattern: observed value — (via custom rubber band) — (estimated) true value — (via common rubber band) — mean on the regression line. Here, dots with smaller measurement error will pull the regression line much stronger towards the observed value, whereas dots with large error will tolerate having regression line even very far away.</p>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-53-1.png" width="672" /></p>
+<p>Note that in some cases, information about measurement error is incorporated directly. For example, in binomial likelihood the number of successes and the total number of observations determine not only the proportion of success but also confidence about that value.</p>
 
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div class="footnotes">
 <hr />
-<ol start="14">
-<li id="fn14"><p>In general, changed depending on the effect signs of individual effects.<a href="the-haunted-dag.html#fnref14" class="footnote-back">↩︎</a></p></li>
+<ol start="22">
+<li id="fn22"><p>As Hook’s law is a first-order linear approximation, this metaphor works fully only if we assume L1 distance, i.e., that error increases / probability decreases linearly with distance. Still you could imagine a better rubber band whose force will be proportional to the squared (L2) distance, as for the normal likelihood.<a href="incorporating-measurement-error-a-rubber-band-metaphor.html#fnref22" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>
@@ -268,8 +277,8 @@ model just needs to subtract that same <span class="math inline">\(\beta_N^{true
           </div>
         </div>
       </div>
-<a href="collider-bias.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="information-criteria.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="parameters-combining-information-from-an-individual-with-population.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
