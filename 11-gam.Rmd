@@ -1,0 +1,8 @@
+# Generalized Additive Models as continuous random effects
+
+The purpose of this note is to give an intuition about what generalized additive models (GAMs) are and, more importantly, when can they be handy for _causal_ inferences. Thus, I will leave most mathematical details out^[You can find them all in a [book](https://www.routledge.com/Generalized-Additive-Models-An-Introduction-with-R-Second-Edition/Wood/p/book/9781498728331) by Simon N. Wood.]. 
+
+## Generalized Additive Models: An Über-brief Introduction
+
+Imagine that you have a (completely made up!) data set that describes ice-cream consumption as a function of age. As you can see, it is twisty curve, so a simpler linear regression won't do. And, unless, we have an idea about the process(es) that generate this data, we might just smooth the data to see the underlying dependence more clearly. This is a job for GAM^[Note that GAMs are not the only game in town. There are many ways to smooth the data, starting with a running median, using loess, etc.]!
+
