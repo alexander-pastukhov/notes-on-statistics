@@ -6,13 +6,28 @@ The purpose of this note is to give an intuition about what generalized additive
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(extraDistr)
 library(tidyverse)
 
-age <- seq(1, 100, 200)
+age <- seq(1, 100, length.out=200)
 
-parents_allow <- 
+parents_allow <- 1 / (1 + exp(-(age-7)*0.75))
+age_effect <- 1 - exp(-(100 - age)/15)
+other_priorities <- dnorm(age, 25, 5)
+other_priorities <- 1- 0.7 * other_priorities / max(other_priorities)
+total_effect <- parents_allow * age_effect * other_priorities
+
+set.seed(1239623)
+sim_data <- 
+  tibble(age = age) %>%
+  mutate(Pice = rprop(n(), size= 5, mean=total_effect * 0.925 + 0.0025))
+
+ggplot(sim_data, aes(x=age, y=Pice)) + 
+  geom_point()
 
 ```
+
+
 
 Imagine that you have a (completely made up!) data set that describes ice-cream consumption as a function of age. As you can see, it is twisty curve, so a simpler linear regression won't do. If we do not have an idea about the process(es) that generated this data, we might at least smooth it to see the underlying relationship more clearly. You can do this in a number of ways using a running median, loess, etc., but we will focus on GAMs as they have an advantage of being (generalized) linear models, which makes it easy to incorporate them into bigger generalized linear models.
 
