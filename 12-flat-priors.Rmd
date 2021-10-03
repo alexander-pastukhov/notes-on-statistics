@@ -1,7 +1,7 @@
 # Flat priors: the strings attached
 I have a feeling that one of the biggest issues that a lot of people have when they consider Bayesian statistics is priors. This is something that all the students worry and what they feel insecure about. As a result, they would rather stay in the frequentist world of flat priors.
 
-And flat priors have a lot going for them. They are convenient for mathematicians as they make analytical derivations simpler. They are convenient for users of statistics because they do not have to worry about or even think about priors. And, if you do think about priors, flat priors look superior because they feel impartial. They do not impose any knowledge a priori, they allowed the results to be determined by the data alone. Thus, whatever results you get, you can claim that they are object and untainted by the person behind the analysis.
+And flat priors have a lot going for them. They are convenient for mathematicians as they make analytical derivations simpler. They are convenient for users of statistics because they do not have to worry about or even think about priors. And, if you do think about priors, flat priors look superior because they feel impartial. They do not impose any a priori  knowledge and allow the results to be determined by the data alone. Thus, whatever results you get, you can claim that they are objective and untainted by the person who did the analysis.
 
 However, flat priors with a lot of strings attached. This may not be a deal-breaker (although it should) but this is  something you should be aware of when you use them.
 
