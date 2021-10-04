@@ -50,3 +50,15 @@ people-are-different-but-belong-to-a-group-within-a-population-multilevel-cluste
 people-are-similar-to-some-but-different-to-others-gaussian-process
 people-are-different-but-belong-to-a-population-in-which-parameters-are-correlated-correlated-pooled-parameters
 incorporating-measurement-error-a-rubber-band-metaphor
+generalized-additive-models-as-continuous-random-effects
+generalized-additive-models-an-über-brief-introduction
+what-are-gams-good-for
+covariates-random-factors
+gams-as-continuous-random-factors
+flat-priors-the-strings-attached
+flat-priors-are-silly
+flat-priors-make-you-pretend-that-you-are-naïve
+flat-priors-tend-to-overfit
+flat-priors-are-an-exception
+the-irony-of-power-analysis
+conclusions-1

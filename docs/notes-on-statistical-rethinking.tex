@@ -4,10 +4,14 @@
 %
 \documentclass[
 ]{book}
+\title{Notes on and Solutions for Statistical Rethinking}
+\author{Alexander Pastukhov}
+\date{2021-10-04}
+
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{ifxetex,ifluatex}
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+\usepackage{iftex}
+\ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
@@ -109,15 +113,11 @@
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{5}
 \usepackage{booktabs}
-\ifluatex
+\ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
 \usepackage[]{natbib}
 \bibliographystyle{apalike}
-
-\title{Notes on and Solutions for Statistical Rethinking}
-\author{Alexander Pastukhov}
-\date{2021-07-06}
 
 \begin{document}
 \maketitle
@@ -1233,6 +1233,88 @@ Within this metaphor, measurement error is incorporated as additional inferred v
 \includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-53-1.pdf}
 
 Note that in some cases, information about measurement error is incorporated directly. For example, in binomial likelihood the number of successes and the total number of observations determine not only the proportion of success but also confidence about that value.
+
+\hypertarget{generalized-additive-models-as-continuous-random-effects}{%
+\chapter{Generalized Additive Models as continuous random effects}\label{generalized-additive-models-as-continuous-random-effects}}
+
+The purpose of this note is to give an intuition about what generalized additive models (GAMs) are and, more importantly, when can they be handy for \emph{causal} inferences. Thus, I will leave most mathematical details out\footnote{You can find them all in a \href{https://www.routledge.com/Generalized-Additive-Models-An-Introduction-with-R-Second-Edition/Wood/p/book/9781498728331}{book} by Simon N. Wood.}.
+
+\hypertarget{generalized-additive-models-an-uxfcber-brief-introduction}{%
+\section{Generalized Additive Models: An Über-brief Introduction}\label{generalized-additive-models-an-uxfcber-brief-introduction}}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-54-1.pdf}
+
+Imagine that you have a (completely made up!) data set shown aboe that describes probability of consuming an ice-cream as a function of age. As you can see, it is twisty curve, so a simpler linear regression won't do. If we do not have an idea about the process(es) that generated this data, we might at least smooth it to see the underlying relationship more clearly. You can do this in a number of ways using a running median, loess, etc., but we will focus on GAMs as they have an advantage of being (generalized) linear models, which makes it easy to incorporate them into bigger generalized linear models.
+
+The idea of the GAM is to approximate a dependence as a sum of basis functions. In the example below, all basis functions are \emph{identical} but cover \emph{different} parts of the space. However, you can have it the other way around with \emph{different} basis functions covering \emph{identical} (the entire) space.
+
+In the example below, basis functions are cubic regression splines that are centered on ``knots''. Each tent has its own coefficient that determines its height and, also, the transition between knots. A \emph{wigliness} parameter determines how different coefficients can be, the more different they are, the wigglier will be the line, hence the name. Accordingly, wigliness of \emph{zero} produces a straight horizontal line (all coefficients must be the same). Wigliness of infinity means that coefficients can take any value and fit the data as closely as possible. As you can see, smoothing makes it much easier to see the underlying relationship.
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-55-1.pdf}
+
+\hypertarget{what-are-gams-good-for}{%
+\section{What are GAMs good for?}\label{what-are-gams-good-for}}
+
+As mentioned above, GAMs are just smoothers. They approximate a smooth relationship in the data without any knowledge or assumptions about a generative process behind it. As such they have at least two clear usage cases: an exploratory data analysis and generating predictions. In the former case, the shape of the smoothed line might hint at the underlying mechanisms and facilitate development of a causal model. In the latter case, as long as we stick to interpolation, we can use smoothed line to predict unobserved values for future use.
+
+But what about causal inference? Can GAMs be useful for in this case? Yes, they can play a useful and obvious role. But to make this ``obvious'' obvious, we must take a detour and talk about random factors.
+
+\hypertarget{covariates-random-factors}{%
+\section{Covariates / random factors}\label{covariates-random-factors}}
+
+Imagine that we have data on ice-cream consumption and, among other things, we measured respondents' eye color. What you find is that people with different eye color tend to consume different amount of ice-cream (on average). Why? It is a made-up example, so I do not know. But it could be genetic, same group of genes being responsible for eye color and ice-cream craving. Or it could be something else. Point is, we do not have a good (or any) causal model of a generative process that would link these two variables. Because of that we are not really interested in this link but we also cannot ignore it. Any systematic relationship that we ignore will we leave unexplained variance that, it turn, will make it harder for us to see a causal effect for predictors that we are interested in. What do we do? We include eye color either as a covariate (fixed effect) or a random effect. For frequentist models, the difference is whether intercept for each group are estimated independently (the former, flat priors, no shrinkage) or by pooling information across groups (the latter, produces shrinkage). For Bayesian models, the difference is between fixed (covariates) and adaptative (random effect) priors. Still, the idea is to stress that we have no idea why this particular variable is correlated with the outcome and that we have no causal generative model.
+
+\hypertarget{gams-as-continuous-random-factors}{%
+\section{GAMs as continuous random factors}\label{gams-as-continuous-random-factors}}
+
+Let us get back to ice-cream consumption as a function of age. It is easy to that we are in the same situation as with eye color: We have no idea about the generative process but the dependence is strong and should not be ignored. Thus, we must include age in the bigger model, even if we do not care \emph{how} the age causes ice-cream consumption. But how can we do it? The relationship is not linear or even monotonic, so we cannot use age a linear covariate. And, unlike categorical data for eye color, the data is continuous and we do not have well-defined few levels to estimate values for (unless we introduce some artificial discrete levels). Plus, the latter approach would actually \emph{ignore} the dependence, because will ignore the fact that nearby levels should be more similar than more distance ones. So, what do we do?
+
+It is GAMs to the rescue! By pooling information from nearby data samples, GAMs produce a smooth estimate for each age that can be used in the model. The smooth estimate is, effectively, a continuous random effect! Thus, you should use GAMs whenever you have a \emph{continuous} variable that is correlated with an outcome, you have no idea about the underlying causal link but the relationship is simple and monotonic enough.
+
+\hypertarget{flat-priors-the-strings-attached}{%
+\chapter{Flat priors: the strings attached}\label{flat-priors-the-strings-attached}}
+
+I have a feeling that one of the biggest issues that a lot of people have when they consider Bayesian statistics is priors. This is something that all the students worry and what they feel insecure about. As a result, they would rather stay in the frequentist world of flat priors.
+
+And flat priors have a lot going for them. They are convenient for mathematicians as they make analytical derivations simpler. They are convenient for users of statistics because they do not have to worry about or even think about priors. And, if you do think about priors, flat priors look superior because they feel impartial. They do not impose any a priori knowledge and allow the results to be determined by the data alone. Thus, whatever results you get, you can claim that they are objective and untainted by the person who did the analysis.
+
+However, flat priors have some strings attached. This may not be a deal-breaker (although it probably should) but this is definitely something you should be aware of when you use them.
+
+\hypertarget{flat-priors-are-silly}{%
+\section{Flat priors are silly}\label{flat-priors-are-silly}}
+
+Consider experimental data from a domain you are knowledgeable in. What is the biggest effect that you feel is borderline realistic? I.e., an effect already so ridiculously large that anything larger must come from malfunctioning equipment or software, error in the analysis, etc. For example, evoked potentials in EEG are measured in microvolts, so we can safely assume that any difference between them, which is out of microvolts range, must be artificial. Let's say our threshold for the ``real effect'' is a way-way overly optimistic 1 millivolt, which is 1000 μV. To a specialist that already sounds ridiculous but when we use flat priors we \emph{explicitly} state that we believe equally strongly in difference between evoked potential that is on the scale of microvolts, millivolts, volts, or even billions of volts. Is an a priory belief that human brain is equally capable of generating evoked current of microvolts and billions of volts silly? It sure sound silly to me. Forcing it down on a model does not make this belief less silly.
+
+\hypertarget{flat-priors-make-you-pretend-that-you-are-nauxefve}{%
+\section{Flat priors make you pretend that you are naïve}\label{flat-priors-make-you-pretend-that-you-are-nauxefve}}
+
+The other way to look at this is that by using flat priors you explicitly claim to be naïve with respect to the domain. You act as if you have no prior knowledge about the phenomenon, discarding any experience that you acquired. Do you really feel that all these years of studying the subject are of no relevance? Do you really think that you do not have good predictions about at least the realistic range of the effect? You probably do. Even if you are very uncertain about them, the range from minus to plus infinity is awfully large and you can certainly do better than that. And yet, use of flat priors implies that your are completely clueless and there is not a nugget of wisdom that you have that could aid your analysis.
+
+\hypertarget{flat-priors-tend-to-overfit}{%
+\section{Flat priors tend to overfit}\label{flat-priors-tend-to-overfit}}
+
+Even under best circumstances (more on this below), flat priors do not restrict the model in fitting the sample as close as possible. This means that such models will almost certainly overfit the data. This might or might not be a big issue in each particular case, as it will depend on whether noise exaggerates or belittles the actual effect. I suspect that flat priors combined with a fortunate noise are partially responsible for the plethora of reported strong effects that we cannot replicate. This is definitely something to keep in mind.
+
+\hypertarget{flat-priors-are-an-exception}{%
+\section{Flat priors are an exception}\label{flat-priors-are-an-exception}}
+
+Although for most people flat priors probably feel like a norm, they are applicable only in very specific cases of (relatively) few predictors and plenty of data. Remember all the advice about having that many observations per variable? That is because you need them to afford flat priors and the lack of regularization in general. However, that magic sweet spot is fairly small and flat priors become extremely dangerous as soon as you step out of it.
+
+Do you have an observational study with very little data? See for example ``The Ecological Detective'' by Hilborn and Mangel who give plenty of situations where this is unavoidable.
+Flat priors will lead to extreme overfitting to the point of models being not just useless but dangerously misleading. The book mentioned above shows how usage of proper priors can rescue the analysis.
+
+Do you have a lot of data but also a lot of predictors? You probably will end up overfitting. The field of machine learning invests a lot of time and energy into regularization. Given the sheer number of predictors, they cannot set priors by hand and, instead, use other forms of method-specific batch regularization such as lasso or ridge regression penalties on coefficient weight, pruning trees, dropping out neurons, etc.
+
+In short, you can afford flat priors and no regularization only if you keep yourself to fairly specific kinds of data sets. But this is not a norm, this is an exception.
+
+\hypertarget{the-irony-of-power-analysis}{%
+\section{The irony of power analysis}\label{the-irony-of-power-analysis}}
+
+Even if you are fond of using flat priors and you are not worried about any issues raised above, you still need to think about proper priors once in a while. Specifically, whenever you need to perform a power analysis. Here, you cannot postulate silly things while remaining ``objective and impartial'' but do need to use your domain knowledge to formulate a sign and a magnitude of an effect in order to estimate the sample size you need. Which is why the power analysis is either extremely easy, if you know priors, or extremely hard, if you do not know them. Thus, even ``flat priors'' people cannot avoid using the proper ones and I suspect that, as in most cases, regular thinking about priors in your domain makes it much easier to define them for the power analysis.
+
+\hypertarget{conclusions-1}{%
+\section{Conclusions}\label{conclusions-1}}
+
+My hope is that notes above were able to show that flat priors are neither universal, nor the best prior, nor the norm. They are something you can afford under very specific circumstances. Of course you can use them but you should at least make a mental note to yourself of why do you think they are applicable in that particular case, what advantages they have over alternatives, and what are the costs for using in them in the analysis.
 
   \bibliography{book.bib}
 

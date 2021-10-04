@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 11 Incorporating measurement error: a rubber band metaphor | Notes on and Solutions for Statistical Rethinking</title>
+  <title>Chapter 13 Flat priors: the strings attached | Notes on and Solutions for Statistical Rethinking</title>
   <meta name="description" content="Notes and exercise solutions for Statistical Rethinking book." />
   <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 11 Incorporating measurement error: a rubber band metaphor | Notes on and Solutions for Statistical Rethinking" />
+  <meta property="og:title" content="Chapter 13 Flat priors: the strings attached | Notes on and Solutions for Statistical Rethinking" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 11 Incorporating measurement error: a rubber band metaphor | Notes on and Solutions for Statistical Rethinking" />
+  <meta name="twitter:title" content="Chapter 13 Flat priors: the strings attached | Notes on and Solutions for Statistical Rethinking" />
   
   <meta name="twitter:description" content="Notes and exercise solutions for Statistical Rethinking book." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="parameters-combining-information-from-an-individual-with-population.html"/>
-<link rel="next" href="generalized-additive-models-as-continuous-random-effects.html"/>
+<link rel="prev" href="generalized-additive-models-as-continuous-random-effects.html"/>
+
 <script src="libs/header-attrs-2.10/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -246,28 +246,76 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="incorporating-measurement-error-a-rubber-band-metaphor" class="section level1" number="11">
-<h1><span class="header-section-number">Chapter 11</span> Incorporating measurement error: a rubber band metaphor</h1>
-<p>One way to think about <a href="loss-functions.html#loss-functions">loss functions</a> is as if they are rubber bands<a href="#fn22" class="footnote-ref" id="fnref22"><sup>22</sup></a> (black vertical segments) connecting observations (white dots) with its corresponding mean (red dots) on the regression line. Each band tries to pull the mean and, therefore, the regression line towards the observation and the final estimate is simply a minimal energy state: The total sum of pulling forces is minimal, so that any movement of the regression line would decrease the stretch for sum dots but will produce way more pulling for other dots, increasing the overall force. This is the “usual” way that we performed the regression analysis assuming that <em>same</em> rubber bands connect every dot with the regression line.</p>
-<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-52-1.png" width="672" />
-Within this metaphor, measurement error is incorporated as additional inferred value (blue dots, true value of a measurement) that is connected to the observed value via a <em>custom</em> rubber band (colored) whose strength depends on the measurement error. I.e., large measurement errors make for a very weak stretchable bands, whereas high certainty leads to very small and strong bands. Note the connectivity pattern: observed value — (via custom rubber band) — (estimated) true value — (via common rubber band) — mean on the regression line. Here, dots with smaller measurement error will pull the regression line much stronger towards the observed value, whereas dots with large error will tolerate having regression line even very far away.</p>
-<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-53-1.png" width="672" /></p>
-<p>Note that in some cases, information about measurement error is incorporated directly. For example, in binomial likelihood the number of successes and the total number of observations determine not only the proportion of success but also confidence about that value.</p>
+<div id="flat-priors-the-strings-attached" class="section level1" number="13">
+<h1><span class="header-section-number">Chapter 13</span> Flat priors: the strings attached</h1>
+<p>I have a feeling that one of the biggest issues that a lot of people have when they consider Bayesian statistics is priors. This is something that all the students worry and what they feel insecure about. As a result, they would rather stay in the frequentist world of flat priors.</p>
+<p>And flat priors have a lot going for them. They are convenient for mathematicians as they make analytical derivations simpler. They are convenient for users of statistics because they do not have to worry about or even think about priors. And, if you do think about priors, flat priors look superior because they feel impartial. They do not impose any a priori knowledge and allow the results to be determined by the data alone. Thus, whatever results you get, you can claim that they are objective and untainted by the person who did the analysis.</p>
+<p>However, flat priors have some strings attached. This may not be a deal-breaker (although it probably should) but this is definitely something you should be aware of when you use them.</p>
+<div id="flat-priors-are-silly" class="section level2" number="13.1">
+<h2><span class="header-section-number">13.1</span> Flat priors are silly</h2>
+<p>Consider experimental data from a domain you are knowledgeable in. What is the biggest effect that you feel is borderline realistic? I.e., an effect already so ridiculously large that anything larger must come from malfunctioning equipment or software, error in the analysis, etc. For example, evoked potentials in EEG are measured in microvolts, so we can safely assume that any difference between them, which is out of microvolts range, must be artificial. Let’s say our threshold for the “real effect” is a way-way overly optimistic 1 millivolt, which is 1000 μV. To a specialist that already sounds ridiculous but when we use flat priors we <em>explicitly</em> state that we believe equally strongly in difference between evoked potential that is on the scale of microvolts, millivolts, volts, or even billions of volts. Is an a priory belief that human brain is equally capable of generating evoked current of microvolts and billions of volts silly? It sure sound silly to me. Forcing it down on a model does not make this belief less silly.</p>
+</div>
+<div id="flat-priors-make-you-pretend-that-you-are-naïve" class="section level2" number="13.2">
+<h2><span class="header-section-number">13.2</span> Flat priors make you pretend that you are naïve</h2>
+<p>The other way to look at this is that by using flat priors you explicitly claim to be naïve with respect to the domain. You act as if you have no prior knowledge about the phenomenon, discarding any experience that you acquired. Do you really feel that all these years of studying the subject are of no relevance? Do you really think that you do not have good predictions about at least the realistic range of the effect? You probably do. Even if you are very uncertain about them, the range from minus to plus infinity is awfully large and you can certainly do better than that. And yet, use of flat priors implies that your are completely clueless and there is not a nugget of wisdom that you have that could aid your analysis.</p>
+</div>
+<div id="flat-priors-tend-to-overfit" class="section level2" number="13.3">
+<h2><span class="header-section-number">13.3</span> Flat priors tend to overfit</h2>
+<p>Even under best circumstances (more on this below), flat priors do not restrict the model in fitting the sample as close as possible. This means that such models will almost certainly overfit the data. This might or might not be a big issue in each particular case, as it will depend on whether noise exaggerates or belittles the actual effect. I suspect that flat priors combined with a fortunate noise are partially responsible for the plethora of reported strong effects that we cannot replicate. This is definitely something to keep in mind.</p>
+</div>
+<div id="flat-priors-are-an-exception" class="section level2" number="13.4">
+<h2><span class="header-section-number">13.4</span> Flat priors are an exception</h2>
+<p>Although for most people flat priors probably feel like a norm, they are applicable only in very specific cases of (relatively) few predictors and plenty of data. Remember all the advice about having that many observations per variable? That is because you need them to afford flat priors and the lack of regularization in general. However, that magic sweet spot is fairly small and flat priors become extremely dangerous as soon as you step out of it.</p>
+<p>Do you have an observational study with very little data? See for example “The Ecological Detective” by Hilborn and Mangel who give plenty of situations where this is unavoidable.
+Flat priors will lead to extreme overfitting to the point of models being not just useless but dangerously misleading. The book mentioned above shows how usage of proper priors can rescue the analysis.</p>
+<p>Do you have a lot of data but also a lot of predictors? You probably will end up overfitting. The field of machine learning invests a lot of time and energy into regularization. Given the sheer number of predictors, they cannot set priors by hand and, instead, use other forms of method-specific batch regularization such as lasso or ridge regression penalties on coefficient weight, pruning trees, dropping out neurons, etc.</p>
+<p>In short, you can afford flat priors and no regularization only if you keep yourself to fairly specific kinds of data sets. But this is not a norm, this is an exception.</p>
+</div>
+<div id="the-irony-of-power-analysis" class="section level2" number="13.5">
+<h2><span class="header-section-number">13.5</span> The irony of power analysis</h2>
+<p>Even if you are fond of using flat priors and you are not worried about any issues raised above, you still need to think about proper priors once in a while. Specifically, whenever you need to perform a power analysis. Here, you cannot postulate silly things while remaining “objective and impartial” but do need to use your domain knowledge to formulate a sign and a magnitude of an effect in order to estimate the sample size you need. Which is why the power analysis is either extremely easy, if you know priors, or extremely hard, if you do not know them. Thus, even “flat priors” people cannot avoid using the proper ones and I suspect that, as in most cases, regular thinking about priors in your domain makes it much easier to define them for the power analysis.</p>
+</div>
+<div id="conclusions-1" class="section level2" number="13.6">
+<h2><span class="header-section-number">13.6</span> Conclusions</h2>
+<p>My hope is that notes above were able to show that flat priors are neither universal, nor the best prior, nor the norm. They are something you can afford under very specific circumstances. Of course you can use them but you should at least make a mental note to yourself of why do you think they are applicable in that particular case, what advantages they have over alternatives, and what are the costs for using in them in the analysis.</p>
 
 </div>
-<div class="footnotes">
-<hr />
-<ol start="22">
-<li id="fn22"><p>As Hook’s law is a first-order linear approximation, this metaphor works fully only if we assume L1 distance, i.e., that error increases / probability decreases linearly with distance. Still you could imagine a better rubber band whose force will be proportional to the squared (L2) distance, as for the normal likelihood.<a href="incorporating-measurement-error-a-rubber-band-metaphor.html#fnref22" class="footnote-back">↩︎</a></p></li>
-</ol>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             </section>
 
           </div>
         </div>
       </div>
-<a href="parameters-combining-information-from-an-individual-with-population.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="generalized-additive-models-as-continuous-random-effects.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="generalized-additive-models-as-continuous-random-effects.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

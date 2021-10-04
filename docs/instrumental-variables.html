@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 9 Instrumental Variables | Notes on and Solutions for Statistical Rethinking</title>
   <meta name="description" content="Notes and exercise solutions for Statistical Rethinking book." />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 9 Instrumental Variables | Notes on and Solutions for Statistical Rethinking" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Alexander Pastukhov" />
 
 
-<meta name="date" content="2021-07-06" />
+<meta name="date" content="2021-10-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,8 @@
   
 <link rel="prev" href="mixtures.html"/>
 <link rel="next" href="parameters-combining-information-from-an-individual-with-population.html"/>
-<script src="libs/header-attrs-2.9/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -210,6 +210,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.6" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-different-but-belong-to-a-population-in-which-parameters-are-correlated-correlated-pooled-parameters"><i class="fa fa-check"></i><b>10.6</b> People are different but belong to a population in which parameters are correlated (correlated pooled parameters)</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="incorporating-measurement-error-a-rubber-band-metaphor.html"><a href="incorporating-measurement-error-a-rubber-band-metaphor.html"><i class="fa fa-check"></i><b>11</b> Incorporating measurement error: a rubber band metaphor</a></li>
+<li class="chapter" data-level="12" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html"><i class="fa fa-check"></i><b>12</b> Generalized Additive Models as continuous random effects</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html#generalized-additive-models-an-über-brief-introduction"><i class="fa fa-check"></i><b>12.1</b> Generalized Additive Models: An Über-brief Introduction</a></li>
+<li class="chapter" data-level="12.2" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html#what-are-gams-good-for"><i class="fa fa-check"></i><b>12.2</b> What are GAMs good for?</a></li>
+<li class="chapter" data-level="12.3" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html#covariates-random-factors"><i class="fa fa-check"></i><b>12.3</b> Covariates / random factors</a></li>
+<li class="chapter" data-level="12.4" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html#gams-as-continuous-random-factors"><i class="fa fa-check"></i><b>12.4</b> GAMs as continuous random factors</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html"><i class="fa fa-check"></i><b>13</b> Flat priors: the strings attached</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#flat-priors-are-silly"><i class="fa fa-check"></i><b>13.1</b> Flat priors are silly</a></li>
+<li class="chapter" data-level="13.2" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#flat-priors-make-you-pretend-that-you-are-naïve"><i class="fa fa-check"></i><b>13.2</b> Flat priors make you pretend that you are naïve</a></li>
+<li class="chapter" data-level="13.3" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#flat-priors-tend-to-overfit"><i class="fa fa-check"></i><b>13.3</b> Flat priors tend to overfit</a></li>
+<li class="chapter" data-level="13.4" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#flat-priors-are-an-exception"><i class="fa fa-check"></i><b>13.4</b> Flat priors are an exception</a></li>
+<li class="chapter" data-level="13.5" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#the-irony-of-power-analysis"><i class="fa fa-check"></i><b>13.5</b> The irony of power analysis</a></li>
+<li class="chapter" data-level="13.6" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#conclusions-1"><i class="fa fa-check"></i><b>13.6</b> Conclusions</a></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://alexander-pastukhov.github.io/">Alexander (Sasha) Pastukhov</li>
 
@@ -334,6 +350,10 @@ gitbook.start({
 "text": null
 },
 "download": ["notes-on-statistical-rethinking.pdf", "notes-on-statistical-rethinking.epub"],
+"search": {
+"engine": "lunr",
+"options": null
+},
 "toc": {
 "collapse": "section"
 }

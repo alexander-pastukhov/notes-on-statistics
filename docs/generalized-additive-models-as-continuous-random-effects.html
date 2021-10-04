@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 11 Incorporating measurement error: a rubber band metaphor | Notes on and Solutions for Statistical Rethinking</title>
+  <title>Chapter 12 Generalized Additive Models as continuous random effects | Notes on and Solutions for Statistical Rethinking</title>
   <meta name="description" content="Notes and exercise solutions for Statistical Rethinking book." />
   <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 11 Incorporating measurement error: a rubber band metaphor | Notes on and Solutions for Statistical Rethinking" />
+  <meta property="og:title" content="Chapter 12 Generalized Additive Models as continuous random effects | Notes on and Solutions for Statistical Rethinking" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 11 Incorporating measurement error: a rubber band metaphor | Notes on and Solutions for Statistical Rethinking" />
+  <meta name="twitter:title" content="Chapter 12 Generalized Additive Models as continuous random effects | Notes on and Solutions for Statistical Rethinking" />
   
   <meta name="twitter:description" content="Notes and exercise solutions for Statistical Rethinking book." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="parameters-combining-information-from-an-individual-with-population.html"/>
-<link rel="next" href="generalized-additive-models-as-continuous-random-effects.html"/>
+<link rel="prev" href="incorporating-measurement-error-a-rubber-band-metaphor.html"/>
+<link rel="next" href="flat-priors-the-strings-attached.html"/>
 <script src="libs/header-attrs-2.10/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -246,19 +246,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="incorporating-measurement-error-a-rubber-band-metaphor" class="section level1" number="11">
-<h1><span class="header-section-number">Chapter 11</span> Incorporating measurement error: a rubber band metaphor</h1>
-<p>One way to think about <a href="loss-functions.html#loss-functions">loss functions</a> is as if they are rubber bands<a href="#fn22" class="footnote-ref" id="fnref22"><sup>22</sup></a> (black vertical segments) connecting observations (white dots) with its corresponding mean (red dots) on the regression line. Each band tries to pull the mean and, therefore, the regression line towards the observation and the final estimate is simply a minimal energy state: The total sum of pulling forces is minimal, so that any movement of the regression line would decrease the stretch for sum dots but will produce way more pulling for other dots, increasing the overall force. This is the “usual” way that we performed the regression analysis assuming that <em>same</em> rubber bands connect every dot with the regression line.</p>
-<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-52-1.png" width="672" />
-Within this metaphor, measurement error is incorporated as additional inferred value (blue dots, true value of a measurement) that is connected to the observed value via a <em>custom</em> rubber band (colored) whose strength depends on the measurement error. I.e., large measurement errors make for a very weak stretchable bands, whereas high certainty leads to very small and strong bands. Note the connectivity pattern: observed value — (via custom rubber band) — (estimated) true value — (via common rubber band) — mean on the regression line. Here, dots with smaller measurement error will pull the regression line much stronger towards the observed value, whereas dots with large error will tolerate having regression line even very far away.</p>
-<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-53-1.png" width="672" /></p>
-<p>Note that in some cases, information about measurement error is incorporated directly. For example, in binomial likelihood the number of successes and the total number of observations determine not only the proportion of success but also confidence about that value.</p>
+<div id="generalized-additive-models-as-continuous-random-effects" class="section level1" number="12">
+<h1><span class="header-section-number">Chapter 12</span> Generalized Additive Models as continuous random effects</h1>
+<p>The purpose of this note is to give an intuition about what generalized additive models (GAMs) are and, more importantly, when can they be handy for <em>causal</em> inferences. Thus, I will leave most mathematical details out<a href="#fn23" class="footnote-ref" id="fnref23"><sup>23</sup></a>.</p>
+<div id="generalized-additive-models-an-über-brief-introduction" class="section level2" number="12.1">
+<h2><span class="header-section-number">12.1</span> Generalized Additive Models: An Über-brief Introduction</h2>
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-54-1.png" width="672" /></p>
+<p>Imagine that you have a (completely made up!) data set shown aboe that describes probability of consuming an ice-cream as a function of age. As you can see, it is twisty curve, so a simpler linear regression won’t do. If we do not have an idea about the process(es) that generated this data, we might at least smooth it to see the underlying relationship more clearly. You can do this in a number of ways using a running median, loess, etc., but we will focus on GAMs as they have an advantage of being (generalized) linear models, which makes it easy to incorporate them into bigger generalized linear models.</p>
+<p>The idea of the GAM is to approximate a dependence as a sum of basis functions. In the example below, all basis functions are <em>identical</em> but cover <em>different</em> parts of the space. However, you can have it the other way around with <em>different</em> basis functions covering <em>identical</em> (the entire) space.</p>
+<p>In the example below, basis functions are cubic regression splines that are centered on “knots.” Each tent has its own coefficient that determines its height and, also, the transition between knots. A <em>wigliness</em> parameter determines how different coefficients can be, the more different they are, the wigglier will be the line, hence the name. Accordingly, wigliness of <em>zero</em> produces a straight horizontal line (all coefficients must be the same). Wigliness of infinity means that coefficients can take any value and fit the data as closely as possible. As you can see, smoothing makes it much easier to see the underlying relationship.
+<img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-55-1.png" width="672" /></p>
+</div>
+<div id="what-are-gams-good-for" class="section level2" number="12.2">
+<h2><span class="header-section-number">12.2</span> What are GAMs good for?</h2>
+<p>As mentioned above, GAMs are just smoothers. They approximate a smooth relationship in the data without any knowledge or assumptions about a generative process behind it. As such they have at least two clear usage cases: an exploratory data analysis and generating predictions. In the former case, the shape of the smoothed line might hint at the underlying mechanisms and facilitate development of a causal model. In the latter case, as long as we stick to interpolation, we can use smoothed line to predict unobserved values for future use.</p>
+<p>But what about causal inference? Can GAMs be useful for in this case? Yes, they can play a useful and obvious role. But to make this “obvious” obvious, we must take a detour and talk about random factors.</p>
+</div>
+<div id="covariates-random-factors" class="section level2" number="12.3">
+<h2><span class="header-section-number">12.3</span> Covariates / random factors</h2>
+<p>Imagine that we have data on ice-cream consumption and, among other things, we measured respondents’ eye color. What you find is that people with different eye color tend to consume different amount of ice-cream (on average). Why? It is a made-up example, so I do not know. But it could be genetic, same group of genes being responsible for eye color and ice-cream craving. Or it could be something else. Point is, we do not have a good (or any) causal model of a generative process that would link these two variables. Because of that we are not really interested in this link but we also cannot ignore it. Any systematic relationship that we ignore will we leave unexplained variance that, it turn, will make it harder for us to see a causal effect for predictors that we are interested in. What do we do? We include eye color either as a covariate (fixed effect) or a random effect. For frequentist models, the difference is whether intercept for each group are estimated independently (the former, flat priors, no shrinkage) or by pooling information across groups (the latter, produces shrinkage). For Bayesian models, the difference is between fixed (covariates) and adaptative (random effect) priors. Still, the idea is to stress that we have no idea why this particular variable is correlated with the outcome and that we have no causal generative model.</p>
+</div>
+<div id="gams-as-continuous-random-factors" class="section level2" number="12.4">
+<h2><span class="header-section-number">12.4</span> GAMs as continuous random factors</h2>
+<p>Let us get back to ice-cream consumption as a function of age. It is easy to that we are in the same situation as with eye color: We have no idea about the generative process but the dependence is strong and should not be ignored. Thus, we must include age in the bigger model, even if we do not care <em>how</em> the age causes ice-cream consumption. But how can we do it? The relationship is not linear or even monotonic, so we cannot use age a linear covariate. And, unlike categorical data for eye color, the data is continuous and we do not have well-defined few levels to estimate values for (unless we introduce some artificial discrete levels). Plus, the latter approach would actually <em>ignore</em> the dependence, because will ignore the fact that nearby levels should be more similar than more distance ones. So, what do we do?</p>
+<p>It is GAMs to the rescue! By pooling information from nearby data samples, GAMs produce a smooth estimate for each age that can be used in the model. The smooth estimate is, effectively, a continuous random effect! Thus, you should use GAMs whenever you have a <em>continuous</em> variable that is correlated with an outcome, you have no idea about the underlying causal link but the relationship is simple and monotonic enough.</p>
 
+</div>
 </div>
 <div class="footnotes">
 <hr />
-<ol start="22">
-<li id="fn22"><p>As Hook’s law is a first-order linear approximation, this metaphor works fully only if we assume L1 distance, i.e., that error increases / probability decreases linearly with distance. Still you could imagine a better rubber band whose force will be proportional to the squared (L2) distance, as for the normal likelihood.<a href="incorporating-measurement-error-a-rubber-band-metaphor.html#fnref22" class="footnote-back">↩︎</a></p></li>
+<ol start="23">
+<li id="fn23"><p>You can find them all in a <a href="https://www.routledge.com/Generalized-Additive-Models-An-Introduction-with-R-Second-Edition/Wood/p/book/9781498728331">book</a> by Simon N. Wood.<a href="generalized-additive-models-as-continuous-random-effects.html#fnref23" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>
@@ -266,8 +284,8 @@ Within this metaphor, measurement error is incorporated as additional inferred v
           </div>
         </div>
       </div>
-<a href="parameters-combining-information-from-an-individual-with-population.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="generalized-additive-models-as-continuous-random-effects.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="incorporating-measurement-error-a-rubber-band-metaphor.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="flat-priors-the-strings-attached.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
