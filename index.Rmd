@@ -1,5 +1,5 @@
 --- 
-title: "Notes on and Solutions for Statistical Rethinking"
+title: "Notes on Statistics"
 author: "Alexander Pastukhov"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
@@ -7,9 +7,11 @@ documentclass: book
 bibliography: [book.bib]
 biblio-style: apalike
 link-citations: yes
-description: "Notes and exercise solutions for Statistical Rethinking book."
+description: "Notes on Statistics"
 ---
 
 # Precis
 
-This is a collection of notes on statistics that attempt to provide further details and intuition for some topics, such as loss functions, information theory, information criteria, MCMC algorithms, etc. This material is **free to use** and is licensed under the [Creative Commons Attribution-NonCommercial-NoDerivatives V4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+This is a collection of notes on statistics that attempt to provide further details and intuition for some topics, such as loss functions, information theory, information criteria, MCMC algorithms, etc. 
+
+This material is **free to use** and is licensed under the [Creative Commons Attribution-NonCommercial-NoDerivatives V4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).
