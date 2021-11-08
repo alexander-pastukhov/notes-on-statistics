@@ -1,408 +1,192 @@
 <!DOCTYPE html>
-<html lang="" xml:lang="">
+<html lang="en">
 <head>
-
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 3 Directed Acyclic Graphs and Causal Reasoning | Notes on and Solutions for Statistical Rethinking</title>
-  <meta name="description" content="Notes and exercise solutions for Statistical Rethinking book." />
-  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
-
-  <meta property="og:title" content="Chapter 3 Directed Acyclic Graphs and Causal Reasoning | Notes on and Solutions for Statistical Rethinking" />
-  <meta property="og:type" content="book" />
-  
-  
-  <meta property="og:description" content="Notes and exercise solutions for Statistical Rethinking book." />
-  
-
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 3 Directed Acyclic Graphs and Causal Reasoning | Notes on and Solutions for Statistical Rethinking" />
-  
-  <meta name="twitter:description" content="Notes and exercise solutions for Statistical Rethinking book." />
-  
-
-<meta name="author" content="Alexander Pastukhov" />
-
-
-<meta name="date" content="2021-10-04" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  
-  
-<link rel="prev" href="loss-functions.html"/>
-<link rel="next" href="collider-bias.html"/>
-<script src="libs/header-attrs-2.10/header-attrs.js"></script>
-<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
-<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
-
-
-
-
-
-
-
-
-
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
-
-
-<style type="text/css">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-</style>
-
-
-<link rel="stylesheet" href="style.css" type="text/css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 3 Directed Acyclic Graphs and Causal Reasoning | Notes on Statistics</title>
+<meta name="author" content="Alexander Pastukhov">
+<meta name="description" content="3.1 Peering into a black box To better understand the relationship between data and statistical analysis on the one hand and DAGs (directed acyclic graphs) on the other hand, I came up with an...">
+<meta name="generator" content="bookdown 0.23 with bs4_book()">
+<meta property="og:title" content="Chapter 3 Directed Acyclic Graphs and Causal Reasoning | Notes on Statistics">
+<meta property="og:type" content="book">
+<meta property="og:description" content="3.1 Peering into a black box To better understand the relationship between data and statistical analysis on the one hand and DAGs (directed acyclic graphs) on the other hand, I came up with an...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 3 Directed Acyclic Graphs and Causal Reasoning | Notes on Statistics">
+<meta name="twitter:description" content="3.1 Peering into a black box To better understand the relationship between data and statistical analysis on the one hand and DAGs (directed acyclic graphs) on the other hand, I came up with an...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.10/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.2.5.1/tabs.js"></script><script src="libs/bs3compat-0.2.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><link rel="stylesheet" href="bs4_style.css%20-%20style.css">
 </head>
+<body data-spy="scroll" data-target="#toc">
 
-<body>
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
 
-
-
-  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
-
-    <div class="book-summary">
-      <nav role="navigation">
-
-<ul class="summary">
-<li><a href="./">Notes on Statistical Rethinking</a></li>
-
-<li class="divider"></li>
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Precis</a></li>
-<li class="chapter" data-level="2" data-path="loss-functions.html"><a href="loss-functions.html"><i class="fa fa-check"></i><b>2</b> Loss functions</a>
-<ul>
-<li class="chapter" data-level="2.1" data-path="loss-functions.html"><a href="loss-functions.html#loss-function-the-concept"><i class="fa fa-check"></i><b>2.1</b> Loss function, the concept</a></li>
-<li class="chapter" data-level="2.2" data-path="loss-functions.html"><a href="loss-functions.html#l0-mode"><i class="fa fa-check"></i><b>2.2</b> L0 (mode)</a></li>
-<li class="chapter" data-level="2.3" data-path="loss-functions.html"><a href="loss-functions.html#l1-median"><i class="fa fa-check"></i><b>2.3</b> L1 (median)</a></li>
-<li class="chapter" data-level="2.4" data-path="loss-functions.html"><a href="loss-functions.html#l2-mean"><i class="fa fa-check"></i><b>2.4</b> L2 (mean)</a></li>
-<li class="chapter" data-level="2.5" data-path="loss-functions.html"><a href="loss-functions.html#l1-median-vs.-l2-mean"><i class="fa fa-check"></i><b>2.5</b> L1 (median) vs. L2 (mean)</a></li>
-<li class="chapter" data-level="2.6" data-path="loss-functions.html"><a href="loss-functions.html#choosing-a-likelihood"><i class="fa fa-check"></i><b>2.6</b> Choosing a likelihood</a></li>
-<li class="chapter" data-level="2.7" data-path="loss-functions.html"><a href="loss-functions.html#gaussian-in-frenquentist-versus-bayesian-statistics"><i class="fa fa-check"></i><b>2.7</b> Gaussian in frenquentist versus Bayesian statistics</a></li>
-</ul></li>
-<li class="chapter" data-level="3" data-path="directed-acyclic-graphs-and-causal-reasoning.html"><a href="directed-acyclic-graphs-and-causal-reasoning.html"><i class="fa fa-check"></i><b>3</b> Directed Acyclic Graphs and Causal Reasoning</a>
-<ul>
-<li class="chapter" data-level="3.1" data-path="directed-acyclic-graphs-and-causal-reasoning.html"><a href="directed-acyclic-graphs-and-causal-reasoning.html#peering-into-a-black-box"><i class="fa fa-check"></i><b>3.1</b> Peering into a black box</a></li>
-<li class="chapter" data-level="3.2" data-path="directed-acyclic-graphs-and-causal-reasoning.html"><a href="directed-acyclic-graphs-and-causal-reasoning.html#turning-unconditional-dependence-into-conditional-independence"><i class="fa fa-check"></i><b>3.2</b> Turning unconditional dependence into conditional independence</a></li>
-</ul></li>
-<li class="chapter" data-level="4" data-path="collider-bias.html"><a href="collider-bias.html"><i class="fa fa-check"></i><b>4</b> Collider bias</a>
-<ul>
-<li class="chapter" data-level="4.1" data-path="collider-bias.html"><a href="collider-bias.html#multicollinearity"><i class="fa fa-check"></i><b>4.1</b> Multicollinearity</a></li>
-<li class="chapter" data-level="4.2" data-path="collider-bias.html"><a href="collider-bias.html#back-to-spurious-association"><i class="fa fa-check"></i><b>4.2</b> Back to spurious association</a></li>
-<li class="chapter" data-level="4.3" data-path="collider-bias.html"><a href="collider-bias.html#chain-dag"><i class="fa fa-check"></i><b>4.3</b> Chain DAG</a></li>
-<li class="chapter" data-level="4.4" data-path="collider-bias.html"><a href="collider-bias.html#take-home-message"><i class="fa fa-check"></i><b>4.4</b> Take-home message</a></li>
-</ul></li>
-<li class="chapter" data-level="5" data-path="the-haunted-dag.html"><a href="the-haunted-dag.html"><i class="fa fa-check"></i><b>5</b> The haunted DAG</a></li>
-<li class="chapter" data-level="6" data-path="information-criteria.html"><a href="information-criteria.html"><i class="fa fa-check"></i><b>6</b> Information Criteria</a>
-<ul>
-<li class="chapter" data-level="6.1" data-path="information-criteria.html"><a href="information-criteria.html#deviance"><i class="fa fa-check"></i><b>6.1</b> Deviance</a></li>
-<li class="chapter" data-level="6.2" data-path="information-criteria.html"><a href="information-criteria.html#general-idea-information-criteria-as-miles-per-gallon"><i class="fa fa-check"></i><b>6.2</b> General idea: information criteria as miles-per-gallon</a></li>
-<li class="chapter" data-level="6.3" data-path="information-criteria.html"><a href="information-criteria.html#akaike-information-criterion-aic"><i class="fa fa-check"></i><b>6.3</b> Akaike Information Criterion (AIC)</a></li>
-<li class="chapter" data-level="6.4" data-path="information-criteria.html"><a href="information-criteria.html#bayesian-information-criterion-bic"><i class="fa fa-check"></i><b>6.4</b> Bayesian information criterion (BIC)</a></li>
-<li class="chapter" data-level="6.5" data-path="information-criteria.html"><a href="information-criteria.html#problem-of-aic-and-bic-one-size-may-not-fit-all"><i class="fa fa-check"></i><b>6.5</b> Problem of AIC and BIC: one size may not fit all</a></li>
-<li class="chapter" data-level="6.6" data-path="information-criteria.html"><a href="information-criteria.html#musical-instruments-metaphor"><i class="fa fa-check"></i><b>6.6</b> Musical instruments metaphor</a></li>
-<li class="chapter" data-level="6.7" data-path="information-criteria.html"><a href="information-criteria.html#deviance-information-criterion-dic-and-widely-applicable-information-criterion-waic"><i class="fa fa-check"></i><b>6.7</b> Deviance information criterion (DIC) and widely-applicable information criterion (WAIC)</a></li>
-<li class="chapter" data-level="6.8" data-path="information-criteria.html"><a href="information-criteria.html#importance-sampling"><i class="fa fa-check"></i><b>6.8</b> Importance sampling</a></li>
-<li class="chapter" data-level="6.9" data-path="information-criteria.html"><a href="information-criteria.html#pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo"><i class="fa fa-check"></i><b>6.9</b> Pareto-smoothed importance sampling / leave-one-out cross-validation (PSIS/LOO)</a></li>
-<li class="chapter" data-level="6.10" data-path="information-criteria.html"><a href="information-criteria.html#bayes-factor"><i class="fa fa-check"></i><b>6.10</b> Bayes Factor</a></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html"><i class="fa fa-check"></i><b>7</b> Bayesian versus Frequentist Statistics</a>
-<ul>
-<li class="chapter" data-level="7.1" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#choice-of-likelihood-both"><i class="fa fa-check"></i><b>7.1</b> Choice of likelihood (both)</a></li>
-<li class="chapter" data-level="7.2" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#linear-model-both"><i class="fa fa-check"></i><b>7.2</b> Linear model (both)</a></li>
-<li class="chapter" data-level="7.3" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#priors-optional-for-bayesian"><i class="fa fa-check"></i><b>7.3</b> Priors (optional for Bayesian)</a></li>
-<li class="chapter" data-level="7.4" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#maximum-likelihood-estimate-both"><i class="fa fa-check"></i><b>7.4</b> Maximum-likelihood estimate (both)</a></li>
-<li class="chapter" data-level="7.5" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#uncertainty-about-estimates-different-but-comparable"><i class="fa fa-check"></i><b>7.5</b> Uncertainty about estimates (different but comparable)</a></li>
-<li class="chapter" data-level="7.6" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#model-comparison-via-information-criteria-both"><i class="fa fa-check"></i><b>7.6</b> Model comparison via information criteria (both)</a></li>
-<li class="chapter" data-level="7.7" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#generating-predictions-both"><i class="fa fa-check"></i><b>7.7</b> Generating predictions (both)</a></li>
-<li class="chapter" data-level="7.8" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#conclusions"><i class="fa fa-check"></i><b>7.8</b> Conclusions</a></li>
-<li class="chapter" data-level="7.9" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#take-home-message-1"><i class="fa fa-check"></i><b>7.9</b> Take home message</a></li>
-</ul></li>
-<li class="chapter" data-level="8" data-path="mixtures.html"><a href="mixtures.html"><i class="fa fa-check"></i><b>8</b> Mixtures</a>
-<ul>
-<li class="chapter" data-level="8.1" data-path="mixtures.html"><a href="mixtures.html#beta-binomial"><i class="fa fa-check"></i><b>8.1</b> Beta Binomial</a></li>
-<li class="chapter" data-level="8.2" data-path="mixtures.html"><a href="mixtures.html#negative-binomial-a.k.a.-gamma-poisson"><i class="fa fa-check"></i><b>8.2</b> Negative binomial, a.k.a. Gamma Poisson</a></li>
-<li class="chapter" data-level="8.3" data-path="mixtures.html"><a href="mixtures.html#ordered-categorical"><i class="fa fa-check"></i><b>8.3</b> Ordered categorical</a></li>
-</ul></li>
-<li class="chapter" data-level="9" data-path="instrumental-variables.html"><a href="instrumental-variables.html"><i class="fa fa-check"></i><b>9</b> Instrumental Variables</a>
-<ul>
-<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#disclaimer"><i class="fa fa-check"></i>Disclaimer</a></li>
-<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#can-we-estimate-an-effect-of-military-experience-on-wages"><i class="fa fa-check"></i>Can we estimate an effect of military experience on wages</a></li>
-<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#draft-as-an-instrumental-variable"><i class="fa fa-check"></i>Draft as an instrumental variable</a></li>
-<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#two-stage-least-squares"><i class="fa fa-check"></i>Two-stage least squares</a></li>
-<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#covarying-residuals"><i class="fa fa-check"></i>Covarying residuals</a></li>
-</ul></li>
-<li class="chapter" data-level="10" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html"><i class="fa fa-check"></i><b>10</b> Parameters: combining information from an individual with population</a>
-<ul>
-<li class="chapter" data-level="10.1" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#everyone-is-the-same-single-parameter"><i class="fa fa-check"></i><b>10.1</b> Everyone is the same (single parameter)</a></li>
-<li class="chapter" data-level="10.2" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#everyone-is-unique-independent-parameters"><i class="fa fa-check"></i><b>10.2</b> Everyone is unique (independent parameters)</a></li>
-<li class="chapter" data-level="10.3" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-different-but-belong-to-a-population-pooled-parameters"><i class="fa fa-check"></i><b>10.3</b> People are different but belong to a population (pooled parameters)</a></li>
-<li class="chapter" data-level="10.4" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-different-but-belong-to-a-group-within-a-population-multilevel-clusters-of-pooled-parameters"><i class="fa fa-check"></i><b>10.4</b> People are different but belong to a group within a population (multilevel clusters of pooled parameters)</a></li>
-<li class="chapter" data-level="10.5" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-similar-to-some-but-different-to-others-gaussian-process"><i class="fa fa-check"></i><b>10.5</b> People are similar to some but different to others (Gaussian process)</a></li>
-<li class="chapter" data-level="10.6" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-different-but-belong-to-a-population-in-which-parameters-are-correlated-correlated-pooled-parameters"><i class="fa fa-check"></i><b>10.6</b> People are different but belong to a population in which parameters are correlated (correlated pooled parameters)</a></li>
-</ul></li>
-<li class="chapter" data-level="11" data-path="incorporating-measurement-error-a-rubber-band-metaphor.html"><a href="incorporating-measurement-error-a-rubber-band-metaphor.html"><i class="fa fa-check"></i><b>11</b> Incorporating measurement error: a rubber band metaphor</a></li>
-<li class="chapter" data-level="12" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html"><i class="fa fa-check"></i><b>12</b> Generalized Additive Models as continuous random effects</a>
-<ul>
-<li class="chapter" data-level="12.1" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html#generalized-additive-models-an-über-brief-introduction"><i class="fa fa-check"></i><b>12.1</b> Generalized Additive Models: An Über-brief Introduction</a></li>
-<li class="chapter" data-level="12.2" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html#what-are-gams-good-for"><i class="fa fa-check"></i><b>12.2</b> What are GAMs good for?</a></li>
-<li class="chapter" data-level="12.3" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html#covariates-random-factors"><i class="fa fa-check"></i><b>12.3</b> Covariates / random factors</a></li>
-<li class="chapter" data-level="12.4" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html#gams-as-continuous-random-factors"><i class="fa fa-check"></i><b>12.4</b> GAMs as continuous random factors</a></li>
-</ul></li>
-<li class="chapter" data-level="13" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html"><i class="fa fa-check"></i><b>13</b> Flat priors: the strings attached</a>
-<ul>
-<li class="chapter" data-level="13.1" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#flat-priors-are-silly"><i class="fa fa-check"></i><b>13.1</b> Flat priors are silly</a></li>
-<li class="chapter" data-level="13.2" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#flat-priors-make-you-pretend-that-you-are-naïve"><i class="fa fa-check"></i><b>13.2</b> Flat priors make you pretend that you are naïve</a></li>
-<li class="chapter" data-level="13.3" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#flat-priors-tend-to-overfit"><i class="fa fa-check"></i><b>13.3</b> Flat priors tend to overfit</a></li>
-<li class="chapter" data-level="13.4" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#flat-priors-are-an-exception"><i class="fa fa-check"></i><b>13.4</b> Flat priors are an exception</a></li>
-<li class="chapter" data-level="13.5" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#the-irony-of-power-analysis"><i class="fa fa-check"></i><b>13.5</b> The irony of power analysis</a></li>
-<li class="chapter" data-level="13.6" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#conclusions-1"><i class="fa fa-check"></i><b>13.6</b> Conclusions</a></li>
-</ul></li>
-<li class="divider"></li>
-<li><a href="https://alexander-pastukhov.github.io/">Alexander (Sasha) Pastukhov</li>
-
-</ul>
-
-      </nav>
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Notes on Statistics</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
     </div>
 
-    <div class="book-body">
-      <div class="body-inner">
-        <div class="book-header" role="navigation">
-          <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Notes on and Solutions for Statistical Rethinking</a>
-          </h1>
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> Precis</a></li>
+<li><a class="" href="loss-functions.html"><span class="header-section-number">2</span> Loss functions</a></li>
+<li><a class="active" href="directed-acyclic-graphs-and-causal-reasoning.html"><span class="header-section-number">3</span> Directed Acyclic Graphs and Causal Reasoning</a></li>
+<li><a class="" href="collider-bias.html"><span class="header-section-number">4</span> Collider bias</a></li>
+<li><a class="" href="the-haunted-dag.html"><span class="header-section-number">5</span> The haunted DAG</a></li>
+<li><a class="" href="information-criteria.html"><span class="header-section-number">6</span> Information Criteria</a></li>
+<li><a class="" href="mixtures.html"><span class="header-section-number">7</span> Mixtures</a></li>
+<li><a class="" href="instrumental-variables.html"><span class="header-section-number">8</span> Instrumental Variables</a></li>
+<li><a class="" href="parameters-combining-information-from-an-individual-with-population.html"><span class="header-section-number">9</span> Parameters: combining information from an individual with population</a></li>
+<li><a class="" href="incorporating-measurement-error-a-rubber-band-metaphor.html"><span class="header-section-number">10</span> Incorporating measurement error: a rubber band metaphor</a></li>
+<li><a class="" href="generalized-additive-models-as-continuous-random-effects.html"><span class="header-section-number">11</span> Generalized Additive Models as continuous random effects</a></li>
+<li><a class="" href="flat-priors-the-strings-attached.html"><span class="header-section-number">12</span> Flat priors: the strings attached</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/alexander-pastukhov/notes-on-statistics">View book source <i class="fab fa-github"></i></a></p>
         </div>
-
-        <div class="page-wrapper" tabindex="-1" role="main">
-          <div class="page-inner">
-
-            <section class="normal" id="section-">
-<div id="directed-acyclic-graphs-and-causal-reasoning" class="section level1" number="3">
-<h1><span class="header-section-number">Chapter 3</span> Directed Acyclic Graphs and Causal Reasoning</h1>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="directed-acyclic-graphs-and-causal-reasoning" class="section level1" number="3">
+<h1>
+<span class="header-section-number">3</span> Directed Acyclic Graphs and Causal Reasoning<a class="anchor" aria-label="anchor" href="#directed-acyclic-graphs-and-causal-reasoning"><i class="fas fa-link"></i></a>
+</h1>
 <div id="peering-into-a-black-box" class="section level2" number="3.1">
-<h2><span class="header-section-number">3.1</span> Peering into a black box</h2>
-<p>To better understand the relationship between data and statistical analysis on the one hand and DAGs (directed acyclic graphs) on the other hand, I came up with an electric engineering metaphor<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>. Imagine that you have an electric device that you cannot take apart. However, there are certain points where you can connect your multimeter and check whether current flows between these two points. You also have a schematics for the device but you have no idea whether it is accurate. The names of the connector nodes match but <em>the connectivity</em> between them is anybody’s guess. So, what do you do? You look at the schematics and identify two nodes where current should <em>definitely flow</em> and you measure whether that is the case. Do you have signal? Good, that means that <em>at least with respect to the connectivity between these two nodes</em> you schematics is not completely wrong. No signal? Sorry, your schematics is no good, find a different one or try making one yourself. Conversely, you can identify two nodes, so that <em>no current</em> should flow between them and measure it <em>empirically</em>. No current? Good! Current? Bad, your schematics is wrong.</p>
+<h2>
+<span class="header-section-number">3.1</span> Peering into a black box<a class="anchor" aria-label="anchor" href="#peering-into-a-black-box"><i class="fas fa-link"></i></a>
+</h2>
+<p>To better understand the relationship between data and statistical analysis on the one hand and DAGs (directed acyclic graphs) on the other hand, I came up with an electric engineering metaphor<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Dear electric engineers, yes, I know that’s not quite how it works but it is still a good metaphor!&lt;/p&gt;"><sup>3</sup></a>. Imagine that you have an electric device that you cannot take apart. However, there are certain points where you can connect your multimeter and check whether current flows between these two points. You also have a schematics for the device but you have no idea whether it is accurate. The names of the connector nodes match but <em>the connectivity</em> between them is anybody’s guess. So, what do you do? You look at the schematics and identify two nodes where current should <em>definitely flow</em> and you measure whether that is the case. Do you have signal? Good, that means that <em>at least with respect to the connectivity between these two nodes</em> you schematics is not completely wrong. No signal? Sorry, your schematics is no good, find a different one or try making one yourself. Conversely, you can identify two nodes, so that <em>no current</em> should flow between them and measure it <em>empirically</em>. No current? Good! Current? Bad, your schematics is wrong.</p>
 <p>The relationship between the device and the schematics is that of the large (device) and small (schematics) world. Your job is to iteratively adjust the latter, so that it matches the former. You need to keep prodding the black box until predictions from your schematics start matching the actual readings. Only then you can say that you understand how device works and you can make predictions about what it will do under different conditions. Although testing based on schematics can be automated, generating such schematics is a creating process. It depends on our knowledge about devices of that kind and about individual exposed nodes.</p>
-<p>Hopefully, you can see how it maps on our observational or experimental data (large world, readings from the device) and DAGs (small world, presumed schematics). As a scientist, you <em>guess</em><a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a> the causal relationships between individual variables and you draw a schematics for that (a DAG). Using this DAG, you identify pairs of variables that must be dependent or independent <em>assuming your DAG is correct</em> and check the data on whether this is indeed the case. It is? Good, your DAG is not (entirely) wrong! They are not? Bad news, their causal relationship is different from what you (or others in prior work) came up with. You need to modify DAG or draw a completely different one, just like a engineer must modify the schematics.</p>
+<p>Hopefully, you can see how it maps on our observational or experimental data (large world, readings from the device) and DAGs (small world, presumed schematics). As a scientist, you <em>guess</em><a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;If you feel that science is not about guessing, you are wrong and I have Richard Feynman on my side! You always start by guessing a particular law or rule and then use empirical data to check whether your guess was correct. If you made an &lt;em&gt;educated&lt;/em&gt; guess, your chances of it being correct are higher, so your job is to study the field and prior work to make your guess as educated as possible. But, at the end, it is still a guess and it can be wrong. Good news, at least in my experience, is that guesses that turn out to be spectacularly wrong are the most informative ones, as they reveal something unexpected and, thus, hitherto unknown about the process.&lt;/p&gt;"><sup>4</sup></a> the causal relationships between individual variables and you draw a schematics for that (a DAG). Using this DAG, you identify pairs of variables that must be dependent or independent <em>assuming your DAG is correct</em> and check the data on whether this is indeed the case. It is? Good, your DAG is not (entirely) wrong! They are not? Bad news, their causal relationship is different from what you (or others in prior work) came up with. You need to modify DAG or draw a completely different one, just like a engineer must modify the schematics.</p>
 <p>Note that this process is the opposite to that in a typical multivariate analysis approach using, say, ANOVA. In the latter case, you throw <em>everything</em> together, including some/all interactions between the terms, and try figuring out causal relationship between individual independent and the dependent variable based on magnitude and significance of individual terms. So, <em>first</em> you run the statistical analysis and <em>then</em> you make your inferences about causal relationships. In causal reasoning using DAG, you <em>first</em> formulate causal relationships and <em>then</em> you use statistical analysis to check whether these relationship are correct. The second approach is much more powerful, because you can run ANOVA only once but you can formulate many DAGs that describe your data and test them iteratively, refining your understanding step-by-step. Moreover, ANOVA (or any other regression model like that) is about identifying relationships between invididual independent and the signle dependent variable (individual coefficients tell you how independent variables can be used to predict the dependent). DAG-based analysis allows you to predict and test relationship between pairs of <em>dependent</em> variables as well, decomposing your complex model into <em>testable</em> and <em>verifyable</em> chunks. It is a more involved and time-consuming approach but it gives you much deeper understanding of the process you are styding compared to “throw everything into ANOVA and hope it will magically figure it out.”</p>
 <p>Moreover, causal calculus via DAGs has another trick up its sleeve. You can use <em>conditional probabilities</em> (see below) to flip the relationship between variables. If two variables are independent, they may be dependent when conditioned on some third variable. Or vice versa, depedent variables can become <em>conditionally independent</em>. This means that your predictions about connectivity between pairs of variables can be both more specific (e.g., they are related via a third variable or they both independently cause that third variable) and more testable, as you now have two <em>opposite</em> predictions for the same pair of variables! You can check that current flows when it should (unconditional probability) and <em>does not flow</em> once you condition it on the third variable. Both tests match? DAG is not that bad! One or none match? Back to the drawing board!</p>
 </div>
 <div id="turning-unconditional-dependence-into-conditional-independence" class="section level2" number="3.2">
-<h2><span class="header-section-number">3.2</span> Turning unconditional dependence into conditional independence</h2>
+<h2>
+<span class="header-section-number">3.2</span> Turning unconditional dependence into conditional independence<a class="anchor" aria-label="anchor" href="#turning-unconditional-dependence-into-conditional-independence"><i class="fas fa-link"></i></a>
+</h2>
 <p>Below, you will see how multiple regression can show conditional independence of two variable in case of the fork DAG in divorce data. However, there is another more general way to understand this concept it terms of conditional probabilities <span class="math inline">\(Pr(M|A)\)</span> and <span class="math inline">\(Pr(D|A)\)</span>. For this, it helps to understand condition probabilities as <em>filtering</em> operation. When we compute conditional probability for a <em>specific</em> value of <span class="math inline">\(A\)</span>, this means that we slice the data, keeping only whose values of <span class="math inline">\(M\)</span> and <span class="math inline">\(D\)</span> that correspond to that chosen level of <span class="math inline">\(A\)</span>. It is easier to understand, if we visualize that conditional-probability-as-filtering in synthetic data. For illustration purposes, I will synthesize divorce data, keeping the relationships but I will space marriage age linearly and generate the data so that there are 20 data points for each age (makes it easier to see and understand).</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">84321169</span>)</span>
-<span id="cb1-2"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-2" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">180</span></span>
-<span id="cb1-3"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-3" aria-hidden="true" tabindex="-1"></a>sigma_noise <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
-<span id="cb1-4"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># we repeat each value of age 10 times to make filtering operation easier to see</span></span>
-<span id="cb1-5"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-5" aria-hidden="true" tabindex="-1"></a>sim_waffles <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">MedianAgeMarriage =</span> <span class="fu">rep</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="at">length.out=</span><span class="dv">9</span>), <span class="dv">20</span>), </span>
-<span id="cb1-6"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">Divorce =</span> <span class="fu">rnorm</span>(N, MedianAgeMarriage, sigma_noise),</span>
-<span id="cb1-7"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">Marriage =</span> <span class="sc">-</span><span class="fu">rnorm</span>(N, MedianAgeMarriage, sigma_noise))</span>
-<span id="cb1-8"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-9" aria-hidden="true" tabindex="-1"></a>MD_plot <span class="ot">&lt;-</span> </span>
-<span id="cb1-10"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles, <span class="fu">aes</span>(<span class="at">x=</span>Marriage, <span class="at">y=</span>Divorce)) <span class="sc">+</span> </span>
-<span id="cb1-11"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">&quot;lm&quot;</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span> </span>
-<span id="cb1-12"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb1-13"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Marriage rate&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb1-14"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">&quot;Divorce rate&quot;</span>)</span>
-<span id="cb1-15"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-15" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-16"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-16" aria-hidden="true" tabindex="-1"></a>AD_plot <span class="ot">&lt;-</span> </span>
-<span id="cb1-17"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles, <span class="fu">aes</span>(<span class="at">x=</span>MedianAgeMarriage, <span class="at">y=</span>Divorce)) <span class="sc">+</span> </span>
-<span id="cb1-18"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">&quot;lm&quot;</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span> </span>
-<span id="cb1-19"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb1-20"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Median age marriage&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb1-21"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">&quot;Divorce rate&quot;</span>)</span>
-<span id="cb1-22"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-22" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-23"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-23" aria-hidden="true" tabindex="-1"></a>AM_plot <span class="ot">&lt;-</span> </span>
-<span id="cb1-24"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles, <span class="fu">aes</span>(<span class="at">x=</span>MedianAgeMarriage, <span class="at">y=</span>Marriage)) <span class="sc">+</span> </span>
-<span id="cb1-25"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">&quot;lm&quot;</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span> </span>
-<span id="cb1-26"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb1-27"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Median age marriage&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb1-28"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">&quot;Marriage rate&quot;</span>)</span>
-<span id="cb1-29"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb1-30" aria-hidden="true" tabindex="-1"></a>MD_plot <span class="sc">|</span> AD_plot <span class="sc">|</span> AM_plot</span></code></pre></div>
-<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
-<p>As you can see, all variables being dependent on each other, as in case of the original data. However, let us pick an arbitrary value, say <span class="math inline">\(A=1\)</span><a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> and see which dots on the left plot will be selected via <em>filtering</em> on that value.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-1" aria-hidden="true" tabindex="-1"></a>MD_plot <span class="ot">&lt;-</span> </span>
-<span id="cb2-2"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles, <span class="fu">aes</span>(<span class="at">x=</span>Marriage, <span class="at">y=</span>Divorce)) <span class="sc">+</span> </span>
-<span id="cb2-3"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">&quot;lm&quot;</span>, <span class="at">formula=</span>y<span class="sc">~</span>x, <span class="at">alpha=</span><span class="fl">0.1</span>) <span class="sc">+</span> </span>
-<span id="cb2-4"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">==</span> <span class="dv">1</span>), <span class="at">color=</span><span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
-<span id="cb2-5"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">!=</span> <span class="dv">1</span>), <span class="at">alpha=</span><span class="fl">0.15</span>) <span class="sc">+</span> </span>
-<span id="cb2-6"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Marriage rate&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb2-7"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">&quot;Divorce rate&quot;</span>) </span>
-<span id="cb2-8"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-8" aria-hidden="true" tabindex="-1"></a>AD_plot <span class="ot">&lt;-</span> </span>
-<span id="cb2-9"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles, <span class="fu">aes</span>(<span class="at">x=</span>MedianAgeMarriage, <span class="at">y=</span>Divorce)) <span class="sc">+</span> </span>
-<span id="cb2-10"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">&quot;lm&quot;</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span> </span>
-<span id="cb2-11"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">==</span> <span class="dv">1</span>), <span class="at">color=</span><span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
-<span id="cb2-12"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">!=</span> <span class="dv">1</span>), <span class="at">alpha=</span><span class="fl">0.15</span>) <span class="sc">+</span> </span>
-<span id="cb2-13"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Median age marriage&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb2-14"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">&quot;Divorce rate&quot;</span>)</span>
-<span id="cb2-15"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-15" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-16"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-16" aria-hidden="true" tabindex="-1"></a>AM_plot <span class="ot">&lt;-</span></span>
-<span id="cb2-17"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles, <span class="fu">aes</span>(<span class="at">x=</span>Marriage, <span class="at">y=</span>MedianAgeMarriage)) <span class="sc">+</span> </span>
-<span id="cb2-18"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">&quot;lm&quot;</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span> </span>
-<span id="cb2-19"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">==</span> <span class="dv">1</span>), <span class="at">color=</span><span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
-<span id="cb2-20"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">!=</span> <span class="dv">1</span>), <span class="at">alpha=</span><span class="fl">0.15</span>) <span class="sc">+</span> </span>
-<span id="cb2-21"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">&quot;Median age marriage&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb2-22"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Marriage rate&quot;</span>) </span>
-<span id="cb2-23"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-24" aria-hidden="true" tabindex="-1"></a>MD_A1_plot <span class="ot">&lt;-</span> </span>
-<span id="cb2-25"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">==</span> <span class="dv">1</span>), </span>
-<span id="cb2-26"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-26" aria-hidden="true" tabindex="-1"></a>         <span class="fu">aes</span>(<span class="at">x=</span>Marriage, <span class="at">y=</span>Divorce)) <span class="sc">+</span> </span>
-<span id="cb2-27"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">&quot;lm&quot;</span>, <span class="at">formula=</span>y<span class="sc">~</span>x, <span class="at">color=</span><span class="st">&quot;red&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb2-28"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color=</span><span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
-<span id="cb2-29"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Marriage rate&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb2-30"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">&quot;Divorce rate&quot;</span>) <span class="sc">+</span></span>
-<span id="cb2-31"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="st">&quot;Pr( |Mariage Age = 1)&quot;</span>)</span>
-<span id="cb2-32"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-33"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-33" aria-hidden="true" tabindex="-1"></a>(AD_plot <span class="sc">|</span> MD_plot) <span class="sc">/</span></span>
-<span id="cb2-34"><a href="directed-acyclic-graphs-and-causal-reasoning.html#cb2-34" aria-hidden="true" tabindex="-1"></a>(MD_A1_plot <span class="sc">|</span>AM_plot)</span></code></pre></div>
-<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-12-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">84321169</span><span class="op">)</span>
+<span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">180</span>
+<span class="va">sigma_noise</span> <span class="op">&lt;-</span> <span class="fl">0.5</span>
+<span class="co"># we repeat each value of age 10 times to make filtering operation easier to see</span>
+<span class="va">sim_waffles</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>MedianAgeMarriage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span>, length.out<span class="op">=</span><span class="fl">9</span><span class="op">)</span>, <span class="fl">20</span><span class="op">)</span>, 
+                      Divorce <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">MedianAgeMarriage</span>, <span class="va">sigma_noise</span><span class="op">)</span>,
+                      Marriage <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">MedianAgeMarriage</span>, <span class="va">sigma_noise</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">MD_plot</span> <span class="op">&lt;-</span> 
+  <span class="fu">ggplot</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">Marriage</span>, y<span class="op">=</span><span class="va">Divorce</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_smooth</span><span class="op">(</span>method<span class="op">=</span><span class="st">"lm"</span>, formula<span class="op">=</span><span class="va">y</span><span class="op">~</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">xlab</span><span class="op">(</span><span class="st">"Marriage rate"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">ylab</span><span class="op">(</span><span class="st">"Divorce rate"</span><span class="op">)</span>
+  
+<span class="va">AD_plot</span> <span class="op">&lt;-</span> 
+  <span class="fu">ggplot</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">MedianAgeMarriage</span>, y<span class="op">=</span><span class="va">Divorce</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_smooth</span><span class="op">(</span>method<span class="op">=</span><span class="st">"lm"</span>, formula<span class="op">=</span><span class="va">y</span><span class="op">~</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">xlab</span><span class="op">(</span><span class="st">"Median age marriage"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">ylab</span><span class="op">(</span><span class="st">"Divorce rate"</span><span class="op">)</span>
+  
+<span class="va">AM_plot</span> <span class="op">&lt;-</span> 
+  <span class="fu">ggplot</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">MedianAgeMarriage</span>, y<span class="op">=</span><span class="va">Marriage</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_smooth</span><span class="op">(</span>method<span class="op">=</span><span class="st">"lm"</span>, formula<span class="op">=</span><span class="va">y</span><span class="op">~</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">xlab</span><span class="op">(</span><span class="st">"Median age marriage"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">ylab</span><span class="op">(</span><span class="st">"Marriage rate"</span><span class="op">)</span>
+
+<span class="va">MD_plot</span> <span class="op">|</span> <span class="va">AD_plot</span> <span class="op">|</span> <span class="va">AM_plot</span></code></pre></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;"></div>
+<p>As you can see, all variables being dependent on each other, as in case of the original data. However, let us pick an arbitrary value, say <span class="math inline">\(A=1\)</span><a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;The data is “standardized,” therefore, age of 1 is one standard deviation away from the mean marriage rate.&lt;/p&gt;"><sup>5</sup></a> and see which dots on the left plot will be selected via <em>filtering</em> on that value.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">MD_plot</span> <span class="op">&lt;-</span> 
+  <span class="fu">ggplot</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">Marriage</span>, y<span class="op">=</span><span class="va">Divorce</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_smooth</span><span class="op">(</span>method<span class="op">=</span><span class="st">"lm"</span>, formula<span class="op">=</span><span class="va">y</span><span class="op">~</span><span class="va">x</span>, alpha<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_point</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">MedianAgeMarriage</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>, color<span class="op">=</span><span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu">geom_point</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">MedianAgeMarriage</span> <span class="op">!=</span> <span class="fl">1</span><span class="op">)</span>, alpha<span class="op">=</span><span class="fl">0.15</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">xlab</span><span class="op">(</span><span class="st">"Marriage rate"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">ylab</span><span class="op">(</span><span class="st">"Divorce rate"</span><span class="op">)</span> 
+<span class="va">AD_plot</span> <span class="op">&lt;-</span> 
+  <span class="fu">ggplot</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">MedianAgeMarriage</span>, y<span class="op">=</span><span class="va">Divorce</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_smooth</span><span class="op">(</span>method<span class="op">=</span><span class="st">"lm"</span>, formula<span class="op">=</span><span class="va">y</span><span class="op">~</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_point</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">MedianAgeMarriage</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>, color<span class="op">=</span><span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu">geom_point</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">MedianAgeMarriage</span> <span class="op">!=</span> <span class="fl">1</span><span class="op">)</span>, alpha<span class="op">=</span><span class="fl">0.15</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">xlab</span><span class="op">(</span><span class="st">"Median age marriage"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">ylab</span><span class="op">(</span><span class="st">"Divorce rate"</span><span class="op">)</span>
+  
+<span class="va">AM_plot</span> <span class="op">&lt;-</span>
+  <span class="fu">ggplot</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">Marriage</span>, y<span class="op">=</span><span class="va">MedianAgeMarriage</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_smooth</span><span class="op">(</span>method<span class="op">=</span><span class="st">"lm"</span>, formula<span class="op">=</span><span class="va">y</span><span class="op">~</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_point</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">MedianAgeMarriage</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>, color<span class="op">=</span><span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu">geom_point</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">MedianAgeMarriage</span> <span class="op">!=</span> <span class="fl">1</span><span class="op">)</span>, alpha<span class="op">=</span><span class="fl">0.15</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">ylab</span><span class="op">(</span><span class="st">"Median age marriage"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">xlab</span><span class="op">(</span><span class="st">"Marriage rate"</span><span class="op">)</span> 
+
+<span class="va">MD_A1_plot</span> <span class="op">&lt;-</span> 
+  <span class="fu">ggplot</span><span class="op">(</span>data<span class="op">=</span><span class="va">sim_waffles</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">MedianAgeMarriage</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>, 
+         <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">Marriage</span>, y<span class="op">=</span><span class="va">Divorce</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_smooth</span><span class="op">(</span>method<span class="op">=</span><span class="st">"lm"</span>, formula<span class="op">=</span><span class="va">y</span><span class="op">~</span><span class="va">x</span>, color<span class="op">=</span><span class="st">"red"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_point</span><span class="op">(</span>color<span class="op">=</span><span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu">xlab</span><span class="op">(</span><span class="st">"Marriage rate"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">ylab</span><span class="op">(</span><span class="st">"Divorce rate"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu">labs</span><span class="op">(</span>subtitle <span class="op">=</span> <span class="st">"Pr( |Mariage Age = 1)"</span><span class="op">)</span>
+
+<span class="op">(</span><span class="va">AD_plot</span> <span class="op">|</span> <span class="va">MD_plot</span><span class="op">)</span> <span class="op">/</span>
+<span class="op">(</span><span class="va">MD_A1_plot</span> <span class="op">|</span><span class="va">AM_plot</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-12-1.png" width="100%" style="display: block; margin: auto;"></div>
 <p>First, take at top-left and bottom-right plots that plot, correspondingly, divorce and marriage rate versus marriage age. Note that I’ve flipped axes on the bottom-right plot, so that marriage rate is always mapped on x-axis. The <em>red</em> dots in each plot correspond to divorce and marriage rates <em>given that</em> (filtered on) marriage age is 1. The same dots are marked in red in the top-right plot and are plotted separately at the bottom-right. As you can see, the two variables <em>conditional on A=1</em> are uncorrelated. Why? Because both were fully determined by marriage age and any variation (the spread of red dots vertically or horizontally in the top-left and bottom-right plots) was due to noise. Therefore, the plot on the bottom-left effectively plots noise in marriage rate versus noise in divorce rate and, by our synthetic data design, the noise in two variable was independent, hence, lack of correlation.</p>
-<p>This opportunity to turn dependence into independence by conditioning two variables on the third is at the heart of causal reasoning<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>. You draw a DAG and if it has a fork in it, you know that <em>given your educated guess about causal relationship is correct</em> (small world!), your data (large world!) should show dependence <em>and</em> conditional independence of the two variables (divorce and marriage rates). What if it does not? E.g., the two variables are always dependent or always independent, conditional or not? As we already discussed above, that just means that your educated guess was wrong and that relationship of the variables is different from how you thought it is. Thus, you need to go back to the drawing board, come up with another DAG, repeat the analysis and see if that new DAG is supported by data. If you have more variables, your DAGs will be more complex but the beauty of such causal reasoning is that you can concentrate on <em>parts</em> of it, picking three variables and seeing whether your guess about these three variables was correct. This way, you can tinker with your causal model part-by-part, instead of hoping that you got <em>everything</em> right on the very first attempt.</p>
+<p>This opportunity to turn dependence into independence by conditioning two variables on the third is at the heart of causal reasoning<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;As you will learn later, the opposite is also true, so you can turn independence into conditional dependence.&lt;/p&gt;"><sup>6</sup></a>. You draw a DAG and if it has a fork in it, you know that <em>given your educated guess about causal relationship is correct</em> (small world!), your data (large world!) should show dependence <em>and</em> conditional independence of the two variables (divorce and marriage rates). What if it does not? E.g., the two variables are always dependent or always independent, conditional or not? As we already discussed above, that just means that your educated guess was wrong and that relationship of the variables is different from how you thought it is. Thus, you need to go back to the drawing board, come up with another DAG, repeat the analysis and see if that new DAG is supported by data. If you have more variables, your DAGs will be more complex but the beauty of such causal reasoning is that you can concentrate on <em>parts</em> of it, picking three variables and seeing whether your guess about these three variables was correct. This way, you can tinker with your causal model part-by-part, instead of hoping that you got <em>everything</em> right on the very first attempt.</p>
 
 </div>
 </div>
-<div class="footnotes">
-<hr />
-<ol start="3">
-<li id="fn3"><p>Dear electric engineers, yes, I know that’s not quite how it works but it is still a good metaphor!<a href="directed-acyclic-graphs-and-causal-reasoning.html#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>If you feel that science is not about guessing, you are wrong and I have Richard Feynman on my side! You always start by guessing a particular law or rule and then use empirical data to check whether your guess was correct. If you made an <em>educated</em> guess, your chances of it being correct are higher, so your job is to study the field and prior work to make your guess as educated as possible. But, at the end, it is still a guess and it can be wrong. Good news, at least in my experience, is that guesses that turn out to be spectacularly wrong are the most informative ones, as they reveal something unexpected and, thus, hitherto unknown about the process.<a href="directed-acyclic-graphs-and-causal-reasoning.html#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>The data is “standardized,” therefore, age of 1 is one standard deviation away from the mean marriage rate.<a href="directed-acyclic-graphs-and-causal-reasoning.html#fnref5" class="footnote-back">↩︎</a></p></li>
-<li id="fn6"><p>As you will learn later, the opposite is also true, so you can turn independence into conditional dependence.<a href="directed-acyclic-graphs-and-causal-reasoning.html#fnref6" class="footnote-back">↩︎</a></p></li>
-</ol>
-</div>
-            </section>
 
-          </div>
-        </div>
-      </div>
-<a href="loss-functions.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="collider-bias.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
-    </div>
+  <div class="chapter-nav">
+<div class="prev"><a href="loss-functions.html"><span class="header-section-number">2</span> Loss functions</a></div>
+<div class="next"><a href="collider-bias.html"><span class="header-section-number">4</span> Collider bias</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#directed-acyclic-graphs-and-causal-reasoning"><span class="header-section-number">3</span> Directed Acyclic Graphs and Causal Reasoning</a></li>
+<li><a class="nav-link" href="#peering-into-a-black-box"><span class="header-section-number">3.1</span> Peering into a black box</a></li>
+<li><a class="nav-link" href="#turning-unconditional-dependence-into-conditional-independence"><span class="header-section-number">3.2</span> Turning unconditional dependence into conditional independence</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/alexander-pastukhov/notes-on-statistics/blob/master/02-dags.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/alexander-pastukhov/notes-on-statistics/edit/master/02-dags.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2021-11-08.</p>
   </div>
-<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
-<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
-<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
-<script>
-gitbook.require(["gitbook"], function(gitbook) {
-gitbook.start({
-"sharing": {
-"github": false,
-"facebook": true,
-"twitter": true,
-"linkedin": false,
-"weibo": false,
-"instapaper": false,
-"vk": false,
-"whatsapp": false,
-"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
-},
-"fontsettings": {
-"theme": "white",
-"family": "sans",
-"size": 2
-},
-"edit": {
-"link": null,
-"text": null
-},
-"history": {
-"link": null,
-"text": null
-},
-"view": {
-"link": null,
-"text": null
-},
-"download": ["notes-on-statistical-rethinking.pdf", "notes-on-statistical-rethinking.epub"],
-"search": {
-"engine": "lunr",
-"options": null
-},
-"toc": {
-"collapse": "section"
-}
-});
-});
-</script>
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
@@ -414,7 +198,22 @@ gitbook.start({
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
 </script>
 </body>
-
 </html>

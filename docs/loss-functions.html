@@ -1,294 +1,115 @@
 <!DOCTYPE html>
-<html lang="" xml:lang="">
+<html lang="en">
 <head>
-
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 2 Loss functions | Notes on and Solutions for Statistical Rethinking</title>
-  <meta name="description" content="Notes and exercise solutions for Statistical Rethinking book." />
-  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
-
-  <meta property="og:title" content="Chapter 2 Loss functions | Notes on and Solutions for Statistical Rethinking" />
-  <meta property="og:type" content="book" />
-  
-  
-  <meta property="og:description" content="Notes and exercise solutions for Statistical Rethinking book." />
-  
-
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 2 Loss functions | Notes on and Solutions for Statistical Rethinking" />
-  
-  <meta name="twitter:description" content="Notes and exercise solutions for Statistical Rethinking book." />
-  
-
-<meta name="author" content="Alexander Pastukhov" />
-
-
-<meta name="date" content="2021-10-04" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  
-  
-<link rel="prev" href="index.html"/>
-<link rel="next" href="directed-acyclic-graphs-and-causal-reasoning.html"/>
-<script src="libs/header-attrs-2.10/header-attrs.js"></script>
-<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
-<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
-
-
-
-
-
-
-
-
-
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
-
-
-<style type="text/css">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-</style>
-
-
-<link rel="stylesheet" href="style.css" type="text/css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 2 Loss functions | Notes on Statistics</title>
+<meta name="author" content="Alexander Pastukhov">
+<meta name="description" content="The purpose of this comment is to give you an intuition about loss functions, mentioned in chapter 3. In particular, I want you to understand why different loss functions (L0, L1, and L2)...">
+<meta name="generator" content="bookdown 0.23 with bs4_book()">
+<meta property="og:title" content="Chapter 2 Loss functions | Notes on Statistics">
+<meta property="og:type" content="book">
+<meta property="og:description" content="The purpose of this comment is to give you an intuition about loss functions, mentioned in chapter 3. In particular, I want you to understand why different loss functions (L0, L1, and L2)...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 2 Loss functions | Notes on Statistics">
+<meta name="twitter:description" content="The purpose of this comment is to give you an intuition about loss functions, mentioned in chapter 3. In particular, I want you to understand why different loss functions (L0, L1, and L2)...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.10/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.2.5.1/tabs.js"></script><script src="libs/bs3compat-0.2.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><link rel="stylesheet" href="bs4_style.css%20-%20style.css">
 </head>
+<body data-spy="scroll" data-target="#toc">
 
-<body>
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
 
-
-
-  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
-
-    <div class="book-summary">
-      <nav role="navigation">
-
-<ul class="summary">
-<li><a href="./">Notes on Statistical Rethinking</a></li>
-
-<li class="divider"></li>
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Precis</a></li>
-<li class="chapter" data-level="2" data-path="loss-functions.html"><a href="loss-functions.html"><i class="fa fa-check"></i><b>2</b> Loss functions</a>
-<ul>
-<li class="chapter" data-level="2.1" data-path="loss-functions.html"><a href="loss-functions.html#loss-function-the-concept"><i class="fa fa-check"></i><b>2.1</b> Loss function, the concept</a></li>
-<li class="chapter" data-level="2.2" data-path="loss-functions.html"><a href="loss-functions.html#l0-mode"><i class="fa fa-check"></i><b>2.2</b> L0 (mode)</a></li>
-<li class="chapter" data-level="2.3" data-path="loss-functions.html"><a href="loss-functions.html#l1-median"><i class="fa fa-check"></i><b>2.3</b> L1 (median)</a></li>
-<li class="chapter" data-level="2.4" data-path="loss-functions.html"><a href="loss-functions.html#l2-mean"><i class="fa fa-check"></i><b>2.4</b> L2 (mean)</a></li>
-<li class="chapter" data-level="2.5" data-path="loss-functions.html"><a href="loss-functions.html#l1-median-vs.-l2-mean"><i class="fa fa-check"></i><b>2.5</b> L1 (median) vs. L2 (mean)</a></li>
-<li class="chapter" data-level="2.6" data-path="loss-functions.html"><a href="loss-functions.html#choosing-a-likelihood"><i class="fa fa-check"></i><b>2.6</b> Choosing a likelihood</a></li>
-<li class="chapter" data-level="2.7" data-path="loss-functions.html"><a href="loss-functions.html#gaussian-in-frenquentist-versus-bayesian-statistics"><i class="fa fa-check"></i><b>2.7</b> Gaussian in frenquentist versus Bayesian statistics</a></li>
-</ul></li>
-<li class="chapter" data-level="3" data-path="directed-acyclic-graphs-and-causal-reasoning.html"><a href="directed-acyclic-graphs-and-causal-reasoning.html"><i class="fa fa-check"></i><b>3</b> Directed Acyclic Graphs and Causal Reasoning</a>
-<ul>
-<li class="chapter" data-level="3.1" data-path="directed-acyclic-graphs-and-causal-reasoning.html"><a href="directed-acyclic-graphs-and-causal-reasoning.html#peering-into-a-black-box"><i class="fa fa-check"></i><b>3.1</b> Peering into a black box</a></li>
-<li class="chapter" data-level="3.2" data-path="directed-acyclic-graphs-and-causal-reasoning.html"><a href="directed-acyclic-graphs-and-causal-reasoning.html#turning-unconditional-dependence-into-conditional-independence"><i class="fa fa-check"></i><b>3.2</b> Turning unconditional dependence into conditional independence</a></li>
-</ul></li>
-<li class="chapter" data-level="4" data-path="collider-bias.html"><a href="collider-bias.html"><i class="fa fa-check"></i><b>4</b> Collider bias</a>
-<ul>
-<li class="chapter" data-level="4.1" data-path="collider-bias.html"><a href="collider-bias.html#multicollinearity"><i class="fa fa-check"></i><b>4.1</b> Multicollinearity</a></li>
-<li class="chapter" data-level="4.2" data-path="collider-bias.html"><a href="collider-bias.html#back-to-spurious-association"><i class="fa fa-check"></i><b>4.2</b> Back to spurious association</a></li>
-<li class="chapter" data-level="4.3" data-path="collider-bias.html"><a href="collider-bias.html#chain-dag"><i class="fa fa-check"></i><b>4.3</b> Chain DAG</a></li>
-<li class="chapter" data-level="4.4" data-path="collider-bias.html"><a href="collider-bias.html#take-home-message"><i class="fa fa-check"></i><b>4.4</b> Take-home message</a></li>
-</ul></li>
-<li class="chapter" data-level="5" data-path="the-haunted-dag.html"><a href="the-haunted-dag.html"><i class="fa fa-check"></i><b>5</b> The haunted DAG</a></li>
-<li class="chapter" data-level="6" data-path="information-criteria.html"><a href="information-criteria.html"><i class="fa fa-check"></i><b>6</b> Information Criteria</a>
-<ul>
-<li class="chapter" data-level="6.1" data-path="information-criteria.html"><a href="information-criteria.html#deviance"><i class="fa fa-check"></i><b>6.1</b> Deviance</a></li>
-<li class="chapter" data-level="6.2" data-path="information-criteria.html"><a href="information-criteria.html#general-idea-information-criteria-as-miles-per-gallon"><i class="fa fa-check"></i><b>6.2</b> General idea: information criteria as miles-per-gallon</a></li>
-<li class="chapter" data-level="6.3" data-path="information-criteria.html"><a href="information-criteria.html#akaike-information-criterion-aic"><i class="fa fa-check"></i><b>6.3</b> Akaike Information Criterion (AIC)</a></li>
-<li class="chapter" data-level="6.4" data-path="information-criteria.html"><a href="information-criteria.html#bayesian-information-criterion-bic"><i class="fa fa-check"></i><b>6.4</b> Bayesian information criterion (BIC)</a></li>
-<li class="chapter" data-level="6.5" data-path="information-criteria.html"><a href="information-criteria.html#problem-of-aic-and-bic-one-size-may-not-fit-all"><i class="fa fa-check"></i><b>6.5</b> Problem of AIC and BIC: one size may not fit all</a></li>
-<li class="chapter" data-level="6.6" data-path="information-criteria.html"><a href="information-criteria.html#musical-instruments-metaphor"><i class="fa fa-check"></i><b>6.6</b> Musical instruments metaphor</a></li>
-<li class="chapter" data-level="6.7" data-path="information-criteria.html"><a href="information-criteria.html#deviance-information-criterion-dic-and-widely-applicable-information-criterion-waic"><i class="fa fa-check"></i><b>6.7</b> Deviance information criterion (DIC) and widely-applicable information criterion (WAIC)</a></li>
-<li class="chapter" data-level="6.8" data-path="information-criteria.html"><a href="information-criteria.html#importance-sampling"><i class="fa fa-check"></i><b>6.8</b> Importance sampling</a></li>
-<li class="chapter" data-level="6.9" data-path="information-criteria.html"><a href="information-criteria.html#pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo"><i class="fa fa-check"></i><b>6.9</b> Pareto-smoothed importance sampling / leave-one-out cross-validation (PSIS/LOO)</a></li>
-<li class="chapter" data-level="6.10" data-path="information-criteria.html"><a href="information-criteria.html#bayes-factor"><i class="fa fa-check"></i><b>6.10</b> Bayes Factor</a></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html"><i class="fa fa-check"></i><b>7</b> Bayesian versus Frequentist Statistics</a>
-<ul>
-<li class="chapter" data-level="7.1" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#choice-of-likelihood-both"><i class="fa fa-check"></i><b>7.1</b> Choice of likelihood (both)</a></li>
-<li class="chapter" data-level="7.2" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#linear-model-both"><i class="fa fa-check"></i><b>7.2</b> Linear model (both)</a></li>
-<li class="chapter" data-level="7.3" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#priors-optional-for-bayesian"><i class="fa fa-check"></i><b>7.3</b> Priors (optional for Bayesian)</a></li>
-<li class="chapter" data-level="7.4" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#maximum-likelihood-estimate-both"><i class="fa fa-check"></i><b>7.4</b> Maximum-likelihood estimate (both)</a></li>
-<li class="chapter" data-level="7.5" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#uncertainty-about-estimates-different-but-comparable"><i class="fa fa-check"></i><b>7.5</b> Uncertainty about estimates (different but comparable)</a></li>
-<li class="chapter" data-level="7.6" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#model-comparison-via-information-criteria-both"><i class="fa fa-check"></i><b>7.6</b> Model comparison via information criteria (both)</a></li>
-<li class="chapter" data-level="7.7" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#generating-predictions-both"><i class="fa fa-check"></i><b>7.7</b> Generating predictions (both)</a></li>
-<li class="chapter" data-level="7.8" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#conclusions"><i class="fa fa-check"></i><b>7.8</b> Conclusions</a></li>
-<li class="chapter" data-level="7.9" data-path="bayesian-versus-frequentist-statistics.html"><a href="bayesian-versus-frequentist-statistics.html#take-home-message-1"><i class="fa fa-check"></i><b>7.9</b> Take home message</a></li>
-</ul></li>
-<li class="chapter" data-level="8" data-path="mixtures.html"><a href="mixtures.html"><i class="fa fa-check"></i><b>8</b> Mixtures</a>
-<ul>
-<li class="chapter" data-level="8.1" data-path="mixtures.html"><a href="mixtures.html#beta-binomial"><i class="fa fa-check"></i><b>8.1</b> Beta Binomial</a></li>
-<li class="chapter" data-level="8.2" data-path="mixtures.html"><a href="mixtures.html#negative-binomial-a.k.a.-gamma-poisson"><i class="fa fa-check"></i><b>8.2</b> Negative binomial, a.k.a. Gamma Poisson</a></li>
-<li class="chapter" data-level="8.3" data-path="mixtures.html"><a href="mixtures.html#ordered-categorical"><i class="fa fa-check"></i><b>8.3</b> Ordered categorical</a></li>
-</ul></li>
-<li class="chapter" data-level="9" data-path="instrumental-variables.html"><a href="instrumental-variables.html"><i class="fa fa-check"></i><b>9</b> Instrumental Variables</a>
-<ul>
-<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#disclaimer"><i class="fa fa-check"></i>Disclaimer</a></li>
-<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#can-we-estimate-an-effect-of-military-experience-on-wages"><i class="fa fa-check"></i>Can we estimate an effect of military experience on wages</a></li>
-<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#draft-as-an-instrumental-variable"><i class="fa fa-check"></i>Draft as an instrumental variable</a></li>
-<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#two-stage-least-squares"><i class="fa fa-check"></i>Two-stage least squares</a></li>
-<li class="chapter" data-level="" data-path="instrumental-variables.html"><a href="instrumental-variables.html#covarying-residuals"><i class="fa fa-check"></i>Covarying residuals</a></li>
-</ul></li>
-<li class="chapter" data-level="10" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html"><i class="fa fa-check"></i><b>10</b> Parameters: combining information from an individual with population</a>
-<ul>
-<li class="chapter" data-level="10.1" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#everyone-is-the-same-single-parameter"><i class="fa fa-check"></i><b>10.1</b> Everyone is the same (single parameter)</a></li>
-<li class="chapter" data-level="10.2" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#everyone-is-unique-independent-parameters"><i class="fa fa-check"></i><b>10.2</b> Everyone is unique (independent parameters)</a></li>
-<li class="chapter" data-level="10.3" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-different-but-belong-to-a-population-pooled-parameters"><i class="fa fa-check"></i><b>10.3</b> People are different but belong to a population (pooled parameters)</a></li>
-<li class="chapter" data-level="10.4" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-different-but-belong-to-a-group-within-a-population-multilevel-clusters-of-pooled-parameters"><i class="fa fa-check"></i><b>10.4</b> People are different but belong to a group within a population (multilevel clusters of pooled parameters)</a></li>
-<li class="chapter" data-level="10.5" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-similar-to-some-but-different-to-others-gaussian-process"><i class="fa fa-check"></i><b>10.5</b> People are similar to some but different to others (Gaussian process)</a></li>
-<li class="chapter" data-level="10.6" data-path="parameters-combining-information-from-an-individual-with-population.html"><a href="parameters-combining-information-from-an-individual-with-population.html#people-are-different-but-belong-to-a-population-in-which-parameters-are-correlated-correlated-pooled-parameters"><i class="fa fa-check"></i><b>10.6</b> People are different but belong to a population in which parameters are correlated (correlated pooled parameters)</a></li>
-</ul></li>
-<li class="chapter" data-level="11" data-path="incorporating-measurement-error-a-rubber-band-metaphor.html"><a href="incorporating-measurement-error-a-rubber-band-metaphor.html"><i class="fa fa-check"></i><b>11</b> Incorporating measurement error: a rubber band metaphor</a></li>
-<li class="chapter" data-level="12" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html"><i class="fa fa-check"></i><b>12</b> Generalized Additive Models as continuous random effects</a>
-<ul>
-<li class="chapter" data-level="12.1" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html#generalized-additive-models-an-über-brief-introduction"><i class="fa fa-check"></i><b>12.1</b> Generalized Additive Models: An Über-brief Introduction</a></li>
-<li class="chapter" data-level="12.2" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html#what-are-gams-good-for"><i class="fa fa-check"></i><b>12.2</b> What are GAMs good for?</a></li>
-<li class="chapter" data-level="12.3" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html#covariates-random-factors"><i class="fa fa-check"></i><b>12.3</b> Covariates / random factors</a></li>
-<li class="chapter" data-level="12.4" data-path="generalized-additive-models-as-continuous-random-effects.html"><a href="generalized-additive-models-as-continuous-random-effects.html#gams-as-continuous-random-factors"><i class="fa fa-check"></i><b>12.4</b> GAMs as continuous random factors</a></li>
-</ul></li>
-<li class="chapter" data-level="13" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html"><i class="fa fa-check"></i><b>13</b> Flat priors: the strings attached</a>
-<ul>
-<li class="chapter" data-level="13.1" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#flat-priors-are-silly"><i class="fa fa-check"></i><b>13.1</b> Flat priors are silly</a></li>
-<li class="chapter" data-level="13.2" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#flat-priors-make-you-pretend-that-you-are-naïve"><i class="fa fa-check"></i><b>13.2</b> Flat priors make you pretend that you are naïve</a></li>
-<li class="chapter" data-level="13.3" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#flat-priors-tend-to-overfit"><i class="fa fa-check"></i><b>13.3</b> Flat priors tend to overfit</a></li>
-<li class="chapter" data-level="13.4" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#flat-priors-are-an-exception"><i class="fa fa-check"></i><b>13.4</b> Flat priors are an exception</a></li>
-<li class="chapter" data-level="13.5" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#the-irony-of-power-analysis"><i class="fa fa-check"></i><b>13.5</b> The irony of power analysis</a></li>
-<li class="chapter" data-level="13.6" data-path="flat-priors-the-strings-attached.html"><a href="flat-priors-the-strings-attached.html#conclusions-1"><i class="fa fa-check"></i><b>13.6</b> Conclusions</a></li>
-</ul></li>
-<li class="divider"></li>
-<li><a href="https://alexander-pastukhov.github.io/">Alexander (Sasha) Pastukhov</li>
-
-</ul>
-
-      </nav>
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Notes on Statistics</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
     </div>
 
-    <div class="book-body">
-      <div class="body-inner">
-        <div class="book-header" role="navigation">
-          <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Notes on and Solutions for Statistical Rethinking</a>
-          </h1>
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> Precis</a></li>
+<li><a class="active" href="loss-functions.html"><span class="header-section-number">2</span> Loss functions</a></li>
+<li><a class="" href="directed-acyclic-graphs-and-causal-reasoning.html"><span class="header-section-number">3</span> Directed Acyclic Graphs and Causal Reasoning</a></li>
+<li><a class="" href="collider-bias.html"><span class="header-section-number">4</span> Collider bias</a></li>
+<li><a class="" href="the-haunted-dag.html"><span class="header-section-number">5</span> The haunted DAG</a></li>
+<li><a class="" href="information-criteria.html"><span class="header-section-number">6</span> Information Criteria</a></li>
+<li><a class="" href="mixtures.html"><span class="header-section-number">7</span> Mixtures</a></li>
+<li><a class="" href="instrumental-variables.html"><span class="header-section-number">8</span> Instrumental Variables</a></li>
+<li><a class="" href="parameters-combining-information-from-an-individual-with-population.html"><span class="header-section-number">9</span> Parameters: combining information from an individual with population</a></li>
+<li><a class="" href="incorporating-measurement-error-a-rubber-band-metaphor.html"><span class="header-section-number">10</span> Incorporating measurement error: a rubber band metaphor</a></li>
+<li><a class="" href="generalized-additive-models-as-continuous-random-effects.html"><span class="header-section-number">11</span> Generalized Additive Models as continuous random effects</a></li>
+<li><a class="" href="flat-priors-the-strings-attached.html"><span class="header-section-number">12</span> Flat priors: the strings attached</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/alexander-pastukhov/notes-on-statistics">View book source <i class="fab fa-github"></i></a></p>
         </div>
-
-        <div class="page-wrapper" tabindex="-1" role="main">
-          <div class="page-inner">
-
-            <section class="normal" id="section-">
-<div id="loss-functions" class="section level1" number="2">
-<h1><span class="header-section-number">Chapter 2</span> Loss functions</h1>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="loss-functions" class="section level1" number="2">
+<h1>
+<span class="header-section-number">2</span> Loss functions<a class="anchor" aria-label="anchor" href="#loss-functions"><i class="fas fa-link"></i></a>
+</h1>
 <p>The purpose of this comment is to give you an intuition about loss functions, mentioned in chapter 3. In particular, I want you to understand why different loss functions (L0, L1, and L2) correspond to different point-estimates (mode, median, and mean). Plus, I want you to understand that you can view a choice of a likelihood function, as in picking Gaussian in chapter 4, as being analogous to picking a loss function.</p>
-<p>I am afraid that the easiest way to explain why an <em>L2</em> loss results in <em>mean</em> is via a derivative. So, if you are not confident in your basic calculus skill, it might be useful for you to first watch a few episodes of <a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr">Essense of Calculus</a> series by Grant Sanderson, a.k.a. <a href="https://www.3blue1brown.com/">3Blue1Brown</a>. I would suggest watching at least the first three episodes (actually, I would recommend to watch the whole series) but if you are short on time watch only episode 2<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
+<p>I am afraid that the easiest way to explain why an <em>L2</em> loss results in <em>mean</em> is via a derivative. So, if you are not confident in your basic calculus skill, it might be useful for you to first watch a few episodes of <a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr">Essense of Calculus</a> series by Grant Sanderson, a.k.a. <a href="https://www.3blue1brown.com/">3Blue1Brown</a>. I would suggest watching at least the first three episodes (actually, I would recommend to watch the whole series) but if you are short on time watch only episode 2<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;Although, if you skip episode 1, you won’t know why it is &lt;em&gt;obvious&lt;/em&gt; that area of a circle is &lt;span class="math inline"&gt;\(\pi\cdot r^2\)&lt;/span&gt;&lt;/p&gt;'><sup>1</sup></a>.</p>
 <div id="loss-function-the-concept" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> Loss function, the concept</h2>
+<h2>
+<span class="header-section-number">2.1</span> Loss function, the concept<a class="anchor" aria-label="anchor" href="#loss-function-the-concept"><i class="fas fa-link"></i></a>
+</h2>
 <p>Imagine that you are selling ice-cream on a beach, so we can assume it is a narrow strip of sand and, therefore, a one-dimensional problem. It is hot, so <em>everyone</em> wants ice-cream (obviously) and you want to maximize the number of ice-creams you sell (obviously). People are distributed in some random (not necessarily uniform or symmetric) way along the beach, so the question is: Where do you put your <em>single</em> ice-cream stand to maximize your profits? The answer depends on your choice of the <em>loss function</em> that describes how distance between a particular person and your stand influences whether person will buy your ice-cream. In other words, it describes the <em>cost</em> of getting to your stand, i.e. walking all-the-way through the sand in that heat. This <em>cost</em> clearly depends on the distance and in the simplest case, it is linearly proportional to the distance: If you need to walk twice the distance, your costs for getting an ice-cream are twice as high. However, the relationship between the distance and cost does not have to be so simple and linear and this is why we have many different <em>loss</em> / <em>cost</em> functions.</p>
 <p>We can write a loss/cost function more formally as <span class="math inline">\(L(stand, person_i)\)</span> where <code>stand</code> is the location of your stand and <code>person_i</code> is a location of a particular i<sup>th</sup> person. The cost can be either zero or positive, i.e., we assume there is no benefit in walking all the way, only no or some cost. So, where should you put your ice-cream stand?</p>
-<p><img src="images/loss-functions-where-to.jpg" width="100%" style="display: block; margin: auto;" /></p>
+<div class="inline-figure"><img src="images/loss-functions-where-to.jpg" width="100%" style="display: block; margin: auto;"></div>
 </div>
 <div id="l0-mode" class="section level2" number="2.2">
-<h2><span class="header-section-number">2.2</span> L0 (mode)</h2>
-<p>The simplest loss function is<br />
-<span class="math display">\[L0(stand, person_i) =  \begin{cases}
+<h2>
+<span class="header-section-number">2.2</span> L0 (mode)<a class="anchor" aria-label="anchor" href="#l0-mode"><i class="fas fa-link"></i></a>
+</h2>
+<p>The simplest loss function is<br><span class="math display">\[L0(stand, person_i) =  \begin{cases}
 0, stand == person_i \\
 \infty, stand \neq person_i
 \end{cases}\]</span></p>
 <p>This function assumes that everybody hates walking so much, that <em>any</em> walk is unbearable and should be avoided. Thus, there is no cost for getting your ice-cream only for people who are positioned right next to your stand. For everybody else, even one meter away, the costs of walking are infinite, so they won’t bother and, therefore, won’t buy your ice-cream. Still, we are in the business of selling one, so where do we put our stand given how lazy our customers are? Well, we just find the biggest group of people and put our stand next to them. No one else will come but at least you got the biggest group of customers you could. If you look at the <em>distribution</em> of your customers along the beach this is the highest peak (that you peak) and it is called the <em>mode</em> of the distribution.</p>
-<p><img src="images/loss-functions-L0.jpg" width="100%" style="display: block; margin: auto;" /></p>
+<div class="inline-figure"><img src="images/loss-functions-L0.jpg" width="100%" style="display: block; margin: auto;"></div>
 </div>
 <div id="l1-median" class="section level2" number="2.3">
-<h2><span class="header-section-number">2.3</span> L1 (median)</h2>
+<h2>
+<span class="header-section-number">2.3</span> L1 (median)<a class="anchor" aria-label="anchor" href="#l1-median"><i class="fas fa-link"></i></a>
+</h2>
 <p>The next loss function, that I already mentioned, assumes a simple linear relationship between the distance and the cost
 <span class="math display">\[L1(stand, person_i) = |person_i - stand|\]</span>
 In other words, the cost is equal to distance (we need <code>| |</code> to get an absolute value, because the person could be “to the left of” of stand, in which case <code>person - stand</code> distance will be negative). So, where should we put our stand? Let us start at a fairly random location so that 3 of our customers are on the left and 7 are on the right.
-<img src="images/loss-functions-L1-off-median.jpg" width="100%" style="display: block; margin: auto;" /></p>
+<img src="images/loss-functions-L1-off-median.jpg" width="100%" style="display: block; margin: auto;"></p>
 <p>We can, in principle, compute the actual cost but it is simpler to ask the question of whether we can <em>improve</em> on that cost by moving somewhere else? Imagine that we move to the left where <em>minority</em> of our customers are. Now we have 1 on the left and 8 on the right (plus 2 more at our location).
-<img src="images/loss-functions-L1-left.jpg" width="100%" style="display: block; margin: auto;" /></p>
+<img src="images/loss-functions-L1-left.jpg" width="100%" style="display: block; margin: auto;"></p>
 <p>The problem is, we moved <em>away</em> from the majority of the people so our total cost is <em>original cost - 3 (improvement due to moving close to minority) + 8 (increase in loss due to moving away from majority)</em>, so <span class="math inline">\(\Delta L1 = +5\)</span>. Oops, we made it worse! How about moving to the <em>right</em>?
-<img src="images/loss-functions-L1-right.jpg" width="100%" style="display: block; margin: auto;" />
+<img src="images/loss-functions-L1-right.jpg" width="100%" style="display: block; margin: auto;">
 Now that we move <em>towards</em> the majority of customers, we have four on the left and six on the right (plus one at our location). The change in cost is <em>original cost + 4 (loss due to moving away from minority) - 6 (improvement due to moving towards majority)</em>, so <span class="math inline">\(\Delta L1 = -2\)</span>. Which gives us an idea: we should try to get even closer to that majority by keeping walking to the right! Eventually, you will get to point of the 50/50. Should you keep moving to the right? Should you move to the left? Should you move at all?</p>
-<p><img src="images/loss-functions-L1-median.jpg" width="100%" style="display: block; margin: auto;" /></p>
+<div class="inline-figure"><img src="images/loss-functions-L1-median.jpg" width="100%" style="display: block; margin: auto;"></div>
 <p>There is no point in moving to the left. You just came from where because moving to the right made things better. However, if you keep moving to the right, you will keep passing people, so that majority now will be on the left and you would be walking <em>away</em> from the majority, raising the costs (and your losses). So, once you get to point where half of your customers are on the left and half are on the right, you cannot do any better. Any movement that gets you from 50/50 means there are more customers on one side (say left, if you moved to the right) and, as we already figured out, your best strategy is to move towards the majority, which gets you back where you started at 50/50 point. That 50/50 points split, when half of customers / probability mass is on one side and half is on the other, is called <em>median</em>.</p>
 </div>
 <div id="l2-mean" class="section level2" number="2.4">
-<h2><span class="header-section-number">2.4</span> L2 (mean)</h2>
+<h2>
+<span class="header-section-number">2.4</span> L2 (mean)<a class="anchor" aria-label="anchor" href="#l2-mean"><i class="fas fa-link"></i></a>
+</h2>
 <p>The classic loss function is Euclidean distance <span class="math display">\[L2(stand, person_i) = (person - stand)^2\]</span>
 Here, every next step becomes progressively harder for our customers. The cost of walking 1 meter is 1 (unit of effort). But walking 2 is <span class="math inline">\(2^2 = 4\)</span> and is <span class="math inline">\(3^2=9\)</span> for 3 meters. Thus, the penalty (cost/loss) for being further away from your stand increases as a power law. Still, one needs to sell ice-cream, so one needs to find the best spot where total cost is minimal</p>
 <p><span class="math display">\[L2(stand, person) = \sum_{i=1}^{N}{(person_i - stand)^2}\]</span>
-<img src="images/loss-functions-L2-mean.jpg" width="100%" style="display: block; margin: auto;" /></p>
+<img src="images/loss-functions-L2-mean.jpg" width="100%" style="display: block; margin: auto;"></p>
 <p>Or, we can compute the minimal <em>average</em> cost by dividing the sum by the total number of customers <code>N</code>:
 <span class="math display">\[&lt;L2(stand, person)&gt; = \frac{1}{N}\sum_{i=1}^{N}{(person_i - stand)^2}\]</span></p>
-<p>Conceptually, you find that minimum by walking along the beach in the direction that reduces the cost until you hit the point where it start going up again. This strategy is called <em>gradient descent</em> and, generally speaking, this is how computer finds minima computationally: They make steps in different directions to see which way is down and keep going until things start going up. However, in one-dimensional well-behaving case we have here things are even simpler as you can use calculus to figure out the solution analytically. If you watched the videos I advertised above, you’ll know that the <em>derivative</em> of the function is zero at the extrema (minima or maxima), so we just need to differentiate our average <em>L2</em> over position of the stand and find where it is zero<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>.</p>
+<p>Conceptually, you find that minimum by walking along the beach in the direction that reduces the cost until you hit the point where it start going up again. This strategy is called <em>gradient descent</em> and, generally speaking, this is how computer finds minima computationally: They make steps in different directions to see which way is down and keep going until things start going up. However, in one-dimensional well-behaving case we have here things are even simpler as you can use calculus to figure out the solution analytically. If you watched the videos I advertised above, you’ll know that the <em>derivative</em> of the function is zero at the extrema (minima or maxima), so we just need to differentiate our average <em>L2</em> over position of the stand and find where it is zero<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;I’ve nicked the derivations from [&lt;a href="https://stats.stackexchange.com/a/312997" class="uri"&gt;https://stats.stackexchange.com/a/312997&lt;/a&gt;]&lt;/p&gt;'><sup>2</sup></a>.</p>
 <p><span class="math display">\[\frac{\partial L2}{\partial stand} = -\frac{2}{N}\sum_{i=1}^{N}{(person_i - stand)}\]</span>
 As we want
 <span class="math display">\[\frac{\partial L2}{\partial stand} = 0\]</span>
@@ -301,98 +122,76 @@ stand = \frac{1}{N}\sum_{i=1}^{N}{person_i}\]</span></p>
 <p>So, the optimal location of your stand is the <em>mean</em>: an average location of all people on the beach.</p>
 </div>
 <div id="l1-median-vs.-l2-mean" class="section level2" number="2.5">
-<h2><span class="header-section-number">2.5</span> L1 (median) vs. L2 (mean)</h2>
+<h2>
+<span class="header-section-number">2.5</span> L1 (median) vs. L2 (mean)<a class="anchor" aria-label="anchor" href="#l1-median-vs.-l2-mean"><i class="fas fa-link"></i></a>
+</h2>
 <p>One problem about the <em>mean</em> is that it is sensitive to outliers. Because the costs grow as a power law, this approach favors a lot of medium-sized distances over lots of smalls ones plus one really large one. Thus, a single person at a far side of the beach would have a big influence on your stand’s location (you already saw the difference in the example above). In data analysis, this means that those outliers will pull your estimates away from the majority of responses. Which is why it might be a good idea to consider using <code>median</code> rather than <code>mean</code>. If you distribution is symmetric, the difference will be negligible but in presence of outliers <code>median</code>, as a point-estimate, is more robust.</p>
 </div>
 <div id="choosing-a-likelihood" class="section level2" number="2.6">
-<h2><span class="header-section-number">2.6</span> Choosing a likelihood</h2>
+<h2>
+<span class="header-section-number">2.6</span> Choosing a likelihood<a class="anchor" aria-label="anchor" href="#choosing-a-likelihood"><i class="fas fa-link"></i></a>
+</h2>
 <p>So far we talked about selling ice-cream on the beach but same question of choosing your loss function applies when you are trying to fit a distribution or a regression line, as in chapter 4. Here, you also have a point-estimate (regression line at each point) and you try to put it in such a way as to minimize the costs of having data points off that line (the distance from the point-estimate of the line and each data point is called a <em>residual</em>). The classic way is to use <em>L2</em> distance and the approach is called <em>ordinary least squares</em>, as you try to minimize squared residuals.</p>
-<p>Alternatively, you can express same costs-of-being-off-the-line using a distribution, such as Gaussian. You put its peak (mean) at the (candidate) location of your point estimate (that point has highest probability, so lowest cost) and the loss is computed as a probability of the residual (distance-to-the-point). You can think about it in terms of the probability that a person will go and buy ice-cream from your stand.
-<img src="images/loss-functions-Gaussian.jpg" width="100%" style="display: block; margin: auto;" /></p>
+<div class="inline-figure">Alternatively, you can express same costs-of-being-off-the-line using a distribution, such as Gaussian. You put its peak (mean) at the (candidate) location of your point estimate (that point has highest probability, so lowest cost) and the loss is computed as a probability of the residual (distance-to-the-point). You can think about it in terms of the probability that a person will go and buy ice-cream from your stand.
+<img src="images/loss-functions-Gaussian.jpg" width="100%" style="display: block; margin: auto;">
+</div>
 <p>The Gaussian is special because it uses L2 distance, see <span class="math inline">\((x - \mu)^2\)</span> inside the exponential:
 <span class="math display">\[f(x) = \frac{1}{\sigma \sqrt(2 \pi)}e^{\left(-\frac{1}{2}\frac{(x - \mu)^2}{\sigma^2}\right)}\]</span></p>
 <p>so using it is equivalent to fitting via ordinary least squares. However, as McElreath hinted, you can choose different priors that are different not only in the distance-to-loss formula (like <em>L1</em> is different from <em>L2</em>) but also in symmetry. Both <em>L1</em> and <em>L2</em> (and Gaussian) ignore the sign of the distance. It does not matter whether customers are on the left or on the right. Other distributions, such as Beta, Gamma, or Log Normal are not symmetric, so the same distance will cost differently depending on the side the customer is at.
-<img src="images/loss-functions-Gamma.jpg" width="100%" style="display: block; margin: auto;" /></p>
+<img src="images/loss-functions-Gamma.jpg" width="100%" style="display: block; margin: auto;"></p>
 <p>This allows you to think about the choice of your likelihood distribution in terms of choosing a loss function. Both describe how tolerant you are for points to be off the point estimate (regression line). For example, a t-distribution has heavier tails than a Gaussian (if you want to sound like a real mathematician, you say “leptokurtic”), so its losses for outliers (penalty for larger residuals) are lower. Using it instead of a Gaussian would be similar to changing the loss function from L2 to be more like L1 (e.g. <span class="math inline">\(|person_i - stand|^{1.5}\)</span>). Conversely, you can pick a symmetric distribution that is narrower than a Gaussian to make residuals penalty even higher (e.g. using <span class="math inline">\((person_i - stand)^{4}\)</span>). You can also consider other properties: Should it be symmetric? Should it operate only within certain range (1..7 for a Likert scale, 0..1 for proportions, positive values for Gamma)? Should it weight all points equally? As you saw in the examples above, picking a different function moves your cart (regression line), so you should keep in mind that using a different likelihood will move the regression line and produce different estimates and predictions.</p>
 <p>How do you pick a likelihood/loss function? It depends on the kind of data you have, on your knowledge about the process that generated the data, robustness of inferences in the presence of outliers, etc. However, most real-life cases you are likely to encounter will be covered by the distributions described in the book (Gaussian, exponential, binomial, Poisson, Gamma, etc.). After finishing the book, you will have a basic understanding of which are most appropiate in typical cases. The atypical cases you’ll have to research yourself!</p>
 </div>
 <div id="gaussian-in-frenquentist-versus-bayesian-statistics" class="section level2" number="2.7">
-<h2><span class="header-section-number">2.7</span> Gaussian in frenquentist versus Bayesian statistics</h2>
+<h2>
+<span class="header-section-number">2.7</span> Gaussian in frenquentist versus Bayesian statistics<a class="anchor" aria-label="anchor" href="#gaussian-in-frenquentist-versus-bayesian-statistics"><i class="fas fa-link"></i></a>
+</h2>
 <p>Later on in the book McElreath will note that erroneously assuming normal distribution for residuals ruins your inferences in frequentist statistics but not in Bayesian. This is because picking a distribution means different things in frequentist and Bayesian. As I wrote above, in the Bayesian case, likelihood is merely a loss function that translate distance from a data point to a regression line (residual) into a penalty (again, it determines just how tolerant you are for points off the line). Thus, you are using penalties for <em>observed residuals</em> and having a bad loss function will make your posterior distribution suboptimal but you still can make inferences because it still is based on your actual residuals.</p>
 <p>In contrast, in frequentist statistics, when you are stating that your observed residuals are a sample from a particular distribution, your actual residuals are used to determine parameters of this distribution. Then, however, you make your inferences using <em>that distribution</em> not the residuals themselves. This is a very strong conjecture and probably the biggest leap of faith in frequentist statistics saying “I know the true distribution.” Problem is, if you got your likelihood function / distribution wrong, your inferences are based on a model that describes <em>something else</em> not your data. For example, you have a proportion data but you assume Gaussian distribution for residuals and build a model as if your residuals are always symmetrically distributed (not squashed on one side by floor or celing). That model will not be about your data, it will be about normally distributed <em>something else</em>. The numbers for that <em>something else</em> may look good (or bad) but they are not the numbers you are interested in. This is a mistake that is remarkably easy to do because computers won’t stop you from making it. Think back to Chapter 1: Golems don’t care! You can abuse any statistical model/test and they will simply spit out the numbers, even if tests are completely unsuitable for your data. Making sure that distribution is correct and that you are doing the right thing is on you, not the Golem!</p>
 
 </div>
 </div>
-<div class="footnotes">
-<hr />
-<ol start="1">
-<li id="fn1"><p>Although, if you skip episode 1, you won’t know why it is <em>obvious</em> that area of a circle is <span class="math inline">\(\pi\cdot r^2\)</span><a href="loss-functions.html#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>I’ve nicked the derivations from [<a href="https://stats.stackexchange.com/a/312997" class="uri">https://stats.stackexchange.com/a/312997</a>]<a href="loss-functions.html#fnref2" class="footnote-back">↩︎</a></p></li>
-</ol>
+
+  <div class="chapter-nav">
+<div class="prev"><a href="index.html"><span class="header-section-number">1</span> Precis</a></div>
+<div class="next"><a href="directed-acyclic-graphs-and-causal-reasoning.html"><span class="header-section-number">3</span> Directed Acyclic Graphs and Causal Reasoning</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#loss-functions"><span class="header-section-number">2</span> Loss functions</a></li>
+<li><a class="nav-link" href="#loss-function-the-concept"><span class="header-section-number">2.1</span> Loss function, the concept</a></li>
+<li><a class="nav-link" href="#l0-mode"><span class="header-section-number">2.2</span> L0 (mode)</a></li>
+<li><a class="nav-link" href="#l1-median"><span class="header-section-number">2.3</span> L1 (median)</a></li>
+<li><a class="nav-link" href="#l2-mean"><span class="header-section-number">2.4</span> L2 (mean)</a></li>
+<li><a class="nav-link" href="#l1-median-vs.-l2-mean"><span class="header-section-number">2.5</span> L1 (median) vs. L2 (mean)</a></li>
+<li><a class="nav-link" href="#choosing-a-likelihood"><span class="header-section-number">2.6</span> Choosing a likelihood</a></li>
+<li><a class="nav-link" href="#gaussian-in-frenquentist-versus-bayesian-statistics"><span class="header-section-number">2.7</span> Gaussian in frenquentist versus Bayesian statistics</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/alexander-pastukhov/notes-on-statistics/blob/master/01-loss-functions.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/alexander-pastukhov/notes-on-statistics/edit/master/01-loss-functions.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
 </div>
-            </section>
+    </nav>
+</div>
 
-          </div>
-        </div>
-      </div>
-<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="directed-acyclic-graphs-and-causal-reasoning.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
-    </div>
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2021-11-08.</p>
   </div>
-<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
-<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
-<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
-<script>
-gitbook.require(["gitbook"], function(gitbook) {
-gitbook.start({
-"sharing": {
-"github": false,
-"facebook": true,
-"twitter": true,
-"linkedin": false,
-"weibo": false,
-"instapaper": false,
-"vk": false,
-"whatsapp": false,
-"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
-},
-"fontsettings": {
-"theme": "white",
-"family": "sans",
-"size": 2
-},
-"edit": {
-"link": null,
-"text": null
-},
-"history": {
-"link": null,
-"text": null
-},
-"view": {
-"link": null,
-"text": null
-},
-"download": ["notes-on-statistical-rethinking.pdf", "notes-on-statistical-rethinking.epub"],
-"search": {
-"engine": "lunr",
-"options": null
-},
-"toc": {
-"collapse": "section"
-}
-});
-});
-</script>
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
@@ -404,7 +203,22 @@ gitbook.start({
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
 </script>
 </body>
-
 </html>

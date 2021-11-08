@@ -4,9 +4,9 @@
 %
 \documentclass[
 ]{book}
-\title{Notes on and Solutions for Statistical Rethinking}
+\title{Notes on Statistics}
 \author{Alexander Pastukhov}
-\date{2021-10-04}
+\date{2021-11-08}
 
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
@@ -40,7 +40,7 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
-  pdftitle={Notes on and Solutions for Statistical Rethinking},
+  pdftitle={Notes on Statistics},
   pdfauthor={Alexander Pastukhov},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
@@ -129,7 +129,9 @@
 \hypertarget{precis}{%
 \chapter{Precis}\label{precis}}
 
-This is a collection of notes that attempt to provide further details and intuition for some topics, such as loss functions, information theory, information criteria, MCMC algorithms, etc. This material is \textbf{free to use} and is licensed under the \href{https://creativecommons.org/licenses/by-nc-nd/4.0/}{Creative Commons Attribution-NonCommercial-NoDerivatives V4.0 International License}.
+This is a collection of notes on statistics that attempt to provide further details and intuition for some topics, such as loss functions, information theory, information criteria, MCMC algorithms, etc.
+
+This material is \textbf{free to use} and is licensed under the \href{https://creativecommons.org/licenses/by-nc-nd/4.0/}{Creative Commons Attribution-NonCommercial-NoDerivatives V4.0 International License}.
 
 \hypertarget{loss-functions}{%
 \chapter{Loss functions}\label{loss-functions}}
@@ -817,9 +819,6 @@ If you assume that both hypotheses/models are equally likely (you have flat prio
 
 I am not a big fan of Bayes Factor for conceptual reasons. Although it can compare any two models (as long as the sample is the same), it looks a lot like a Bayesian version of a p-value and, therefore, lends itself naturally to the null-hypothesis testing. And, as far as my reading of literature in my field is concerned, this is how people most frequently use it, as a cooler Bayesian way of null-hypothesis testing. You have no worries about multiple comparisons (it is Bayesian, so no need for error correction!) and it can prove null hypothesis (it is the ratio, so flip it and see how much stronger \emph{H0} is)! There is nothing wrong with this per se but the advantage of Bayesian statistics and information criteria is that you do not \emph{need} to think in terms of null hypothesis testing and nested models. Adopting Bayes Factor may prevent you from seeing this and will allow you to continue doing same analysis just in a differently colored wrapper. Again, there is nothing wrong with exploratory analysis using null hypothesis testing until you can formulate a better model. But it should not be the \emph{only} way you approach modeling.
 
-\hypertarget{bayesian-versus-frequentist-statistics}{%
-\chapter{Bayesian versus Frequentist Statistics}\label{bayesian-versus-frequentist-statistics}}
-
 I suspect that many student who read ``Statistical Rethinking'' have a feeling that it is something completely different from what they have been learning in ``traditional'' statistics classes. That Bayesian approach is more ``hands-on'' and complicated, whereas ``normal'' statistics is simpler and easy to work with even it is ``less powerful.''\footnote{Not really.} Thus, the purpose of this note is to walk you through a typical statistical analysis and focus on practical differences and, more importantly, similarity of the two approaches.
 
 \hypertarget{choice-of-likelihood-both}{%
@@ -879,17 +878,17 @@ In short, Bayesian inference gives you an \emph{option} to specify priors. You d
 
 \emph{Side note.} In reality, flat priors are never good priors. If there is sufficient data then, in most cases, the priors (flat or not) do not have much influence. However, if the data is limited then flat priors almost inevitably lead to overfitting as there is no additional information to counteract the effect of noise. This overfitting may feel more ``objective'' and ``data-driven'' than a more conservative underfitting of data via strongly regularizing priors but the latter is more likely to lead to better out-of-sample predictions and, therefore, are more likely to be replicated.
 
-\hypertarget{maximum-likelihood-estimate-both}{%
-\section{Maximum-likelihood estimate (both)}\label{maximum-likelihood-estimate-both}}
+\hypertarget{maximum-likelihood-maximum-a-posteriori-estimate-both}{%
+\section{Maximum-likelihood / Maximum A Posteriori estimate (both)}\label{maximum-likelihood-maximum-a-posteriori-estimate-both}}
 
-Once you fitted the model, you get estimates for each parameter you specified. If you opted for flat priors, these estimates will be the same but for very minor differences due to sampling in Bayesian statistics. If you did specify regularizing priors then estimates will be different, although the magnitude of that difference will depend the amount of data: the more data you have, the smaller the influence of the priors, we closer the estimates will be (see also the side note above). Importantly, both types of inferences will produce (very similar) estimates and you interpret them the same way.
+Once you fitted the model, you get estimates for each parameter you specified. If you opted for flat priors, these estimates will be the same but for very minor differences due to sampling in Bayesian statistics. If you did specify regularizing priors then MAP estimates will be different from MLE, although the magnitude of that difference will depend the amount of data: the more data you have, the smaller the influence of the priors, we closer the estimates will be (see also the side note above). Importantly, both types of inferences will produce (very similar) estimates and you interpret their values the same way.
 
 \hypertarget{uncertainty-about-estimates-different-but-comparable}{%
 \section{Uncertainty about estimates (different but comparable)}\label{uncertainty-about-estimates-different-but-comparable}}
 
 This is the point where the two approach fundamentally diverge. In case of frenquetists statistics you obtain confidence intervals and p-values based on appropriate statistics and degrees of freedom, whereas in case of Bayesian inference you obtain credible/compatibility intervals and can use posterior distribution for individual parameters to compute probability that they are strictly positive, negative, concentrated within a certain region around zero, etc.
 
-These measures are conceptually different but tend to be interpreted similarly and mostly from Bayesian perspective. I think it is a good idea to compute and report all of them. Typically, they would be close, making you more certain about the results. More importantly, whenever they diverge it serves as a warning to investigate the case and what can cause this difference.
+These measures are conceptually different but tend to be interpreted similarly and mostly from Bayesian perspective. I think it is a good idea to compute and report all of them. If they are close, it would make you more certain about the results. More importantly, whenever they diverge it serves as a warning to investigate the case and what can cause this difference.
 
 \hypertarget{model-comparison-via-information-criteria-both}{%
 \section{Model comparison via information criteria (both)}\label{model-comparison-via-information-criteria-both}}
@@ -899,7 +898,7 @@ Both approaches use information criteria to compare models with Akaike and Bayes
 \hypertarget{generating-predictions-both}{%
 \section{Generating predictions (both)}\label{generating-predictions-both}}
 
-You generate predictions using the model definition which is the same for both approach. Hence, you are going to get same predictions, at least for the mean. As the two approach differ in how they characterize uncertainty, the uncertainty of predictions will be different but, typically, comparable.
+You generate predictions using the model definition which is the same for both approach. Hence, you are going to get similar predictions, at least for the mean (depending on your priors, see MLE vs.~MAP above). As the two approach differ in how they characterize uncertainty, the uncertainty of predictions will be different but, typically, comparable.
 
 \hypertarget{conclusions}{%
 \section{Conclusions}\label{conclusions}}

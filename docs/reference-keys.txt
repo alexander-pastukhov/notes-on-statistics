@@ -27,11 +27,10 @@ deviance-information-criterion-dic-and-widely-applicable-information-criterion-w
 importance-sampling
 pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo
 bayes-factor
-bayesian-versus-frequentist-statistics
 choice-of-likelihood-both
 linear-model-both
 priors-optional-for-bayesian
-maximum-likelihood-estimate-both
+maximum-likelihood-maximum-a-posteriori-estimate-both
 uncertainty-about-estimates-different-but-comparable
 model-comparison-via-information-criteria-both
 generating-predictions-both
