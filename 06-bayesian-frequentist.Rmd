@@ -1,4 +1,3 @@
-# Bayesian versus Frequentist Statistics
 
 I suspect that many student who read "Statistical Rethinking" have a feeling that it is something completely different from what they have been learning in "traditional" statistics classes. That Bayesian approach is more "hands-on" and complicated, whereas "normal" statistics is simpler and easy to work with even it is "less powerful."^[Not really.] Thus, the purpose of this note is to walk you through a typical statistical analysis and focus on practical differences and, more importantly, similarity of the two approaches.
 
@@ -54,19 +53,19 @@ In short, Bayesian inference gives you an _option_ to specify priors. You do not
 
 _Side note._ In reality, flat priors are never good priors. If there is sufficient data then, in most cases, the priors (flat or not) do not have much influence. However, if the data is limited then flat priors almost inevitably lead to overfitting as there is no additional information to counteract the effect of noise. This overfitting may feel more "objective" and "data-driven" than a more conservative underfitting of data via strongly regularizing priors but the latter is more likely to lead to better out-of-sample predictions and, therefore, are more likely to be replicated. 
 
-## Maximum-likelihood estimate (both)
-Once you fitted the model, you get estimates for each parameter you specified. If you opted for flat priors, these estimates will be the same but for very minor differences due to sampling in Bayesian statistics. If you did specify regularizing priors then estimates will be different, although the magnitude of that difference will depend the amount of data: the more data you have, the smaller the influence of the priors, we closer the estimates will be (see also the side note above). Importantly, both types of inferences will produce (very similar) estimates and you interpret them the same way.
+## Maximum-likelihood / Maximum A Posteriori estimate (both)
+Once you fitted the model, you get estimates for each parameter you specified. If you opted for flat priors, these estimates will be the same but for very minor differences due to sampling in Bayesian statistics. If you did specify regularizing priors then MAP estimates will be different from MLE, although the magnitude of that difference will depend the amount of data: the more data you have, the smaller the influence of the priors, we closer the estimates will be (see also the side note above). Importantly, both types of inferences will produce (very similar) estimates and you interpret their values the same way.
 
 ## Uncertainty about estimates (different but comparable)
 This is the point where the two approach fundamentally diverge. In case of frenquetists statistics you obtain confidence intervals and p-values based on appropriate statistics and degrees of freedom, whereas in case of Bayesian inference you obtain credible/compatibility intervals and can use posterior distribution for individual parameters to compute probability that they are strictly positive, negative, concentrated within a certain region around zero, etc. 
 
-These measures are conceptually different but tend to be interpreted similarly and mostly from Bayesian perspective. I think it is a good idea to compute and report all of them. Typically, they would be close, making you more certain about the results. More importantly, whenever they diverge it serves as a warning to investigate the case and what can cause this difference.
+These measures are conceptually different but tend to be interpreted similarly and mostly from Bayesian perspective. I think it is a good idea to compute and report all of them. If they are close, it would make you more certain about the results. More importantly, whenever they diverge it serves as a warning to investigate the case and what can cause this difference.
 
 ## Model comparison via information criteria (both)
 Both approaches use information criteria to compare models with Akaike and Bayesian/Schwarz information criteria being developed specifically for the case of flat priors of frenquetist models. Here, Bayesian approach holds an advantage as the full posterior allows for more elaborate information criteria such as DIC, WAIC, or LOO. Still the core idea and the interpretation of the comparison results are the same.
 
 ## Generating predictions (both)
-You generate predictions using the model definition which is the same for both approach. Hence, you are going to get same predictions, at least for the mean. As the two approach differ in how they characterize uncertainty, the uncertainty of predictions will be different but, typically, comparable.
+You generate predictions using the model definition which is the same for both approach. Hence, you are going to get similar predictions, at least for the mean (depending on your priors, see MLE vs. MAP above). As the two approach differ in how they characterize uncertainty, the uncertainty of predictions will be different but, typically, comparable.
 
 ## Conclusions
 As you can see, from _practical_ point of view, apart from optional Bayesian priors and different ways to quantify the uncertainty of estimates, the two approaches are the same. They require you making same decisions and the results are interpreted the same way. This lack of difference becomes even more apparent when you use software packages for running your statistical models. E.g., the way you specify your model in `lme4` (frenquetist) and `brms` (Bayesian) is very much the same to the point that in most cases you only need to change the function name (`lmer` to `brm` or vice versa) and leave the rest the same.
