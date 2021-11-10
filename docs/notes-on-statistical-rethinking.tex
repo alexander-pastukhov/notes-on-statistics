@@ -129,7 +129,9 @@
 \hypertarget{precis}{%
 \chapter{Precis}\label{precis}}
 
-This is a collection of notes on statistics that attempt to provide further details and intuition for some topics, such as loss functions, information theory, information criteria, MCMC algorithms, etc. These notes are aimed primarily at future-me but I hope that might be useful others, which is why this material is \textbf{free to use} and is licensed under the \href{https://creativecommons.org/licenses/by-nc-nd/4.0/}{Creative Commons Attribution-NonCommercial-NoDerivatives V4.0 International License}.
+This is a collection of notes on statistics that attempt to provide further details and intuition for some topics, such as loss functions, information theory, information criteria, MCMC algorithms, etc. The primary source for these notes is ``Statistical Rethinking'' book by Richard McElreath, so if I mention a chapter, I mean a chapter from that book.
+
+These notes are aimed primarily at future-me but I hope that might be useful others, which is why this material is \textbf{free to use} and is licensed under the \href{https://creativecommons.org/licenses/by-nc-nd/4.0/}{Creative Commons Attribution-NonCommercial-NoDerivatives V4.0 International License}.
 
 \hypertarget{loss-functions}{%
 \chapter{Loss functions}\label{loss-functions}}
@@ -1361,6 +1363,13 @@ and for PDF:
 \includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-61-1.pdf}
 
 Our constant PDF value is 2! Way above one, how come? Think about the slope and think about the area of rectangle: if its 0.5 units wide it must be 2 units tall to make are equal to 1. The point of this is probability density \emph{is not} a probability and that you should not care about \emph{absolute} values of probability density, only about \emph{relative} values. If you feel that ``adding up'' values larger than 1 should not give you 1 at the end, yes, it is very counter-intuitive. Integrals, as other things that have to do with infinitely small or large numbers, are counter-intuitive. Thus, ignore the units, ignore the absolute values, just keep in mind that whenever it is higher, the more probable that specific value is. (But, again, there is no way to compute a meaningful probability for a \emph{single} value).
+
+\hypertarget{effective-degrees-of-freedom-number-of-parameters}{%
+\chapter{Effective degrees of freedom / number of parameters}\label{effective-degrees-of-freedom-number-of-parameters}}
+
+One thing that your learn once you start using linear mixed models (multulevel) models is that degrees of freedom used up by the model is less than number of parameters, so the total number is called number of \emph{effective} parameters / degrees of freedom. This is because each parameter (whether it is formally ``fixed'' or ``random'') can use up 1 degree of freedom. It will use full one degree of freedom, if it can take \emph{any} value. In other words, a parameter with flat prior takes up 1 degree of freedom. In yet other words, a parameter takes one full degree of freedom if its prior distribution has \emph{infinite} variance (a different way to say that it can take any value and its prior is flat). Conversely, if prior distribution for the parameter has \emph{zero} variance, then it is fixed (a constant!) and take zero degrees of freedom. Finally, if prior distribution for the parameter has non-zero \emph{finite} variance (whatever it is), it uses up a fraction of the degree of freedom. How much it uses up depends on the variance.
+
+This is why fixed parameters in frequentist statistics use full degree of freedom (flat priors!) but same ``fixed'' parameters will use less than one in Bayesian models with non-flat priors (even weakly regularizing priors mean that you are not enjoying the full freedom). Similarly, a random effect in repeated measures ANOVA uses one degree of freedom because it has flat priors (can take any value, no shrinkage) but only a fraction in linear mixed models, because in LMM random effects come from a Gaussian distribution with finite variance (shrinkage!).
 
   \bibliography{book.bib}
 

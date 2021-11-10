@@ -64,3 +64,4 @@ the-irony-of-power-analysis
 conclusions-1
 unbiased-mean-versus-biased-variance-in-plain-english
 probability-mass-versus-probability-density
+effective-degrees-of-freedom-number-of-parameters
