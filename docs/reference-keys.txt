@@ -27,6 +27,7 @@ deviance-information-criterion-dic-and-widely-applicable-information-criterion-w
 importance-sampling
 pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo
 bayes-factor
+bayesian-vs.-fequentist-statisics
 choice-of-likelihood-both
 linear-model-both
 priors-optional-for-bayesian

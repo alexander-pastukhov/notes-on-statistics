@@ -4,15 +4,15 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Chapter 11 Generalized Additive Models as continuous random effects | Notes on Statistics</title>
+<title>Chapter 12 Generalized Additive Models as continuous random effects | Notes on Statistics</title>
 <meta name="author" content="Alexander Pastukhov">
 <meta name="description" content="The purpose of this note is to give an intuition about what generalized additive models (GAMs) are and, more importantly, when can they be handy for causal inferences. Thus, I will leave most...">
 <meta name="generator" content="bookdown 0.23 with bs4_book()">
-<meta property="og:title" content="Chapter 11 Generalized Additive Models as continuous random effects | Notes on Statistics">
+<meta property="og:title" content="Chapter 12 Generalized Additive Models as continuous random effects | Notes on Statistics">
 <meta property="og:type" content="book">
 <meta property="og:description" content="The purpose of this note is to give an intuition about what generalized additive models (GAMs) are and, more importantly, when can they be handy for causal inferences. Thus, I will leave most...">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Chapter 11 Generalized Additive Models as continuous random effects | Notes on Statistics">
+<meta name="twitter:title" content="Chapter 12 Generalized Additive Models as continuous random effects | Notes on Statistics">
 <meta name="twitter:description" content="The purpose of this note is to give an intuition about what generalized additive models (GAMs) are and, more importantly, when can they be handy for causal inferences. Thus, I will leave most...">
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.10/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
@@ -45,14 +45,15 @@
 <li><a class="" href="collider-bias.html"><span class="header-section-number">4</span> Collider bias</a></li>
 <li><a class="" href="the-haunted-dag.html"><span class="header-section-number">5</span> The haunted DAG</a></li>
 <li><a class="" href="information-criteria.html"><span class="header-section-number">6</span> Information Criteria</a></li>
-<li><a class="" href="mixtures.html"><span class="header-section-number">7</span> Mixtures</a></li>
-<li><a class="" href="instrumental-variables.html"><span class="header-section-number">8</span> Instrumental Variables</a></li>
-<li><a class="" href="parameters-combining-information-from-an-individual-with-population.html"><span class="header-section-number">9</span> Parameters: combining information from an individual with population</a></li>
-<li><a class="" href="incorporating-measurement-error-a-rubber-band-metaphor.html"><span class="header-section-number">10</span> Incorporating measurement error: a rubber band metaphor</a></li>
-<li><a class="active" href="generalized-additive-models-as-continuous-random-effects.html"><span class="header-section-number">11</span> Generalized Additive Models as continuous random effects</a></li>
-<li><a class="" href="flat-priors-the-strings-attached.html"><span class="header-section-number">12</span> Flat priors: the strings attached</a></li>
-<li><a class="" href="unbiased-mean-versus-biased-variance-in-plain-english.html"><span class="header-section-number">13</span> Unbiased mean versus biased variance in plain English</a></li>
-<li><a class="" href="probability-mass-versus-probability-density.html"><span class="header-section-number">14</span> Probability mass versus probability density</a></li>
+<li><a class="" href="bayesian-vs.-fequentist-statisics.html"><span class="header-section-number">7</span> Bayesian vs. fequentist statisics</a></li>
+<li><a class="" href="mixtures.html"><span class="header-section-number">8</span> Mixtures</a></li>
+<li><a class="" href="instrumental-variables.html"><span class="header-section-number">9</span> Instrumental Variables</a></li>
+<li><a class="" href="parameters-combining-information-from-an-individual-with-population.html"><span class="header-section-number">10</span> Parameters: combining information from an individual with population</a></li>
+<li><a class="" href="incorporating-measurement-error-a-rubber-band-metaphor.html"><span class="header-section-number">11</span> Incorporating measurement error: a rubber band metaphor</a></li>
+<li><a class="active" href="generalized-additive-models-as-continuous-random-effects.html"><span class="header-section-number">12</span> Generalized Additive Models as continuous random effects</a></li>
+<li><a class="" href="flat-priors-the-strings-attached.html"><span class="header-section-number">13</span> Flat priors: the strings attached</a></li>
+<li><a class="" href="unbiased-mean-versus-biased-variance-in-plain-english.html"><span class="header-section-number">14</span> Unbiased mean versus biased variance in plain English</a></li>
+<li><a class="" href="probability-mass-versus-probability-density.html"><span class="header-section-number">15</span> Probability mass versus probability density</a></li>
 </ul>
 
         <div class="book-extra">
@@ -60,14 +61,14 @@
         </div>
       </nav>
 </div>
-  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="generalized-additive-models-as-continuous-random-effects" class="section level1" number="11">
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="generalized-additive-models-as-continuous-random-effects" class="section level1" number="12">
 <h1>
-<span class="header-section-number">11</span> Generalized Additive Models as continuous random effects<a class="anchor" aria-label="anchor" href="#generalized-additive-models-as-continuous-random-effects"><i class="fas fa-link"></i></a>
+<span class="header-section-number">12</span> Generalized Additive Models as continuous random effects<a class="anchor" aria-label="anchor" href="#generalized-additive-models-as-continuous-random-effects"><i class="fas fa-link"></i></a>
 </h1>
 <p>The purpose of this note is to give an intuition about what generalized additive models (GAMs) are and, more importantly, when can they be handy for <em>causal</em> inferences. Thus, I will leave most mathematical details out<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;You can find them all in a &lt;a href="https://www.routledge.com/Generalized-Additive-Models-An-Introduction-with-R-Second-Edition/Wood/p/book/9781498728331"&gt;book&lt;/a&gt; by Simon N. Wood.&lt;/p&gt;'><sup>23</sup></a>.</p>
-<div id="generalized-additive-models-an-über-brief-introduction" class="section level2" number="11.1">
+<div id="generalized-additive-models-an-über-brief-introduction" class="section level2" number="12.1">
 <h2>
-<span class="header-section-number">11.1</span> Generalized Additive Models: An Über-brief Introduction<a class="anchor" aria-label="anchor" href="#generalized-additive-models-an-%C3%BCber-brief-introduction"><i class="fas fa-link"></i></a>
+<span class="header-section-number">12.1</span> Generalized Additive Models: An Über-brief Introduction<a class="anchor" aria-label="anchor" href="#generalized-additive-models-an-%C3%BCber-brief-introduction"><i class="fas fa-link"></i></a>
 </h2>
 <div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-54-1.png" width="672"></div>
 <p>Imagine that you have a (completely made up!) data set shown aboe that describes probability of consuming an ice-cream as a function of age. As you can see, it is twisty curve, so a simpler linear regression won’t do. If we do not have an idea about the process(es) that generated this data, we might at least smooth it to see the underlying relationship more clearly. You can do this in a number of ways using a running median, loess, etc., but we will focus on GAMs as they have an advantage of being (generalized) linear models, which makes it easy to incorporate them into bigger generalized linear models.</p>
@@ -75,22 +76,22 @@
 <p>In the example below, basis functions are cubic regression splines that are centered on “knots.” Each tent has its own coefficient that determines its height and, also, the transition between knots. A <em>wigliness</em> parameter determines how different coefficients can be, the more different they are, the wigglier will be the line, hence the name. Accordingly, wigliness of <em>zero</em> produces a straight horizontal line (all coefficients must be the same). Wigliness of infinity means that coefficients can take any value and fit the data as closely as possible. As you can see, smoothing makes it much easier to see the underlying relationship.
 <img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-55-1.png" width="672"></p>
 </div>
-<div id="what-are-gams-good-for" class="section level2" number="11.2">
+<div id="what-are-gams-good-for" class="section level2" number="12.2">
 <h2>
-<span class="header-section-number">11.2</span> What are GAMs good for?<a class="anchor" aria-label="anchor" href="#what-are-gams-good-for"><i class="fas fa-link"></i></a>
+<span class="header-section-number">12.2</span> What are GAMs good for?<a class="anchor" aria-label="anchor" href="#what-are-gams-good-for"><i class="fas fa-link"></i></a>
 </h2>
 <p>As mentioned above, GAMs are just smoothers. They approximate a smooth relationship in the data without any knowledge or assumptions about a generative process behind it. As such they have at least two clear usage cases: an exploratory data analysis and generating predictions. In the former case, the shape of the smoothed line might hint at the underlying mechanisms and facilitate development of a causal model. In the latter case, as long as we stick to interpolation, we can use smoothed line to predict unobserved values for future use.</p>
 <p>But what about causal inference? Can GAMs be useful for in this case? Yes, they can play a useful and obvious role. But to make this “obvious” obvious, we must take a detour and talk about random factors.</p>
 </div>
-<div id="covariates-random-factors" class="section level2" number="11.3">
+<div id="covariates-random-factors" class="section level2" number="12.3">
 <h2>
-<span class="header-section-number">11.3</span> Covariates / random factors<a class="anchor" aria-label="anchor" href="#covariates-random-factors"><i class="fas fa-link"></i></a>
+<span class="header-section-number">12.3</span> Covariates / random factors<a class="anchor" aria-label="anchor" href="#covariates-random-factors"><i class="fas fa-link"></i></a>
 </h2>
 <p>Imagine that we have data on ice-cream consumption and, among other things, we measured respondents’ eye color. What you find is that people with different eye color tend to consume different amount of ice-cream (on average). Why? It is a made-up example, so I do not know. But it could be genetic, same group of genes being responsible for eye color and ice-cream craving. Or it could be something else. Point is, we do not have a good (or any) causal model of a generative process that would link these two variables. Because of that we are not really interested in this link but we also cannot ignore it. Any systematic relationship that we ignore will we leave unexplained variance that, it turn, will make it harder for us to see a causal effect for predictors that we are interested in. What do we do? We include eye color either as a covariate (fixed effect) or a random effect. For frequentist models, the difference is whether intercept for each group are estimated independently (the former, flat priors, no shrinkage) or by pooling information across groups (the latter, produces shrinkage). For Bayesian models, the difference is between fixed (covariates) and adaptative (random effect) priors. Still, the idea is to stress that we have no idea why this particular variable is correlated with the outcome and that we have no causal generative model.</p>
 </div>
-<div id="gams-as-continuous-random-factors" class="section level2" number="11.4">
+<div id="gams-as-continuous-random-factors" class="section level2" number="12.4">
 <h2>
-<span class="header-section-number">11.4</span> GAMs as continuous random factors<a class="anchor" aria-label="anchor" href="#gams-as-continuous-random-factors"><i class="fas fa-link"></i></a>
+<span class="header-section-number">12.4</span> GAMs as continuous random factors<a class="anchor" aria-label="anchor" href="#gams-as-continuous-random-factors"><i class="fas fa-link"></i></a>
 </h2>
 <p>Let us get back to ice-cream consumption as a function of age. It is easy to that we are in the same situation as with eye color: We have no idea about the generative process but the dependence is strong and should not be ignored. Thus, we must include age in the bigger model, even if we do not care <em>how</em> the age causes ice-cream consumption. But how can we do it? The relationship is not linear or even monotonic, so we cannot use age a linear covariate. And, unlike categorical data for eye color, the data is continuous and we do not have well-defined few levels to estimate values for (unless we introduce some artificial discrete levels). Plus, the latter approach would actually <em>ignore</em> the dependence, because will ignore the fact that nearby levels should be more similar than more distance ones. So, what do we do?</p>
 <p>It is GAMs to the rescue! By pooling information from nearby data samples, GAMs produce a smooth estimate for each age that can be used in the model. The smooth estimate is, effectively, a continuous random effect! Thus, you should use GAMs whenever you have a <em>continuous</em> variable that is correlated with an outcome, you have no idea about the underlying causal link but the relationship is simple and monotonic enough.</p>
@@ -99,16 +100,16 @@
 </div>
 
   <div class="chapter-nav">
-<div class="prev"><a href="incorporating-measurement-error-a-rubber-band-metaphor.html"><span class="header-section-number">10</span> Incorporating measurement error: a rubber band metaphor</a></div>
-<div class="next"><a href="flat-priors-the-strings-attached.html"><span class="header-section-number">12</span> Flat priors: the strings attached</a></div>
+<div class="prev"><a href="incorporating-measurement-error-a-rubber-band-metaphor.html"><span class="header-section-number">11</span> Incorporating measurement error: a rubber band metaphor</a></div>
+<div class="next"><a href="flat-priors-the-strings-attached.html"><span class="header-section-number">13</span> Flat priors: the strings attached</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
-<li><a class="nav-link" href="#generalized-additive-models-as-continuous-random-effects"><span class="header-section-number">11</span> Generalized Additive Models as continuous random effects</a></li>
-<li><a class="nav-link" href="#generalized-additive-models-an-%C3%BCber-brief-introduction"><span class="header-section-number">11.1</span> Generalized Additive Models: An Über-brief Introduction</a></li>
-<li><a class="nav-link" href="#what-are-gams-good-for"><span class="header-section-number">11.2</span> What are GAMs good for?</a></li>
-<li><a class="nav-link" href="#covariates-random-factors"><span class="header-section-number">11.3</span> Covariates / random factors</a></li>
-<li><a class="nav-link" href="#gams-as-continuous-random-factors"><span class="header-section-number">11.4</span> GAMs as continuous random factors</a></li>
+<li><a class="nav-link" href="#generalized-additive-models-as-continuous-random-effects"><span class="header-section-number">12</span> Generalized Additive Models as continuous random effects</a></li>
+<li><a class="nav-link" href="#generalized-additive-models-an-%C3%BCber-brief-introduction"><span class="header-section-number">12.1</span> Generalized Additive Models: An Über-brief Introduction</a></li>
+<li><a class="nav-link" href="#what-are-gams-good-for"><span class="header-section-number">12.2</span> What are GAMs good for?</a></li>
+<li><a class="nav-link" href="#covariates-random-factors"><span class="header-section-number">12.3</span> Covariates / random factors</a></li>
+<li><a class="nav-link" href="#gams-as-continuous-random-factors"><span class="header-section-number">12.4</span> GAMs as continuous random factors</a></li>
 </ul>
 
       <div class="book-extra">
@@ -126,7 +127,7 @@
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2021-11-09.</p>
+    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2021-11-10.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

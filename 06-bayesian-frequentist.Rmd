@@ -1,4 +1,4 @@
-
+# Bayesian vs. fequentist statisics
 I suspect that many student who read "Statistical Rethinking" have a feeling that it is something completely different from what they have been learning in "traditional" statistics classes. That Bayesian approach is more "hands-on" and complicated, whereas "normal" statistics is simpler and easy to work with even it is "less powerful."^[Not really.] Thus, the purpose of this note is to walk you through a typical statistical analysis and focus on practical differences and, more importantly, similarity of the two approaches.
 
 ## Choice of likelihood (both)

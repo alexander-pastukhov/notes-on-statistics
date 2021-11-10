@@ -6,7 +6,7 @@
 ]{book}
 \title{Notes on Statistics}
 \author{Alexander Pastukhov}
-\date{2021-11-09}
+\date{2021-11-10}
 
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
@@ -816,6 +816,9 @@ here \(\frac{\Pr(D|M_{1})}{\Pr(D|M_{2})}\) are \textbf{posterior odds}, \(\frac 
 If you assume that both hypotheses/models are equally likely (you have flat priors), the prior odds are 1:1 and your posterior odds are equal to Bayes Factor or, vice versa, Bayes Factor is equal to posterior odds. This means you can just pick their likelihoods from the posterior sampled distribution and compute the ratio.
 
 I am not a big fan of Bayes Factor for conceptual reasons. Although it can compare any two models (as long as the sample is the same), it looks a lot like a Bayesian version of a p-value and, therefore, lends itself naturally to the null-hypothesis testing. And, as far as my reading of literature in my field is concerned, this is how people most frequently use it, as a cooler Bayesian way of null-hypothesis testing. You have no worries about multiple comparisons (it is Bayesian, so no need for error correction!) and it can prove null hypothesis (it is the ratio, so flip it and see how much stronger \emph{H0} is)! There is nothing wrong with this per se but the advantage of Bayesian statistics and information criteria is that you do not \emph{need} to think in terms of null hypothesis testing and nested models. Adopting Bayes Factor may prevent you from seeing this and will allow you to continue doing same analysis just in a differently colored wrapper. Again, there is nothing wrong with exploratory analysis using null hypothesis testing until you can formulate a better model. But it should not be the \emph{only} way you approach modeling.
+
+\hypertarget{bayesian-vs.-fequentist-statisics}{%
+\chapter{Bayesian vs.~fequentist statisics}\label{bayesian-vs.-fequentist-statisics}}
 
 I suspect that many student who read ``Statistical Rethinking'' have a feeling that it is something completely different from what they have been learning in ``traditional'' statistics classes. That Bayesian approach is more ``hands-on'' and complicated, whereas ``normal'' statistics is simpler and easy to work with even it is ``less powerful.''\footnote{Not really.} Thus, the purpose of this note is to walk you through a typical statistical analysis and focus on practical differences and, more importantly, similarity of the two approaches.
 
