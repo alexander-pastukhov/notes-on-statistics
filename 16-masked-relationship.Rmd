@@ -14,11 +14,17 @@ milk_df <-
   mutate(K = standardize(kcal.per.g),
          N = standardize(neocortex.perc),
          M = standardize(log(mass)), 
-         iM = cut_number(M, 5)) %>%
+         iM = cut_number(M, 3), 
+         iN = cut_number(N, 3)) %>%
   na.omit()
 
 ggplot(milk_df, aes(x = N, y=K, color=iM)) + 
   geom_point() + 
   geom_smooth(method="lm", formula=y~x, se=FALSE)
+
+ggplot(milk_df, aes(x = M, y=K, color=iN)) + 
+  geom_point() + 
+  geom_smooth(method="lm", formula=y~x, se=FALSE)
+
 ```
 
