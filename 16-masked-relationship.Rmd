@@ -1,0 +1,24 @@
+# Masked Relationship
+
+```{r, include=FALSE}
+library(dagitty)
+library(rethinking)
+library(tidyverse)
+```
+
+
+```{r}
+data(milk)
+milk_df <- 
+  milk %>%
+  mutate(K = standardize(kcal.per.g),
+         N = standardize(neocortex.perc),
+         M = standardize(log(mass)), 
+         iM = cut_number(M, 5)) %>%
+  na.omit()
+
+ggplot(milk_df, aes(x = N, y=K, color=iM)) + 
+  geom_point() + 
+  geom_smooth(method="lm", formula=y~x, se=FALSE)
+```
+
