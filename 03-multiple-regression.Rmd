@@ -1,4 +1,4 @@
-# Collider bias
+# Multiple regression - Spurious association
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(dagitty)
