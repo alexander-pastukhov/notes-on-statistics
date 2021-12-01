@@ -42,7 +42,7 @@
 <li><a class="" href="index.html"><span class="header-section-number">1</span> Precis</a></li>
 <li><a class="" href="loss-functions.html"><span class="header-section-number">2</span> Loss functions</a></li>
 <li><a class="" href="directed-acyclic-graphs-and-causal-reasoning.html"><span class="header-section-number">3</span> Directed Acyclic Graphs and Causal Reasoning</a></li>
-<li><a class="" href="collider-bias.html"><span class="header-section-number">4</span> Collider bias</a></li>
+<li><a class="" href="spurious-association.html"><span class="header-section-number">4</span> Multiple regression - Spurious association</a></li>
 <li><a class="" href="the-haunted-dag.html"><span class="header-section-number">5</span> The haunted DAG</a></li>
 <li><a class="" href="information-criteria.html"><span class="header-section-number">6</span> Information Criteria</a></li>
 <li><a class="active" href="bayesian-vs.-fequentist-statisics.html"><span class="header-section-number">7</span> Bayesian vs. fequentist statisics</a></li>
@@ -55,6 +55,7 @@
 <li><a class="" href="unbiased-mean-versus-biased-variance-in-plain-english.html"><span class="header-section-number">14</span> Unbiased mean versus biased variance in plain English</a></li>
 <li><a class="" href="probability-mass-versus-probability-density.html"><span class="header-section-number">15</span> Probability mass versus probability density</a></li>
 <li><a class="" href="effective-degrees-of-freedom-number-of-parameters.html"><span class="header-section-number">16</span> Effective degrees of freedom / number of parameters</a></li>
+<li><a class="" href="multiple-regression---masked-relationship.html"><span class="header-section-number">17</span> Multiple regression - Masked relationship</a></li>
 </ul>
 
         <div class="book-extra">
@@ -153,9 +154,9 @@ y_i \sim Normal(\mu_i, \sigma) \\
 <p>As you can see, from <em>practical</em> point of view, apart from optional Bayesian priors and different ways to quantify the uncertainty of estimates, the two approaches are the same. They require you making same decisions and the results are interpreted the same way. This lack of difference becomes even more apparent when you use software packages for running your statistical models. E.g., the way you specify your model in <code>lme4</code> (frenquetist) and <code>brms</code> (Bayesian) is very much the same to the point that in most cases you only need to change the function name (<code>lmer</code> to <code>brm</code> or vice versa) and leave the rest the same.</p>
 <p>Thus, the point is that you should not be choosing between studying or doing frenquetists or Bayesian statistic. I feel more comfortable with Bayesian, mostly because it makes it easier interpret statistical significance. However, my typical approach is to start with frenquetist statistics (fast, good for shooting from a hip), once I am certain about my decisions (likelihood, model) I re-impliement the same model in Bayesian using informative priors and see whether results match (with reason). Then, I report both sets of inferences. This costs me remarkably little time precisely because there is so little difference between the two approaches from practical point of view!</p>
 </div>
-<div id="take-home-message-1" class="section level2" number="7.9">
+<div id="take-home-message" class="section level2" number="7.9">
 <h2>
-<span class="header-section-number">7.9</span> Take home message<a class="anchor" aria-label="anchor" href="#take-home-message-1"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.9</span> Take home message<a class="anchor" aria-label="anchor" href="#take-home-message"><i class="fas fa-link"></i></a>
 </h2>
 <p>We are not studying something completely different! We are merely approaching it from an unusual angle that leads to deeper understanding and interesting insights in the long run.</p>
 
@@ -177,7 +178,7 @@ y_i \sim Normal(\mu_i, \sigma) \\
 <li><a class="nav-link" href="#model-comparison-via-information-criteria-both"><span class="header-section-number">7.6</span> Model comparison via information criteria (both)</a></li>
 <li><a class="nav-link" href="#generating-predictions-both"><span class="header-section-number">7.7</span> Generating predictions (both)</a></li>
 <li><a class="nav-link" href="#conclusions"><span class="header-section-number">7.8</span> Conclusions</a></li>
-<li><a class="nav-link" href="#take-home-message-1"><span class="header-section-number">7.9</span> Take home message</a></li>
+<li><a class="nav-link" href="#take-home-message"><span class="header-section-number">7.9</span> Take home message</a></li>
 </ul>
 
       <div class="book-extra">
@@ -195,7 +196,7 @@ y_i \sim Normal(\mu_i, \sigma) \\
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2021-11-10.</p>
+    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2021-12-01.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

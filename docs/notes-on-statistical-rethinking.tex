@@ -6,7 +6,7 @@
 ]{book}
 \title{Notes on Statistics}
 \author{Alexander Pastukhov}
-\date{2021-11-10}
+\date{2021-12-01}
 
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
@@ -351,10 +351,10 @@ First, take at top-left and bottom-right plots that plot, correspondingly, divor
 
 This opportunity to turn dependence into independence by conditioning two variables on the third is at the heart of causal reasoning\footnote{As you will learn later, the opposite is also true, so you can turn independence into conditional dependence.}. You draw a DAG and if it has a fork in it, you know that \emph{given your educated guess about causal relationship is correct} (small world!), your data (large world!) should show dependence \emph{and} conditional independence of the two variables (divorce and marriage rates). What if it does not? E.g., the two variables are always dependent or always independent, conditional or not? As we already discussed above, that just means that your educated guess was wrong and that relationship of the variables is different from how you thought it is. Thus, you need to go back to the drawing board, come up with another DAG, repeat the analysis and see if that new DAG is supported by data. If you have more variables, your DAGs will be more complex but the beauty of such causal reasoning is that you can concentrate on \emph{parts} of it, picking three variables and seeing whether your guess about these three variables was correct. This way, you can tinker with your causal model part-by-part, instead of hoping that you got \emph{everything} right on the very first attempt.
 
-\hypertarget{collider-bias}{%
-\chapter{Collider bias}\label{collider-bias}}
+\hypertarget{spurious-association}{%
+\chapter{Multiple regression - Spurious association}\label{spurious-association}}
 
-This notes are on Chapter 5 ``The Many Variables \& The Spurious Waffles'', specifically, on section 5.1 ``Spurious association''. If you are to remember one thing from that chapter, it should be ``doing multiple regression is easy, understanding and interpreting it is hard''. As you will see below, fully understanding relationship between variables is complicate even when we are working with a minimal multiple regression with just two predictors.
+These notes are on Chapter 5 ``The Many Variables \& The Spurious Waffles'', specifically, on section 5.1 ``Spurious association''. If you are to remember one thing from that chapter, it should be ``doing multiple regression is easy, understanding and interpreting it is hard''. As you will see below, fully understanding relationship between variables is complicate even when we are working with a minimal multiple regression with just two predictors.
 
 When reading section 5.1 ``Spurious association'', I found relationships between the \emph{marriage age}, \emph{marriage rate}, and \emph{divorce rate} to be both clear and mysterious. On the one hand, everything is correlated with everything.
 
@@ -370,7 +370,7 @@ So, what's going on? \emph{How does it know?} To understand this, let us start w
 \section{Multicollinearity}\label{multicollinearity}}
 
 To make things easier to understand, let us use simulated data. Imagine that both marriage and divorce rate are both \emph{caused by} marriage age and are almost perfectly linearly dependent it, so that \(D_i = \beta_A^{true} \cdot A_i\) (for the sake of simplicity \(\beta_A^{true} = -1\)) and \(M_i = -A_i\). The \emph{causal} relationship that we are modeling is called a fork:
-\[Marriage~rate~\leftarrow~Age~of~marriage~\rightarrow~Divorce~rate\].
+\[Marriage~rate~\leftarrow~Age~of~marriage~\rightarrow~Divorce~rate\]
 We pretend our variables are already standardized, so the plots would look something like this.
 
 \begin{Shaded}
@@ -502,7 +502,7 @@ By definition, \(\epsilon\) is \emph{pure noise} and has zero predictive value w
 
 \includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-18-1.pdf}
 
-But we are not fitting it alone, as the coefficient \(\beta_M\) appears at \emph{twice}:
+But we are not fitting it alone, as the coefficient \(\beta_M\) appears \emph{twice}:
 \[D = (\beta_A  - \beta_M) \cdot A + \beta_M \cdot \epsilon\]
 The latter part, \(\beta_M \cdot \epsilon\), pushes \(\beta_M\) towards zero slope, which is the best solution for pure noise, as you saw in the plot above. But the former part, \(\beta_A - \beta_M\) only needs to add up to \(\beta_A^{true}\), so however we fix \(\beta_M\), \(\beta_A\) can accommodate. Thus the closer \(\beta_M\) to zero, the closer is \(\beta_A\) to \(\beta_A^{true}\). And that's how the magic works! If one variable is other variable plus noise, that \emph{plus noise} induces extra penalty (extra residuals) and the only way to reduce residuals is to ignore the \emph{uncorrelated} noise by setting the slope to zero. Therefore, you ignore the variable as well, because it is merely a noisy twin of a better variable. You can see how added noise ``disambiguates'' the causal relationship\footnote{I've used ordinary least squares just to make simulations faster. You will get the same result using Bayesian fittings procedures.}.
 
@@ -622,12 +622,12 @@ The plots look very similar to those that we had before, so let us run the model
 ## sigma  0.16656407 0.01661272  0.14001374  0.19311440
 \end{verbatim}
 
-The model fit is virtually identical to that for the real data and, effectively, for a noisy simulated fork DAG. Yet, remember, that the underlying causal relationship between marriage rate and marriage age are now \emph{opposite}. In the fork DAG, age was causing marriage rate. Here, in the chain DAG, marriage rate for causing age. Moreover, the way we generated synthetic data, marriage rate causes divorce rate, although its effect is \emph{mediated} via marriage age. Yet, looking at the parameter values for \(\beta_M\) we might be tempted to conclude that marriage rate has no effect on divorce rate. To understand why, think about the relationship between marriage rate and age again. We designed it, so that \(A = -M + \epsilon\) and \(D = -A\) (we ignore the noise in the latter part for clarity). Substituting, we get \(D = M - \epsilon\) or, since we designed noise to be symmetric, we can also write \(D = M + \epsilon\). To put it differently, divorce rate are based on \emph{actual} values of age, which include noise. So, somewhat paradoxically, the cleaner version of the original variable is less correlated. If it still unclear, let me try with a metaphor. Imagine your friend sings you a song she heard. \(original \rightarrow friend \rightarrow you\). She remembered it wrong, so her version is somewhat different from the original. But because you are used to \emph{her} version of the song, the original, once you finally hear it, sounds wrong, as it does not have the distortions introduced by your friend.
+The model fit is virtually identical to that for the real data and, effectively, for a noisy simulated fork DAG. Yet, remember, that the underlying causal relationship between marriage rate and marriage age is now \emph{opposite}. In the fork DAG, age was causing marriage rate. Here, in the chain DAG, marriage rate for causing age. Moreover, the way we generated synthetic data, marriage rate causes divorce rate, although its effect is \emph{mediated} via marriage age. Yet, looking at the parameter values for \(\beta_M\) we might be tempted to conclude that marriage rate has no effect on divorce rate. To understand why, think about the relationship between marriage rate and age again. We designed it, so that \(A = -M + \epsilon\) and \(D = -A\) (we ignore the noise in the latter part for clarity). Substituting, we get \(D = M - \epsilon\) or, since we designed noise to be symmetric, we can also write \(D = M + \epsilon\). To put it differently, divorce rate are based on \emph{actual} values of age, which include noise. So, somewhat paradoxically, the cleaner version of the original variable is less correlated. If it still unclear, let me try with a metaphor. Imagine your friend sings you a song she heard. \(original \rightarrow friend \rightarrow you\). She remembered it wrong, so her version is somewhat different from the original. But because you are used to \emph{her} version of the song, the original, once you finally hear it, sounds wrong, as it does not have the distortions introduced by your friend.
 
-\hypertarget{take-home-message}{%
-\section{Take-home message}\label{take-home-message}}
+\hypertarget{take-home-messages}{%
+\section{Take-home messages}\label{take-home-messages}}
 
-So, two DAGs, two \emph{differently} generated data sets, yet, one statistical model. Both DAGs agree that there is a direct causal path between marriage age and divorce but have opposite assumptions about causal relationship between marriage age and rate. What should we conclude from this? That it might be impossible to understand causal relationships between all variables even for the simplest case of just two predictors. The only thing to do is to embrace this ambiguity and be aware of it whenever you interpret regression models. So, you should use DAGs exactly for this purpose of understanding in how many ways can you generate the observed data. I understand that a simple unambiguous story is far more appealing\footnote{``Just tell me how things are!''} but as Jochen Braun of Magdeburg says: ``Do not fall for your own propaganda!''. Selecting just one story / DAG does not make them true. Considering all possible DAGs will likely lead to insights based on predictions they make. Even if your current data cannot decide between them, their different predictions for future experiment will help to solve the puzzle eventually.
+So, two DAGs, two \emph{differently} generated data sets, yet, one statistical model. Both DAGs agree that there is a direct causal path between marriage age and divorce but have opposite assumptions about causal relationship between marriage age and rate. What should we conclude from this? That it might be impossible to understand causal relationships between all variables even for the simplest case of just two predictors. The only thing to do is to embrace this ambiguity and be aware of it whenever you interpret regression models. So, you should use DAGs exactly for this purpose of understanding in how many ways can you generate the observed data. I understand that a simple unambiguous story is far more appealing\footnote{``Just tell me how things are!''} but as Jochen Braun of Magdeburg says: ``Do not fall for your own propaganda!''. Selecting just one story / DAG does not make them true. Considering all possible DAGs will likely lead to insights based on predictions they make. Even if your current data cannot decide between them, their different predictions for future experiments will help to solve the puzzle eventually.
 
 Another take home message: Regression models cannot do magic. They can quantify correctional relationship and their signal-to-noise ratios but they do not know causality and they won't tell you which model is the ``true'' model. Imagine that we never measured marriage age, we would model divorce rate from marriage rate and would be quite pleased with the results. And, given how noisy the real data is, we probably did not consider some other \emph{very important} variables, those presence might render age as irrelevant as the marriage rate is now. Again, assuming the chain DAG
 \[marriage~rate \rightarrow age \rightarrow variable~we~missed \rightarrow divorce~rate\]
@@ -910,8 +910,8 @@ As you can see, from \emph{practical} point of view, apart from optional Bayesia
 
 Thus, the point is that you should not be choosing between studying or doing frenquetists or Bayesian statistic. I feel more comfortable with Bayesian, mostly because it makes it easier interpret statistical significance. However, my typical approach is to start with frenquetist statistics (fast, good for shooting from a hip), once I am certain about my decisions (likelihood, model) I re-impliement the same model in Bayesian using informative priors and see whether results match (with reason). Then, I report both sets of inferences. This costs me remarkably little time precisely because there is so little difference between the two approaches from practical point of view!
 
-\hypertarget{take-home-message-1}{%
-\section{Take home message}\label{take-home-message-1}}
+\hypertarget{take-home-message}{%
+\section{Take home message}\label{take-home-message}}
 
 We are not studying something completely different! We are merely approaching it from an unusual angle that leads to deeper understanding and interesting insights in the long run.
 
@@ -1370,6 +1370,204 @@ Our constant PDF value is 2! Way above one, how come? Think about the slope and 
 One thing that your learn once you start using linear mixed models (multulevel) models is that degrees of freedom used up by the model is less than number of parameters, so the total number is called number of \emph{effective} parameters / degrees of freedom. This is because each parameter (whether it is formally ``fixed'' or ``random'') can use up 1 degree of freedom. It will use full one degree of freedom, if it can take \emph{any} value. In other words, a parameter with flat prior takes up 1 degree of freedom. In yet other words, a parameter takes one full degree of freedom if its prior distribution has \emph{infinite} variance (a different way to say that it can take any value and its prior is flat). Conversely, if prior distribution for the parameter has \emph{zero} variance, then it is fixed (a constant!) and take zero degrees of freedom. Finally, if prior distribution for the parameter has non-zero \emph{finite} variance (whatever it is), it uses up a fraction of the degree of freedom. How much it uses up depends on the variance.
 
 This is why fixed parameters in frequentist statistics use full degree of freedom (flat priors!) but same ``fixed'' parameters will use less than one in Bayesian models with non-flat priors (even weakly regularizing priors mean that you are not enjoying the full freedom). Similarly, a random effect in repeated measures ANOVA uses one degree of freedom because it has flat priors (can take any value, no shrinkage) but only a fraction in linear mixed models, because in LMM random effects come from a Gaussian distribution with finite variance (shrinkage!).
+
+\hypertarget{multiple-regression---masked-relationship}{%
+\chapter{Multiple regression - Masked relationship}\label{multiple-regression---masked-relationship}}
+
+These notes are on section 5.2 ``Masked relationship'' from chapter 5 ``The Many Variables \& The Spurious Waffles''. This section introduces is a mirror twin of section 5.1 on \protect\hyperlink{spurious-association}{spurious associations}. The latter explores how each of two predictors can have a strong relationship with an outcome variable \emph{if fitted individually} but how only one of them retains that relationship when both predictors are used in multiple regression. Section 5.2 is concerned with the exact opposite. When we look at the association between each predictor variable (\emph{neocortex percent} and \emph{log body mass}) and the richness of milk \emph{individually}, we find nothing. However, when you use \emph{both} simultaneously via multiple regression, we find that both are strongly associated with the outcome variable.
+
+The key to understanding this are figure 5.9 (particularly, the bottom counterfactual plots) and an explanation on page 151 that coefficients of regression model shows that ``species that have high neocortex percent \emph{for their body mass} have lower milk energy'' and ``species with high body mass \emph{for their neocortex percent} have higher milk energy''. In other words, if you take several species with very similar body mass, you expect those with higher percent of neocortex to have richer milk. Conversely, if you handpick several species with very similar neocortex percentage, you expect that the larger ones will have a less energetic milk. But because these two predictor variables are correlated, this relationship is easy to see only when you fix one of them. Figure 5.9 tries to show that but we can do better by (artificially) grouping the data looking at relationship between each predictor variable and the milk energy individually.
+
+Let us start by replicating top subplots in figure 5.9. Note that 1) I used frequentist linear model fit with flat priors via \texttt{geom\_smooth()} and, therefore, 2) the stripes correspond to standard error rather than 89\% credible interval. However, the two are close enough in this case for illustration purposes.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{data}\NormalTok{(milk)}
+\NormalTok{milk\_df }\OtherTok{\textless{}{-}} 
+\NormalTok{  milk }\SpecialCharTok{\%\textgreater{}\%}
+  \CommentTok{\# standardize}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{K =} \FunctionTok{standardize}\NormalTok{(kcal.per.g),}
+         \AttributeTok{N =} \FunctionTok{standardize}\NormalTok{(neocortex.perc),}
+         \AttributeTok{M =} \FunctionTok{standardize}\NormalTok{(}\FunctionTok{log}\NormalTok{(mass))) }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \CommentTok{\# keep only complete cases}
+  \FunctionTok{na.omit}\NormalTok{()}
+
+\NormalTok{NK\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(milk\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ N, }\AttributeTok{y=}\NormalTok{K)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"neocortex percent (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"kilocal per g (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{coord\_equal}\NormalTok{()}
+
+\NormalTok{MK\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(milk\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ M, }\AttributeTok{y=}\NormalTok{K)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x) }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"log body mass (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"kilocal per g (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{coord\_equal}\NormalTok{()}
+
+\NormalTok{NK\_plot }\SpecialCharTok{|}\NormalTok{ MK\_plot}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-63-1.pdf}
+
+So, once again, we see that there is no clear relationship is evident if we consider neocortex percent while ignoring body mass of an animal and, vice versa, when we look only at the log body mass ignoring the cortex. Let us reduce our state of ignorance by splitting individual species into three groups based on their similarity in neocortex percentage. Note that I have put no extra care into the grouping process apart from ensuring that all groups have roughly the same number of species. Also note that connecting lines have no specific meaning and I've added them only to make visual grouping of dots of the same color easier.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{milk\_df }\OtherTok{\textless{}{-}} 
+\NormalTok{  milk\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \CommentTok{\# split data into three groups}
+  \FunctionTok{mutate}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Mass group}\StringTok{\textasciigrave{}} \OtherTok{=} \FunctionTok{cut\_number}\NormalTok{(M, }\DecValTok{3}\NormalTok{), }
+         \StringTok{\textasciigrave{}}\AttributeTok{Neocortex group}\StringTok{\textasciigrave{}} \OtherTok{=} \FunctionTok{cut\_number}\NormalTok{(N, }\DecValTok{3}\NormalTok{))}
+
+\NormalTok{NK\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(milk\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ N, }\AttributeTok{y=}\NormalTok{K, }\AttributeTok{color=}\StringTok{\textasciigrave{}}\AttributeTok{Neocortex group}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"neocortex percent (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"kilocal per g (std)"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position=}\StringTok{"bottom"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{guides}\NormalTok{(}\AttributeTok{col =} \FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{nrow =} \DecValTok{3}\NormalTok{, }\AttributeTok{byrow =} \ConstantTok{TRUE}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{coord\_equal}\NormalTok{()}
+
+\NormalTok{MK\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(milk\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ M, }\AttributeTok{y=}\NormalTok{K, }\AttributeTok{color=}\StringTok{\textasciigrave{}}\AttributeTok{Neocortex group}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"log body mass (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"kilocal per g (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position=}\StringTok{"bottom"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{guides}\NormalTok{(}\AttributeTok{col =} \FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{nrow =} \DecValTok{3}\NormalTok{, }\AttributeTok{byrow =} \ConstantTok{TRUE}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{coord\_equal}\NormalTok{()}
+
+\NormalTok{NK\_plot }\SpecialCharTok{|}\NormalTok{ MK\_plot}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-64-1.pdf}
+
+Once we group species either by their their neocortex percent, you can immediately see the pattern. The pattern on the left is trivial as it merely shows our grouping based on low (red), medium (green), and high (blue) percentage of neocortex. However, when we look at the right plot, we see how species with similar neocortex percentage cluster nicely together and this way you can see a nice negative correlation between log body mass and milk energy \emph{within each group}. This is because the same \emph{absolute} log body mass corresponds to different \emph{relative} log body mass with each group. I.e., a vertical slice through body mass leads to different values of milk energy \emph{because} these values come from different neocortex percent groups. To summarize, we can see that log body mass is informative \emph{only} if we know neocortex percent of an animal.
+
+Let us try to visualize what multiple regression is doing. Keep in mind that this will only be a rough approximation because we will use just three means (one for each neocortex percent group), whereas our model computes an appropriate mean for every single specie. We will emulate the model check of whether ``species that have \emph{particular} neocortex percent \emph{for their body mass} have lower milk energy'' by centering each group, i.e., subtracting each groups' mean from body mass of each specie from that group. In other words, we align each group so that average bogy mass species \emph{for each group} are in the center, the larger species \emph{within each group} are on the right and the smaller species \emph{within each group} are on the left. This way we remove a positive correlation between neocortex percent and body mass and, therefore, can see the effect of the body mass on the milk energy \emph{alone}. And, even in this approximate way the dependence in very clear.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{milk\_df }\OtherTok{\textless{}{-}} 
+\NormalTok{  milk\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Neocortex group}\StringTok{\textasciigrave{}}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{cM =}\NormalTok{ M }\SpecialCharTok{{-}} \FunctionTok{mean}\NormalTok{(M))}
+
+\FunctionTok{ggplot}\NormalTok{(milk\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ cM, }\AttributeTok{y=}\NormalTok{K)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method=}\StringTok{"lm"}\NormalTok{, }\AttributeTok{formula=}\NormalTok{y}\SpecialCharTok{\textasciitilde{}}\NormalTok{x, }\AttributeTok{color=}\StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{color=}\StringTok{\textasciigrave{}}\AttributeTok{Neocortex group}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"log body mass {-} group mean log body mass (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"kilocal per g (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position=}\StringTok{"right"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{guides}\NormalTok{(}\AttributeTok{col =} \FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{nrow =} \DecValTok{3}\NormalTok{, }\AttributeTok{byrow =} \ConstantTok{TRUE}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{xlim}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{coord\_equal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-65-1.pdf}
+
+The plot above expresses the same idea as a counterfactual right bottom plot in figure 5.9. Where, the question was ``what is the effect of log body mass for \emph{all} species with an average neocortex percent'', so single very specific group of animals. Our plot merely extended that idea to three groups. To appreciate this the link, let us fit the model and plot same counterfactuals for each group that we identified.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m5}\FloatTok{.7} \OtherTok{\textless{}{-}} \FunctionTok{quap}\NormalTok{(}
+  \FunctionTok{alist}\NormalTok{(}
+\NormalTok{    K }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{( mu , sigma ) ,}
+\NormalTok{    mu }\OtherTok{\textless{}{-}}\NormalTok{ a }\SpecialCharTok{+}\NormalTok{ bN}\SpecialCharTok{*}\NormalTok{N }\SpecialCharTok{+}\NormalTok{ bM}\SpecialCharTok{*}\NormalTok{M ,}
+\NormalTok{    a }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{( }\DecValTok{0}\NormalTok{ , }\FloatTok{0.2}\NormalTok{ ) ,}
+\NormalTok{    bN }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{( }\DecValTok{0}\NormalTok{ , }\FloatTok{0.5}\NormalTok{ ) ,}
+\NormalTok{    bM }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dnorm}\NormalTok{( }\DecValTok{0}\NormalTok{ , }\FloatTok{0.5}\NormalTok{ ) ,}
+\NormalTok{    sigma }\SpecialCharTok{\textasciitilde{}} \FunctionTok{dexp}\NormalTok{( }\DecValTok{1}\NormalTok{ )}
+\NormalTok{  ),}
+  \AttributeTok{data=}\NormalTok{milk\_df)}
+
+
+\CommentTok{\# function to compute counterfactuals}
+\NormalTok{compute\_counterfactual }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(quap\_fit, neocortex, logmass)\{}
+\NormalTok{  mu }\OtherTok{\textless{}{-}} \FunctionTok{link}\NormalTok{(quap\_fit, }\AttributeTok{data=}\FunctionTok{data.frame}\NormalTok{(}\AttributeTok{N=}\NormalTok{neocortex, }\AttributeTok{M=}\NormalTok{logmass))}
+\NormalTok{  mu\_PI }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(mu,}\DecValTok{2}\NormalTok{,PI)}
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{M =}\NormalTok{ logmass,}
+         \AttributeTok{N =}\NormalTok{ neocortex,}
+         \AttributeTok{K =} \FunctionTok{apply}\NormalTok{(mu,}\DecValTok{2}\NormalTok{,mean),}
+         \AttributeTok{KLower =}\NormalTok{ mu\_PI[}\DecValTok{1}\NormalTok{, ],}
+         \AttributeTok{KUpper =}\NormalTok{ mu\_PI[}\DecValTok{2}\NormalTok{, ])}
+\NormalTok{\}}
+
+
+
+\CommentTok{\# defining x{-}ticks as all milk values at regular intervals}
+\NormalTok{x\_seq }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{( }\AttributeTok{from=}\FunctionTok{min}\NormalTok{(milk\_df}\SpecialCharTok{$}\NormalTok{M)}\SpecialCharTok{{-}}\FloatTok{0.15}\NormalTok{ , }\AttributeTok{to=}\FunctionTok{max}\NormalTok{(milk\_df}\SpecialCharTok{$}\NormalTok{M)}\SpecialCharTok{+}\FloatTok{0.15}\NormalTok{ , }\AttributeTok{length.out=}\DecValTok{30}\NormalTok{)}
+
+\CommentTok{\# mean neocortex percent for each neocortex percent group}
+\NormalTok{neocortex\_counterfactuals\_df }\OtherTok{\textless{}{-}}
+  \CommentTok{\# compute average neocortex for each group}
+\NormalTok{  milk\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Neocortex group}\StringTok{\textasciigrave{}}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{MeanPercent =} \FunctionTok{mean}\NormalTok{(N), }\AttributeTok{.groups=}\StringTok{"keep"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \CommentTok{\# compute counterfactual predictions for each group}
+  \FunctionTok{group\_modify}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\FunctionTok{compute\_counterfactual}\NormalTok{(m5}\FloatTok{.7}\NormalTok{, }\AttributeTok{neocortex=}\NormalTok{.x}\SpecialCharTok{$}\NormalTok{MeanPercent, }\AttributeTok{logmass=}\NormalTok{x\_seq)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ungroup}\NormalTok{()}
+  
+\CommentTok{\# plotting data}
+\FunctionTok{ggplot}\NormalTok{(milk\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ M, }\AttributeTok{y=}\NormalTok{K, }\AttributeTok{color=}\StringTok{\textasciigrave{}}\AttributeTok{Neocortex group}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{neocortex\_counterfactuals\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{ymin=}\NormalTok{KLower, }\AttributeTok{ymax=}\NormalTok{KUpper, }\AttributeTok{fill=}\StringTok{\textasciigrave{}}\AttributeTok{Neocortex group}\StringTok{\textasciigrave{}}\NormalTok{), }\AttributeTok{color=}\ConstantTok{NA}\NormalTok{, }\AttributeTok{alpha=}\FloatTok{0.25}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{neocortex\_counterfactuals\_df) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{shape=}\DecValTok{21}\NormalTok{, }\AttributeTok{fill=}\StringTok{"white"}\NormalTok{, }\AttributeTok{size=}\DecValTok{3}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"log body mass (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"kilocal per g (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{xlim}\NormalTok{(}\SpecialCharTok{{-}}\FloatTok{2.5}\NormalTok{, }\FloatTok{2.5}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position=}\StringTok{"right"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{guides}\NormalTok{(}\AttributeTok{col =} \FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{nrow =} \DecValTok{3}\NormalTok{, }\AttributeTok{byrow =} \ConstantTok{TRUE}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{coord\_equal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-66-1.pdf}
+
+And we can do this the other way around grouping species by their log body mass.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{logmass\_counterfactuals\_df }\OtherTok{\textless{}{-}}
+\NormalTok{  milk\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Mass group}\StringTok{\textasciigrave{}}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{MeanMass =} \FunctionTok{mean}\NormalTok{(M), }\AttributeTok{.groups=}\StringTok{"keep"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \CommentTok{\# compute counterfactual predictions for each group}
+  \FunctionTok{group\_modify}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\FunctionTok{compute\_counterfactual}\NormalTok{(m5}\FloatTok{.7}\NormalTok{, }\AttributeTok{neocortex=}\NormalTok{x\_seq, }\AttributeTok{logmass=}\NormalTok{.x}\SpecialCharTok{$}\NormalTok{MeanMass)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ungroup}\NormalTok{()}
+  
+\CommentTok{\# plotting data}
+\FunctionTok{ggplot}\NormalTok{(milk\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ N, }\AttributeTok{y=}\NormalTok{K, }\AttributeTok{color=}\StringTok{\textasciigrave{}}\AttributeTok{Mass group}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{logmass\_counterfactuals\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{ymin=}\NormalTok{KLower, }\AttributeTok{ymax=}\NormalTok{KUpper, }\AttributeTok{fill=}\StringTok{\textasciigrave{}}\AttributeTok{Mass group}\StringTok{\textasciigrave{}}\NormalTok{), }\AttributeTok{color=}\ConstantTok{NA}\NormalTok{, }\AttributeTok{alpha=}\FloatTok{0.25}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{logmass\_counterfactuals\_df) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{shape=}\DecValTok{21}\NormalTok{, }\AttributeTok{fill=}\StringTok{"white"}\NormalTok{, }\AttributeTok{size=}\DecValTok{3}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"log body mass (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"kilocal per g (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{xlim}\NormalTok{(}\SpecialCharTok{{-}}\FloatTok{2.5}\NormalTok{, }\FloatTok{2.5}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position=}\StringTok{"right"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{guides}\NormalTok{(}\AttributeTok{col =} \FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{nrow =} \DecValTok{3}\NormalTok{, }\AttributeTok{byrow =} \ConstantTok{TRUE}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{coord\_equal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-67-1.pdf}
+
+\hypertarget{a-warning-message}{%
+\section{A warning message}\label{a-warning-message}}
+
+Do these two examples mean that putting \emph{all} variables into a model is always a good idea because magic? Unfortunately, no. These examples were handpicked by McElreath to show the power of multiple regression. He can also handpick an example when mindlessly throwing variables into a model would lead to a disaster, a.k.a. \href{https://elevanth.org/blog/2021/06/15/regression-fire-and-dangerous-things-1-3/}{Causal Salad} (se also his \href{https://youtu.be/KNPYUVmY3NM}{\textbf{three hour talk}} on that on YouTube). The take home message is same as before: Models are golems, they can help you understand the process you are investigating but they won't understand it for you! It is your job to think about causal relationship using statistical inferences merely as an aid, not as an oracle.s
 
   \bibliography{book.bib}
 

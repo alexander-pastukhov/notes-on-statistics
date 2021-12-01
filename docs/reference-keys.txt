@@ -10,11 +10,11 @@ gaussian-in-frenquentist-versus-bayesian-statistics
 directed-acyclic-graphs-and-causal-reasoning
 peering-into-a-black-box
 turning-unconditional-dependence-into-conditional-independence
-collider-bias
+spurious-association
 multicollinearity
 back-to-spurious-association
 chain-dag
-take-home-message
+take-home-messages
 the-haunted-dag
 information-criteria
 deviance
@@ -36,7 +36,7 @@ uncertainty-about-estimates-different-but-comparable
 model-comparison-via-information-criteria-both
 generating-predictions-both
 conclusions
-take-home-message-1
+take-home-message
 mixtures
 beta-binomial
 negative-binomial-a.k.a.-gamma-poisson
@@ -65,3 +65,5 @@ conclusions-1
 unbiased-mean-versus-biased-variance-in-plain-english
 probability-mass-versus-probability-density
 effective-degrees-of-freedom-number-of-parameters
+multiple-regression---masked-relationship
+a-warning-message

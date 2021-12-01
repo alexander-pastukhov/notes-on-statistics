@@ -1,4 +1,4 @@
-# Multiple regression - Spurious association
+# Multiple regression - Spurious association {#spurious-association}
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(dagitty)
@@ -7,7 +7,7 @@ library(rethinking)
 library(tidyverse)
 ```
 
-This notes are on Chapter 5 "The Many Variables & The Spurious Waffles", specifically, on section 5.1 "Spurious association". If you are to remember one thing from that chapter, it should be "doing multiple regression is easy, understanding and interpreting it is hard". As you will see below, fully understanding relationship between variables is complicate even when we are working with a minimal multiple regression with just two predictors.
+These notes are on Chapter 5 "The Many Variables & The Spurious Waffles", specifically, on section 5.1 "Spurious association". If you are to remember one thing from that chapter, it should be "doing multiple regression is easy, understanding and interpreting it is hard". As you will see below, fully understanding relationship between variables is complicate even when we are working with a minimal multiple regression with just two predictors.
 
 When reading section 5.1 "Spurious association", I found relationships between the *marriage age*, *marriage rate*, and *divorce rate* to be both clear and mysterious. On the one hand, everything is correlated with everything.
 
