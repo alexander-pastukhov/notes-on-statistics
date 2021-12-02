@@ -6,7 +6,7 @@
 ]{book}
 \title{Notes on Statistics}
 \author{Alexander Pastukhov}
-\date{2021-12-01}
+\date{2021-12-02}
 
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
@@ -1376,7 +1376,7 @@ This is why fixed parameters in frequentist statistics use full degree of freedo
 
 These notes are on section 5.2 ``Masked relationship'' from chapter 5 ``The Many Variables \& The Spurious Waffles''. This section introduces is a mirror twin of section 5.1 on \protect\hyperlink{spurious-association}{spurious associations}. The latter explores how each of two predictors can have a strong relationship with an outcome variable \emph{if fitted individually} but how only one of them retains that relationship when both predictors are used in multiple regression. Section 5.2 is concerned with the exact opposite. When we look at the association between each predictor variable (\emph{neocortex percent} and \emph{log body mass}) and the richness of milk \emph{individually}, we find nothing. However, when you use \emph{both} simultaneously via multiple regression, we find that both are strongly associated with the outcome variable.
 
-The key to understanding this are figure 5.9 (particularly, the bottom counterfactual plots) and an explanation on page 151 that coefficients of regression model shows that ``species that have high neocortex percent \emph{for their body mass} have lower milk energy'' and ``species with high body mass \emph{for their neocortex percent} have higher milk energy''. In other words, if you take several species with very similar body mass, you expect those with higher percent of neocortex to have richer milk. Conversely, if you handpick several species with very similar neocortex percentage, you expect that the larger ones will have a less energetic milk. But because these two predictor variables are correlated, this relationship is easy to see only when you fix one of them. Figure 5.9 tries to show that but we can do better by (artificially) grouping the data looking at relationship between each predictor variable and the milk energy individually.
+The key to understanding this are figure 5.9 (particularly, the bottom counterfactual plots) and an explanation on page 151 that coefficients of regression model shows that ``species that have high neocortex percent \emph{for their body mass} have higher milk energy'' and ``species with high body mass \emph{for their neocortex percent} have lower milk energy''. In other words, if you take several species with very similar body mass, you expect those with higher percent of neocortex to have richer milk. Conversely, if you handpick several species with very similar neocortex percentage, you expect that the larger ones will have a less energetic milk. But because these two predictor variables are correlated, this relationship is easy to see only when you fix one of them. Figure 5.9 tries to show that but we can do better by (artificially) grouping the data looking at relationship between each predictor variable and the milk energy individually.
 
 Let us start by replicating top subplots in figure 5.9. Note that 1) I used frequentist linear model fit with flat priors via \texttt{geom\_smooth()} and, therefore, 2) the stripes correspond to standard error rather than 89\% credible interval. However, the two are close enough in this case for illustration purposes.
 
@@ -1553,7 +1553,7 @@ And we can do this the other way around grouping species by their log body mass.
   \FunctionTok{geom\_ribbon}\NormalTok{(}\AttributeTok{data=}\NormalTok{logmass\_counterfactuals\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{ymin=}\NormalTok{KLower, }\AttributeTok{ymax=}\NormalTok{KUpper, }\AttributeTok{fill=}\StringTok{\textasciigrave{}}\AttributeTok{Mass group}\StringTok{\textasciigrave{}}\NormalTok{), }\AttributeTok{color=}\ConstantTok{NA}\NormalTok{, }\AttributeTok{alpha=}\FloatTok{0.25}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data=}\NormalTok{logmass\_counterfactuals\_df) }\SpecialCharTok{+}
   \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{shape=}\DecValTok{21}\NormalTok{, }\AttributeTok{fill=}\StringTok{"white"}\NormalTok{, }\AttributeTok{size=}\DecValTok{3}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{xlab}\NormalTok{(}\StringTok{"log body mass (std)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"neocortex percent (std)"}\NormalTok{) }\SpecialCharTok{+} 
   \FunctionTok{ylab}\NormalTok{(}\StringTok{"kilocal per g (std)"}\NormalTok{) }\SpecialCharTok{+} 
   \FunctionTok{xlim}\NormalTok{(}\SpecialCharTok{{-}}\FloatTok{2.5}\NormalTok{, }\FloatTok{2.5}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position=}\StringTok{"right"}\NormalTok{) }\SpecialCharTok{+}
@@ -1567,7 +1567,7 @@ And we can do this the other way around grouping species by their log body mass.
 \hypertarget{a-warning-message}{%
 \section{A warning message}\label{a-warning-message}}
 
-Do these two examples mean that putting \emph{all} variables into a model is always a good idea because magic? Unfortunately, no. These examples were handpicked by McElreath to show the power of multiple regression. He can also handpick an example when mindlessly throwing variables into a model would lead to a disaster, a.k.a. \href{https://elevanth.org/blog/2021/06/15/regression-fire-and-dangerous-things-1-3/}{Causal Salad} (se also his \href{https://youtu.be/KNPYUVmY3NM}{\textbf{three hour talk}} on that on YouTube). The take home message is same as before: Models are golems, they can help you understand the process you are investigating but they won't understand it for you! It is your job to think about causal relationship using statistical inferences merely as an aid, not as an oracle.s
+Do these two examples (spriouos associations and masked relationship) mean that putting \emph{all} variables into a model is always a good idea because ``magic''? Unfortunately, no. These examples were handpicked by McElreath to show the power of multiple regression. He can also handpick an example when mindlessly throwing variables into a model would lead to a disaster, a.k.a. \href{https://elevanth.org/blog/2021/06/15/regression-fire-and-dangerous-things-1-3/}{Causal Salad} (watch his \href{https://youtu.be/KNPYUVmY3NM}{\textbf{three hour talk}} on that on YouTube). The take home message is same as before: Models are golems, they can help you understand the process you are investigating but they won't understand it for you! It is your job to think about causal relationship using statistical inferences merely as an aid, not as an oracle.
 
   \bibliography{book.bib}
 
