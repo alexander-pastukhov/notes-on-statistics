@@ -6,7 +6,7 @@
 ]{book}
 \title{Notes on Statistics}
 \author{Alexander Pastukhov}
-\date{2021-12-02}
+\date{2022-01-12}
 
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
@@ -680,25 +680,24 @@ These are notes on information criteria, presented in chapter 7 of the Statistic
 \hypertarget{deviance}{%
 \section{Deviance}\label{deviance}}
 
-In the chapter, deviance is introduced as a an estimate for KL-divergence, which in turn is a relative entropy, i.e., the difference between cross-entropy and actual entropy of events. Keep that in mind but you could look at deviance itself as a straightforward goodness-of-fit measure, similar to squared residuals and coefficient of determination \(R^2\). In both cases, you have difference between model prediction (the regression line) and an actual data point. In ordinary least squares (OLS) approach, you quantify this imperfection of prediction by squaring residuals. You sum up all residuals to get the sum of squared residuals (\(SS_{res}\)) and then you can compute \(R^2\) by comparing it to the total sum of residuals in the data (\(SS_{total}\)):
-\[R^2 = 1 - \frac{SS_{res}}{SS_{total}}\]
-
-If you use likelihood, you compute the probability that a data point comes from a distribution defined by a model. Then, you compute the (total) joint probability by multiplying all probabilities or, better still, by computing the sum of their log-transform (log likelihood). Then, you can compare the observed log likelihood to the highest theoretically possible log likelihood for a \emph{saturated model} (\(\Theta_s\)), which has as many parameters as there are data points, so that it predicts each point perfectly. This is the original definition of (total) \emph{deviance}:
+In the chapter, deviance is introduced as an estimate for KL-divergence, which in turn is a relative entropy, i.e., the difference between cross-entropy and actual entropy of events. Keep that in mind but you could look at deviance itself as a straightforward goodness-of-fit measure, similar to squared residuals (RMSE, Root Mean Square Error) and coefficient of determination \(R^2\). In both cases, you have difference between model prediction (the regression line) and an actual data point. In ordinary least squares (OLS) approach, you quantify this imperfection of prediction by squaring residuals. You sum up all residuals to get the sum of squared residuals (\(SS_{res}\)) and then you can compute \(R^2\) by comparing it to the total sum of residuals in the data (\(SS_{total}\)):
+\[R^2 = 1 - \frac{SS_{res}}{SS_{total}} = \frac{SS_{total} - SS_{res}}{SS_{total}}\]
+As the total sum of residuals \(SS_{res}\) gets close to zero, the fraction gets close to 1. The disadvantage of squared residuals and \(R^2\) is that tricky to use with non-metric data, such as binomial, ordered categorical data, etc., or when deviations from the prediction might be asymmetric (binomial data, response times, etc.). Instead, you can use use likelihood to compute the probability that a data point comes from a distribution defined by a model. Then, you compute the (total) joint probability by multiplying all probabilities or, better still, by computing the sum of their log-transform (log likelihood)\footnote{Mathematically equivalent but the sum of logs is far more numerically stable.}. Then, you can compare the observed log likelihood to the highest theoretically possible log likelihood for a \emph{saturated model} (\(\Theta_s\)), which has as many parameters as there are data points, so that it predicts each point perfectly. This is the original definition of (total) \emph{deviance}:
 \[D = -2 \cdot (log(p(y|\Theta)) - log(p(y|\Theta_s)))\]
 
 Recall that \(log(\frac{a}{b}) = log(a) - log(b)\), so we can rearrange it and see that it is a log-ratio of likelihoods:
 \[D = -2 \cdot  log \left(\frac{p(y|\Theta)}{p(y|\Theta_s)}\right)\]
 As \(p(y|\Theta)\) increases, the fraction inside get closer to 1. The \(log()\) bit flips and non-linearly scales it. The minus sign flips it back and we end up with smaller numbers meaning better fit.
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-24-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-25-1.pdf}
 
-The \(2\) is there to facilitate significance testing for \emph{nested} models. Models \(\Theta1\) and \(\Theta2\) are nested, if \(\Theta2\) has all predictors of \(\Theta1\) plus \emph{k} predictors. E.g., model \(Divorce = Marriage~Rate\) is nested inside \(Divorce = Marriage~Rate + Marriage~Age\) with later model having 1 more parameter. Your actual model \(\Theta\) is nested inside the saturated model \(\Theta_s\) that has \(k = n - k_{model}\) more parameters, where \(n\) is sample size and \(k_{model}\) is number of parameters in your model. It turns out that in this case, you can determine whether the difference in goodness-of-fit between two models is significant using chi-squared distribution with \emph{k} degrees of freedom. The only catch is that log-ratio is half the magnitude, so you need that \(2\) to match things up\footnote{I did not follow the derivation of that correspondence yet, so I cannot comment on how and why.}.
+The \(2\) is there to facilitate significance testing for \emph{nested} models. Models \(\Theta1\) and \(\Theta2\) are nested, if \(\Theta2\) has all predictors of \(\Theta1\) plus \emph{k} predictors. E.g., model \(Divorce = Marriage~Rate\) is nested inside \(Divorce = Marriage~Rate + Marriage~Age\) with later model having 1 more parameter. Your actual model \(\Theta\) is nested inside the saturated model \(\Theta_s\) that has \(k = n - k_{model}\) more parameters, where \(n\) is sample size and \(k_{model}\) is number of parameters in your model. It turns out that in this case, you can determine whether the difference in goodness-of-fit between two models is significant using \(\chi^2\) distribution with \emph{k} degrees of freedom. The only catch is that log-ratio is half the magnitude, so you need that \(2\) to match things up\footnote{I did not follow the derivation of that correspondence yet, so I cannot comment on how and why.}.
 
-At this point, you might remember that the definition of deviance in the book was for a single model:
+At this point, you might remember that the definition of deviance for a single model in the book was:
 \[D = -2 \cdot log(p(y|\Theta))\]
 
-Unfortunately, same term can be used both ways, to refer to a log likelihood of a single model or, technically more correctly, to the log-ratio you saw above. In reality, you will mostly see deviance defined as in the book because it is used to compare nested models via chi-square distribution as I've described above, with only difference that you compare any two nested models, not just to a saturated one. This is how nested models are frequently compared, for example, see \href{https://stat.ethz.ch/R-manual/R-patched/library/stats/html/anova.html}{anova()} function in R.
+Unfortunately, same term can be used both ways, to refer to a log likelihood of a single model or, technically more correctly, to the log-ratio you saw above. In reality, you will mostly see the deviance defined as in the book because it is used to compare nested models via \(\chi^2\) distribution as I've described above, with only difference that you compare any two nested models, not just to a saturated one. This is how nested models are frequently compared, for example, see \href{https://stat.ethz.ch/R-manual/R-patched/library/stats/html/anova.html}{anova()} function in R.
 
-Note that a deviance for a single model still expresses the same idea of goodness-of-fit but is merely not normalized. Thus deviance as in the book \(D = -2 \cdot log(p(y|\Theta))\) corresponds to sum of residuals (absolute values mean nothing but you can use them to compare two models on the same data), whereas \emph{total} deviance corresponds to the \(R^2\) (values are directly interpretable, theoretically, you can use them to compare models fit on different samples).
+Note that a deviance for a single model still expresses the same idea of goodness-of-fit but is merely not normalized by the deviance of the saturated model. Thus deviance as in the book \(D = -2 \cdot log(p(y|\Theta))\) corresponds to sum of residuals (absolute values mean nothing but you can use them to compare two models on the same data), whereas \emph{total} deviance corresponds to the \(R^2\) (values are directly interpretable).
 
 \hypertarget{general-idea-information-criteria-as-miles-per-gallon}{%
 \section{General idea: information criteria as miles-per-gallon}\label{general-idea-information-criteria-as-miles-per-gallon}}
@@ -708,28 +707,28 @@ The general formula for all information criteria discussed below is
 
 The goodness-of-fit in the numerator is the likelihood, the joint probability of observing the model given each data point \(\prod_i p(\Theta|y_i)\). The denominator expresses model complexity, i.e., its flexibility in fitting the sample and, therefore, its tendency to overfit. Thus, the fraction itself is \emph{goodness-of-fit per unit of model complexity}. This is like miles-per-gallon for car efficiency, so better models are more efficient models, churning out more goodness per complexity.
 
-The numerator is the same for all information criteria discussed below and they differ only in how they compute the model complexity.
+The numerator is the same\footnote{Almost, the minor difference is whether you use the entire posterior averaging over samples (DIC, WAIC, PSIS-LOO) or only a single maximum a posteriori sample (AIC, BIC).} for all information criteria discussed below and they differ only in how they compute the model complexity.
 
 \hypertarget{akaike-information-criterion-aic}{%
 \section{Akaike Information Criterion (AIC)}\label{akaike-information-criterion-aic}}
 
-The formula most commonly used is
+The formula most commonly used\footnote{And the one you should use to actually compute it, as it offers a better computation stability.} is
 \[ AIC = -2\cdot log(p(\Theta|y)) + 2k \]
-where \(k\) is the number of parameters of the model. If you are not a mathematician who is used to translate back-and-forth using logarithms, you may fail spot to the ratio I was talking about earlier. For this, you need to keep in mind that \(log(\frac{a}{b}) = log(a) - log(b)\) and that \(a = log(exp(a))\). Let us re-arrange a bit to get the log-ratio back:
+where \(k\) is the number of parameters of the model. If you are not a mathematician who is used to translate back-and-forth using logarithms, you may fail spot the ratio I was talking about earlier. For this, you need to keep in mind that \(log(\frac{a}{b}) = log(a) - log(b)\) and that \(a = log(exp(a))\). Let us re-arrange a bit to get the log-ratio back:
 \[ AIC = -2\cdot log(p(\Theta|y)) + 2k \]
 \[ AIC = -2 (log(p(\Theta|y)) - k)\]
 \[ AIC = -2 (log(p(\Theta|y)) - log(exp(k))\]
 \[ AIC = -2 \cdot log \left(\frac{p(\Theta|y)}{exp(k)} \right)\]
-And here it is, the log-ratio I've promised! As you can see, AIC assumes that model complexity grows exponentially with the number of parameters. In other words, adding another parameter increases complexity \textasciitilde{}\(2.718\) times.
+And here it is, the log-ratio I've promised! As you can see, AIC assumes that model complexity grows exponentially with the number of parameters.
 
 If you are to use AIC, the current recommendation is to \emph{correct it} with an extra penalty for the size of the sample
 \[AICc = AIC + \frac{2k^2 + 2k}{n - k - 1}\]
-where \(n\) is the sample size. I won't do it here but you should be able to work out how it is added into the exponent in the denominator.
+where \(n\) is the sample size. I won't do it here but you should be able to work out how it is added to the exponent in the denominator.
 
 \hypertarget{bayesian-information-criterion-bic}{%
 \section{Bayesian information criterion (BIC)}\label{bayesian-information-criterion-bic}}
 
-A.k.a. Schwarz information criterion (SIC, SBC, SBIC). The motivation is the same as with AIC but the complexity term, in addition to the number of parameters, also reflects the sample size \(n\).
+A.k.a. Schwarz information criterion (SIC, SBC, SBIC)\footnote{McElreath writes that ``BIC\ldots it's not actually an ``information criterion.''``. So far, I was not able to figure out why.}. The motivation is the same as with AIC but the penalty (complexity term), in addition to the number of parameters, also reflects the sample size \(n\).
 
 \[BIC = -2\cdot log(p(\Theta|y)) + log(n) k \]
 
@@ -748,22 +747,22 @@ Thus, we end up with very similar power law complexity term which uses sample si
 \hypertarget{problem-of-aic-and-bic-one-size-may-not-fit-all}{%
 \section{Problem of AIC and BIC: one size may not fit all}\label{problem-of-aic-and-bic-one-size-may-not-fit-all}}
 
-Both AIC and BIC assume that model complexity and flexibility, that leads to overfitting, is reflected in the number of parameters \emph{k}. However, this is a fairly indirect measure of a model flexibility, based on how models in general tend to overfit data in general. But you probably want to know how your specific model uses its parameters to fit your specific sample and how much overfitting you should expect in that specific case. Because even if a parameter is present in the model, it may not be able to fully use it in case of regularization or multilevel models.
+Both AIC and BIC assume that model complexity and flexibility, that leads to overfitting, is reflected in the number of parameters \emph{k}. However, this is a fairly indirect measure of model flexibility, based on how models \emph{in general} tend to overfit data \emph{in general}. But you probably want to know how \emph{your specific} model uses its parameters to fit \emph{your specific} sample and how much overfitting you should expect in that specific case. Because even if a parameter is present in the model, it may not be able to fully use it in case of regularization or multilevel (adaptive regularization) models.
 
-Regularization, in form of strong priors, lasso/ridge regression, etc., restricts the range of values that a given parameter can take. Thus, a model cannot exploit it as much as \emph{other} parameters and will be less able to use it to improve fit to the sample. Similarly, in hierarchical multilevel modeling, you may have dozens or hundreds of parameters that describe intercepts and/or slopes for individual participants (random factors, in general), but most of them could be trivially average (same as or very similar to the group average) and contribute little to the actual fit. In these cases, a simple raw count, which treats all parameters as equals, will overestimate model complexity.
+Regularization, in form of strong priors, lasso/ridge regression, etc., restricts the range of values that a given parameter can take. Thus, a model cannot exploit it as much as \emph{other} parameters and will be less able to use it to improve fit to the sample. Similarly, in hierarchical multilevel modeling, you may have dozens or hundreds of parameters that describe intercepts and/or slopes for individual participants (random factors, in general), but most of them could be trivially zero (same as or very similar to the group average) and contribute little to the actual fit. In these cases, a simple raw count, which treats all parameters as equals, will overestimate model complexity.
 
-The desire to go beyond one-size-fits-all approach and be as model- and data-specific led to development of deviance information criterion (DIC) and widely-applicable information criterion (WAIC). Both use posterior distribution of \emph{in-sample} deviance and base their penalty on how \emph{variable} this posterior distribution is. Higher variance, meaning that a model produces very different fits ranging from excellent to terrible, hints that model is too flexible for its own good and leads to higher complexity estimate (penalty for overfitting). Conversely, very similar posterior deviance (low variance) means that model is too restricted to fine-tune itself to the sample and its complexity is low.
+The desire to go beyond one-size-fits-all approach and be as model- and data-specific led to development of deviance information criterion (DIC) and widely-applicable information criterion (WAIC). Both use the entire posterior distribution of \emph{in-sample} deviance and base their penalty on how \emph{variable} this posterior distribution is. Higher variance, meaning that a model produces very different fits ranging from excellent to terrible, hints that model is too flexible for its own good and leads to higher complexity estimate (penalty for overfitting). Conversely, very similar posterior deviance (low variance) means that model is too restricted to fine-tune itself to the sample and its complexity is low.
 
 If you understand why variance of the posterior distribution of divergence is related to models' flexibility and, therefore, to the number of effective parameters, just skip the next section. If not, I came up with a musical instruments metaphor that I and at least some people I've tested it upon found useful.
 
 \hypertarget{musical-instruments-metaphor}{%
 \section{Musical instruments metaphor}\label{musical-instruments-metaphor}}
 
-Imagine that you are trying to play a song that you have just heard. But the only instrument you have is a triangle. This is not a particularly flexible instruments pitch-wise, so your rendition of that song will not be very good (your model underfits the data). The good news is that even if you do your worst and do not really try, no one will notice because your worst performance will sound very much like your best one. Simply because it is very hard to make songs sound different using a triangle. Thus, if you play that song many times, trying different versions of it with us judging how close you are to the original, the score we will give you will be very similar (low variance of the deviance for fitting to sample).
+Imagine that you are trying to play a song that you have just heard. But the only instrument you have is a triangle. This is not a particularly flexible instruments pitch-wise, so your rendition of that song will not be very good (your model underfits the data). The good news is that even if you do your worst and do not really try, no one will notice because your worst performance will sound very much like your best one. Simply because it is very hard to make songs sound different using a triangle. Thus, if you play that song many times, trying different versions of it with us judging how close you are to the original, the score we will give you will probably be not particularly high but very similar (low variance of the deviance for fitting to sample).
 
-But what if I give you an instrument that can vary the pitch at least a bit, like a xylophone for children. Now you more expressive freedom and your version of the music will sound much more like the original. But, it also gives you an opportunity to make a mess of it, so your rendition might sound nothing like the music you've just heard. Thus, the instrument increases the difference between the best and the worst possible performance, so the variance of your performances (on how close they are to the original) also increases (higher variance of the deviance). A more flexible instrument will make the difference even bigger. Think violin or trombone which are not restricted to the scale, so you can play any sound in between and you can match the music you just heard exactly. Imagine that the music your just hear has an odd off-the-scale sounds. Was a defect of the turntable, which cannot go at constant speed, so overall pitch wobbles overtime (noise)? Or is it an experimental music piece designed to sound odd (signal)? If you do not know for sure, you will try to play as close to the original music your heard as possible, matching those off-scale sounds. And, because you can play any sound, your range of possible performance is even larger from one-to-one to ``please, have mercy and stop!'' (even larger variance of deviance).
+What if I give you an instrument that can vary the pitch at least a bit, like a xylophone for children. Now you have more freedom and your version of the music will sound much more like the original. But, it also gives you an opportunity to make a mess of it, so your rendition might sound nothing like the music you've just heard. In other words, a more flexbile instrument increases the difference between the best and the worst possible performance, so the variance of your performances (on how close they are to the original) also increases (higher variance of the deviance). A more flexible instrument will make the difference even bigger. Think violin or trombone which are not restricted to the scale, so you can play any sound in-between and you can match the music you just heard exactly. Imagine that the music your just heard has odd off-the-scale sounds. Was it a defect of the turntable, which cannot go at constant speed, so overall pitch wobbles overtime (noise)? Or is it an experimental music piece that was deliberately designed to sound odd (signal)? If you do not know for sure, you will try to play as close to the original music your heard as possible, matching those off-scale sounds. And, because you can play any sound, your range of possible performance is even larger from one-to-one to ``please, have mercy and stop!'' (even larger variance of deviance).
 
-In short, variance of your performance (posterior divergence) reflects how flexible your instrument is. But why is it indicative of the \emph{effective} number of parameters? Here are regularizing priors in the world of music instrument metaphor. Imagine that in addition to the triangle, I also give you a rubber bell (it was used in a super-secret meeting in Stanislaw Lem's Eleventh Voyage of Ijon Tichy, so that no one would hear when they ring that bell!). Now, technically you have two instruments (your number of parameters is 2) but that bell does not affect your performance (we put very strong regularizing priors so that coefficients are zero or something very-very close to zero). Thus, your ability to play the song did not change and your variance of performance stays the same. Two actual instruments, but only one ``effective'' one. Or, I give you a piano but allow you to use only one octave and only white keys. Yes, you have a piano but with this regularization it is as complex as as kids' xylophone. The \emph{potential} number of notes you can play is great (AIC and BIC would be very impressed and slap a heavy penalty on you) but the actual ``effective'' range is small. Or, you regularize yourself to play scale only notes using violin (something you learn to do). In all of these cases, you deliberately restrict yourself. But why? Why not just play as you heard it (why not fit as well as you can?)? Because if the song you heard is short (sample is small), regularization based on your knowledge about real life helps you to ignore the noise that is always present. E.g., you know that song is for kids' xylophone, so even if you heard notes outside of a single octave that was probably a problem with recording. Or, you never heard that piece for violin but you do know other works of this composer and they always use scale-only notes, so you should not use my violin to play off-scale sounds.
+In short, variance of your performance (posterior divergence) reflects how flexible your instrument is. But why is it indicative of the \emph{effective} number of parameters? Here are regularizing priors in the world of music instrument metaphor. Imagine that in addition to the triangle, I also give you a rubber bell\footnote{It was used during a super-secret meeting in Stanislaw Lem's Eleventh Voyage of Ijon Tichy, so that no one would hear when they ring that bell!}. Now, technically you have two instruments (your number of parameters is 2) but that bell does not affect your performance (we put very strong regularizing priors so that coefficients are zero or something very-very close to zero). Thus, your ability to play the song did not change and your variance of performance stays the same. Two actual instruments, but only one ``effective'' one. Or, I give you a piano but allow you to use only one octave and only white keys. Yes, you have a piano but with this regularization it is as complex as as kids' xylophone. The \emph{potential} number of notes you can play is great (AIC and BIC would be very impressed and slap a heavy penalty on you) but the actual ``effective'' range is small. Or, you regularize yourself to play scale-only notes using violin (something you learn to do). In all of these cases, you deliberately restrict yourself. But why? Why not just play as you heard it? I.e., why not fit as well as you can? Because if the song you heard is short (sample is small), regularization based on your knowledge about real life helps you to ignore the noise that is always present. E.g., you know that song is for kids' xylophone, so even if you heard notes outside of a single octave that was probably a problem with recording. Or, you never heard that piece for violin but you do know other works of this composer and they always use scale-only notes, so you should not use violin to play off-scale sounds \emph{in that case}.
 
 Multilevel models also limit the actual use of parameters. Imagine you heard a recording of a symphonic orchestra. Lots of violins but you figured out that most of them actually play the same melody. So you can get away with using one violin score (sample group average) and assume that most violins play like that (most participants are very close to group average). Any deviations from that group melody are probably mistakes by individual musicians, not the actual melody. Same goes if you hear a choir. Again, many people sing (lots of parameters!) but, mostly, in unison, so you do not need to create an individual score sheet (parameter) for each singer, just one per group of singers.
 
@@ -772,37 +771,172 @@ Wrapping up the metaphor, the more flexible your instrument is, the more variabl
 \hypertarget{deviance-information-criterion-dic-and-widely-applicable-information-criterion-waic}{%
 \section{Deviance information criterion (DIC) and widely-applicable information criterion (WAIC)}\label{deviance-information-criterion-dic-and-widely-applicable-information-criterion-waic}}
 
-The two are very similar, as both compute the model complexity based on posterior distribution of log likelihood. The key difference is that DIC sums the log likelihood for each model (sample) first and then computes the variance. WAIC computes variance of log likelihood per point and then sums those variances up. In the musical instrument metaphor, for DIC you perform the piece many times (generate many posterior samples), compute accuracy for each performance (deviance for a single sample), and then compute how variable they are. For WAIC, you go note by note (observation by observation). For each note you compute variance over all sample to see how consistent you are in playing it. Then, you sum this up.
+The two are very similar, as both compute the model complexity based on posterior distribution of log likelihood. The key difference is that DIC sums the log likelihood for each model (sample) first and then computes the variance over samples. WAIC computes variance of log likelihood per point and then sums those variances up. In the musical instrument metaphor, for DIC you perform the piece many times (generate many posterior samples), compute accuracy for each performance (deviance for a single sample), and then compute how variable they are. For WAIC, you go note by note (observation by observation). For each note you compute variance over all samples to see how consistent you are in playing it. Then, you sum this up.
 
 \[DIC = -2 \cdot \left( log(p(y|\Theta)) - var(\sum log(p(y|\Theta_i))) \right)\]
 \[WAIC = -2 \cdot \left( log(p(y|\Theta)) - \sum_i var(log(p(y_i|\Theta))) \right)\]
 
-The penalty replace \(k\) in AIC and, therefore, will go into the exponent inside the ratio. Again, same idea, that increase in variance of deviance (either per sample in DIC or per point in WAIC) leads to exponentially increasing estimate of complexity.
+The penalty replaces \(k\) in AIC and, therefore, will go into the exponent inside the ratio. Again, same idea, that increase in variance of deviance (either per sample in DIC or per point in WAIC) leads to exponentially increasing estimate of complexity.
 
 WAIC is more stable mathematically and is mode widely applicable (that's what statisticians tell us). Moreover, its advantage is that it explicitly recognizes that not all data points in your sample are equal. Some (outliers) are much harder to predict than others. And it is variance of log likelihood for these points that determines how much your model can overfit. An inflexible model will make a poor but consistent job (triangles don't care about pitch!), whereas a complex model can do anything from spot-on to terrible (violins can do anything). In short, you should use WAIC yourself but recognize DIC when you see it and think of it as somewhat less reliable WAIC, which is still better than AIC or BIC when you use regularizing priors and/or hierarchical models.
 
 \hypertarget{importance-sampling}{%
 \section{Importance sampling}\label{importance-sampling}}
 
-Importance sampling is mentioned in the chapter but is never explained, so here is a brief description. The core idea is to pretend that you sample from a distribution you need (but have no access to) by sampling from another distribution (the one you have access to) and ``translating'' the probabilities via \emph{importance ratios}. What does this mean?
+Importance sampling is mentioned in the chapter but is never explained, so here is a brief description. The core idea is to pretend that you sample from a distribution you need (but have no access to or sampling from it directly is very inefficient) by sampling from another distribution (the one you have access to and that you can sample efficiently) and ``translating'' the probabilities via \emph{importance ratios}. What does this mean?
 
-Imagine that you want to know an average total score for a given die after you throw it ten times. The procedure is as simple as it gets: you toss the die ten times, record the number you get on each throw, sum them up at the end. Repeat the same toss-ten-times-and-sum-it-up as many times as you want and compute your average. But what if you do not have access to that die because it is \emph{the die} and is kept under lock in International Bureau of Weights and Measures? Well, you have \emph{a die} which you can toss and you have a list of \emph{importance ratios} for each number. These \emph{important ratios} tell you how much more likely is the number of \emph{the die} (the one you are after) compared to \emph{a die} you have in your hand. Let's say the importance ratio for \emph{1} (so, number 1 comes up on top) is \texttt{3.0}. This means that whenever \emph{your die} gives you \emph{1}, you assume that \emph{the die} came up \emph{1} on \textbf{three} throws. If the importance ratio for \emph{2} is 0.5, whenever you see \emph{2} on your die, you record only half the throw (\emph{2} comes up twice as rarely for real die than for your die, so two throws that give you \emph{2} amount to a single throw). This way you can toss your die and every toss equates to different number of throws that generated the same number for \emph{the die}. So, you sample your die but record outcomes for the other die. Funny thing is that you don't even need to know how fair your die is and what is the probability of individual sides. As long as you know the importance ratios, keep tossing it and translating the probabilities, you will get the samples for the die you are interested in.
+Imagine that you want to know an average total score for a given die after you throw it ten times. The procedure is as simple as it gets: you toss the die ten times, record the number you get on each throw, sum them up at the end. Repeat the same toss-ten-times-and-sum-it-up as many times as you want and compute your average. But what if you do not have access to that die because it is \emph{the die} and is kept under lock in International Bureau of Weights and Measures? Well, you have \emph{a die} which you can toss and you have a list of \emph{importance ratios} for each number. These \emph{important ratios} tell you how much more likely is the number for \emph{the die} (the one you are after) compared to \emph{a die} you have in your hand. Let's say the importance ratio for \emph{1} (so, number 1 comes up on top) is \texttt{3.0}. This means that whenever \emph{your die} gives you \emph{1}, you assume that \emph{the die} came up \emph{1} on \textbf{three} throws. If the importance ratio for \emph{2} is 0.5, whenever you see \emph{2} on your die, you record only half the throw (\emph{2} comes up twice as rarely for real die than for your die, so two throws that give you \emph{2} amount to a single throw). This way you can toss your die and every toss equates to different number of throws that generated the same number for \emph{the die}. So, you sample your die but record outcomes for the other die. Funny thing is that you don't even need to know how fair your die is and what is the probability of individual sides. As long as you know the importance ratios, keep tossing it and translating the probabilities, you will get the samples for \emph{the die} you are interested in.
 
 Note that if you toss your die ten times, the translated number of tosses for \emph{the die} does not need to add up to ten. Imagine that, just by chance, you got \emph{1} four times. Given the importance ratio of \texttt{3.0} that alone translates into twelve tosses. Solution? You \emph{normalize} your result by \emph{sum of importance ratios} and get back you ten tosses.
 
-The very obvious catch is, \emph{how do we know the importance ratios}? Well, that is situation specific. Sometimes, we can compute them because we know both distributions, it just that one is easier to sample than the target one (so, we optimize the use of computing power). Sometimes, as in case of PSIS/LOO below, we can use an approximation.
+The very obvious catch is, \emph{how do we know the importance ratios}? Well, that is situation specific. Sometimes, we can compute them because we know both distributions, it just that one is easier to sample than the target one, so, we optimize the use of computing power\footnote{A canonical example is using importance ratios to sample tails of a distribution, which you have access to but the data points from tails comes up by chance so rarely that sampling them directly is very inefficient.}. Sometimes, as in case of PSIS/LOO below, we can use an approximation.
 
 \hypertarget{pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo}{%
 \section{Pareto-smoothed importance sampling / leave-one-out cross-validation (PSIS/LOO)}\label{pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo}}
 
-The importance sampling I've described above is the key to the PSIS/LOO. The idea is the same, we want to sample from the posterior of the model that was fitted \emph{without} a specific data point \(y_i\) (we write it as \(p(\Theta_{-i,s}|y_i)\)). But we do not really want to refit the model. Instead, we want to use what we already have, samples from the model that was fit on all the data, \emph{including} point \(y_i\). So, we pull of the same importance sampling trick, sampling from \(p(\Theta_s|y_i)\) and translating it to \(p(\Theta_{-i,s}|y_i)\). The only thing we need are importance factors\footnote{Unfortunately, I did not yet follow the derivation of this proportionality, so I cannot explain why this is the case mathematically.}
+The importance sampling I've described above is the key to the PSIS/LOO. The idea is the same, we want to sample from the posterior of the model that was fitted \emph{without} a specific data point \(y_i\) (we write it as \(p(\Theta_{-i,s}|y_i)\)). But we do not really want to refit the model. Instead, we want to use what we already have, samples from the model that was fit on all the data, \emph{including} point \(y_i\). So, wise minds figured out how to use the importance sampling trick, sampling from \(p(\Theta_s|y_i)\) and translating it to \(p(\Theta_{-i,s}|y_i)\). The only thing we need are importance factors
 \[r_i = \frac{p(\Theta_{-i,s}|y_i)}{p(\Theta_s|y_i)} \propto \frac{1}{p(y_i|\Theta_s)}\]
 
-The importance ratio tells you that decrease in your ability to predict an observation out-of-sample is proportional to difficulty of predicting in-sample. Here is an intuition behind this. \emph{Any} observation will be harder to predict, if it was not included into the data the model was trained on. This is because, in its absence the model will use its parameters to fit the data that is present, including fitting noise, if it has spare parameters. So, you expect that out-of-sample deviance (\(p(y_i|\Theta_{-i}\)) should be always worse than in-sample deviance for the same observation (\(p(y_i|\Theta\)). How much worse depends on how ``typical'' the observation is. If it is typical and ``easy'' for a model to predict, in its absence the model will still see many similar ``typical'' observations and will be well prepared to predict it. However, if the observations is atypical, an outlier, the model won't see too many observations that are alike and will concentrate more on typical points.
+The importance ratio tells you the worse you are at predicting a point \(y_i\) \emph{in-sample} (the smaller the \(p(y_i|\Theta_s)\) is), the more important it is when you consider model's performance \emph{out-of-sample} (the larger is \(\frac{1}{p(y_i|\Theta_s)}\)). Here is an intuition behind this. \emph{Any} observation will be harder to predict, if it was not included into the data the model was trained on. This is because, in its absence the model will use its parameters to fit the data that is present, including fitting noise, if it has spare parameters. So, you expect that out-of-sample deviance (\(p(y_i|\Theta_{-i}\)) should be always worse than in-sample deviance for the same observation (\(p(y_i|\Theta\)). How much worse depends on how ``typical'' the observation is. If it is typical and ``easy'' for a model to predict, in its absence the model will still see many similar ``typical'' observations and will be well prepared to predict it. However, if the observations is atypical, an outlier, the model won't see too many observations that are alike and will concentrate more on typical points.
 
-I.e., assume that out-of-sample deviance is in-sample deviance squared (the importance ratio we use goes in that direction). Asume that our \emph{in-sample} deviance is 60, 40, and 50 in one case and 10, 10 and 130 in the other case. Both deviances sum up to 150, so from \emph{in-sample} point of view they are equal. However, approximating \emph{out-of-sample} deviance as a square of \emph{in-sample} deviance makes for a dramatic difference. For the first case, it jumps to 7700 but the second case to 17100, more than twice the difference. This is because in second case \emph{out-of-sample} deviance is dominanted by that single very difficult point, which will be terribly difficult out-of-sample.
+More specifically, the penalty for a particular point based on the importance ratios across all samples reflects how \emph{variable} \(p(y_i|\Theta_s)\) is across the samples. Recall the definition in the book
+\[lppd_{IS} = \sum^N_{i=1} log \frac{\sum^S_{s=1}r(\theta_s)p(y_i|\theta_s)}{\sum^S_{s=1}r(\theta_s)}\]
+Substituting the \(r_i = \frac{1}{p(y_i|\Theta_s)}\) we get
+\[lppd_{IS} = \sum^N_{i=1} log \frac{\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}p(y_i|\theta_s)}{\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]
+\[lppd_{IS} = \sum^N_{i=1} log \frac{\sum^S_{s=1}\frac{p(y_i|\theta_s)}{p(y_i|\Theta_s)}}{\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]
+\[lppd_{IS} = \sum^N_{i=1} log \frac{\sum^S_{s=1}1}{\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]
 
-This explosive powerlaw-like scaling of expected out-of-sample deviance is the reason for warnings that LOO/PSIS generates. A single very difficult observation can be single-handedly responsible for most of the deviance, making it hard to understand whether the model is good or bad on the rest of observations. Thus, you should consider what this extreme outlier means for your understanding of the process. Is it so different because it was recorded wrongly (the responsible person pressed 1 instead of 7)? Is this an extreme response time because a participant was distracted on that trial and started paying attention to the task only 15 seconds after the trial began? Is it an important observations that indicates that you are ignoring a really important predictor? You should think carefully about it and decide on whether you treat that observation differently (e.g., allowing for larger uncertainty for that point because you think this is mostly noise) or you change your model to better account for it.
+\[lppd_{IS} = \sum^N_{i=1} log \frac{S}{\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]
+\[lppd_{IS} = \sum^N_{i=1} log \frac{1}{\frac{1}{S}\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]
+
+This looks like some bizarre re-arrangement of the terms but it ends up producing a point-wise variance-based penalty very similar to WAIC. You can build your intuition for this by playing with easy to compute numbers. Let us take a vector where all values are the same, i.e., variance is zero and compute \(lppd\) and \(lppd_{IS}\).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.2}\NormalTok{, }\FloatTok{0.2}\NormalTok{, }\FloatTok{0.2}\NormalTok{) }\CommentTok{\# mean = 0.2, variance = 0}
+\NormalTok{logp }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(p)}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"mean = "}\NormalTok{, }\FunctionTok{mean}\NormalTok{(p), }\StringTok{", variance of log(p) = "}\NormalTok{, rethinking}\SpecialCharTok{::}\FunctionTok{var2}\NormalTok{(logp), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\AttributeTok{sep =} \StringTok{""}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## mean = 0.2, variance of log(p) = 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lppd }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\FunctionTok{sum}\NormalTok{(p)}\SpecialCharTok{/}\FunctionTok{length}\NormalTok{(p))}
+\NormalTok{lppd\_IS }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\DecValTok{1} \SpecialCharTok{/}\NormalTok{ ( (}\DecValTok{1} \SpecialCharTok{/} \FunctionTok{length}\NormalTok{(p)) }\SpecialCharTok{*} \FunctionTok{sum}\NormalTok{( }\DecValTok{1}\SpecialCharTok{/}\NormalTok{ p)))}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"lppd    ="}\NormalTok{, lppd, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## lppd    = -1.609438
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"lppd\_IS ="}\NormalTok{, lppd\_IS, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## lppd_IS = -1.609438
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"lppd {-} lppd\_IS = "}\NormalTok{, lppd }\SpecialCharTok{{-}}\NormalTok{ lppd\_IS, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## lppd - lppd_IS =  0
+\end{verbatim}
+
+Now let us keep \emph{mean} the same but very slightly increase \emph{variance}. As you can see that tiny increase in sample induces a small \emph{decrease} in \(lppd_{IS}\), i.e., we assume that since the model is variable about this point, it probably has too much power leading to \emph{in-sample} overfitting and, therefore, poor \emph{out-of-sample} performance.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.19}\NormalTok{, }\FloatTok{0.2}\NormalTok{, }\FloatTok{0.21}\NormalTok{)}
+\NormalTok{logp }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(p)}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"mean = "}\NormalTok{, }\FunctionTok{mean}\NormalTok{(p), }\StringTok{", variance of log(p) = "}\NormalTok{, rethinking}\SpecialCharTok{::}\FunctionTok{var2}\NormalTok{(logp), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\AttributeTok{sep =} \StringTok{""}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## mean = 0.2, variance of log(p) = 0.001669798
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lppd }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\FunctionTok{sum}\NormalTok{(p)}\SpecialCharTok{/}\FunctionTok{length}\NormalTok{(p))}
+\NormalTok{lppd\_IS }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\DecValTok{1} \SpecialCharTok{/}\NormalTok{ ( (}\DecValTok{1} \SpecialCharTok{/} \FunctionTok{length}\NormalTok{(p)) }\SpecialCharTok{*} \FunctionTok{sum}\NormalTok{( }\DecValTok{1}\SpecialCharTok{/}\NormalTok{ p)))}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"lppd    ="}\NormalTok{, lppd, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## lppd    = -1.609438
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"lppd\_IS ="}\NormalTok{, lppd\_IS, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## lppd_IS = -1.611107
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"lppd {-} lppd\_IS = "}\NormalTok{, lppd }\SpecialCharTok{{-}}\NormalTok{ lppd\_IS, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## lppd - lppd_IS =  0.001669449
+\end{verbatim}
+
+Increasing variance even further, increases the penalty
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{delta }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\FloatTok{0.0}\NormalTok{, }\FloatTok{0.19}\NormalTok{, }\AttributeTok{length.out =} \DecValTok{100}\NormalTok{)}
+
+\NormalTok{create\_p }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(dp) \{}\FloatTok{0.2} \SpecialCharTok{+} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{dp, }\DecValTok{0}\NormalTok{, dp)\}}
+
+\NormalTok{lppd\_df }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(}
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{Variance =}\NormalTok{ purrr}\SpecialCharTok{::}\FunctionTok{map\_dbl}\NormalTok{(delta, }\SpecialCharTok{\textasciitilde{}}\FunctionTok{var2}\NormalTok{(}\FunctionTok{log}\NormalTok{(}\FunctionTok{create\_p}\NormalTok{(.)))),}
+         \AttributeTok{LPPD =}\NormalTok{ purrr}\SpecialCharTok{::}\FunctionTok{map\_dbl}\NormalTok{(delta, }\SpecialCharTok{\textasciitilde{}}\FunctionTok{log}\NormalTok{(}\FunctionTok{sum}\NormalTok{(}\FunctionTok{create\_p}\NormalTok{(.))}\SpecialCharTok{/}\FunctionTok{length}\NormalTok{(}\FunctionTok{create\_p}\NormalTok{(.)))),}
+         \AttributeTok{Kind =} \StringTok{"lppd"}\NormalTok{),}
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{Variance =}\NormalTok{ purrr}\SpecialCharTok{::}\FunctionTok{map\_dbl}\NormalTok{(delta, }\SpecialCharTok{\textasciitilde{}}\FunctionTok{var2}\NormalTok{(}\FunctionTok{log}\NormalTok{(}\FunctionTok{create\_p}\NormalTok{(.)))),}
+       \AttributeTok{LPPD =}\NormalTok{ purrr}\SpecialCharTok{::}\FunctionTok{map\_dbl}\NormalTok{(delta, }\SpecialCharTok{\textasciitilde{}}\FunctionTok{log}\NormalTok{(}\DecValTok{1} \SpecialCharTok{/}\NormalTok{ ( (}\DecValTok{1} \SpecialCharTok{/} \FunctionTok{length}\NormalTok{(}\FunctionTok{create\_p}\NormalTok{(.))) }\SpecialCharTok{*} \FunctionTok{sum}\NormalTok{( }\DecValTok{1}\SpecialCharTok{/} \FunctionTok{create\_p}\NormalTok{(.))))),}
+       \AttributeTok{Kind =} \StringTok{"lppd\_IS"}\NormalTok{))}
+
+\NormalTok{together\_plot }\OtherTok{\textless{}{-}} 
+  \FunctionTok{ggplot}\NormalTok{(lppd\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Variance, }\AttributeTok{y=}\NormalTok{LPPD, }\AttributeTok{color=}\NormalTok{Kind)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"var log p (WAIC penalty)"}\NormalTok{)}
+
+\NormalTok{difference\_plot }\OtherTok{\textless{}{-}}
+\NormalTok{  lppd\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pivot\_wider}\NormalTok{(}\AttributeTok{names\_from =}\NormalTok{ Kind, }\AttributeTok{values\_from =}\NormalTok{ LPPD) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{lppd\_IS {-} lppd}\StringTok{\textasciigrave{}} \OtherTok{=}\NormalTok{ lppd\_IS }\SpecialCharTok{{-}}\NormalTok{ lppd) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Variance, }\AttributeTok{y=}\StringTok{\textasciigrave{}}\AttributeTok{lppd\_IS {-} lppd}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"var log p (WAIC penalty)"}\NormalTok{)}
+
+\NormalTok{together\_plot }\SpecialCharTok{+}\NormalTok{ difference\_plot}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-28-1.pdf}
+
+Compare the \(var log p(y_i|\Theta_s)\), which is a WAIC penalty term, with the decrease due to variance-based importance ratios. As you can see the two are very close and, therefore, will produce very similar estimates of out-of-sample performance. A \emph{Pareto smoothed} importance sampling has an advantage over WAIC is that it less keen on reducing the performance based on a few samples, which are smoothed away. Still, both methods should identify the same problematic (high variance) data points that you should pay closer attention to.
 
 \hypertarget{bayes-factor}{%
 \section{Bayes Factor}\label{bayes-factor}}
@@ -951,7 +1085,7 @@ In practical terms, this means that parameter \(\theta\) controls the width of t
 
 The idea is the same: We do not have enough information to compute the rate of events, so instead, we compute the mean of the Gamma distribution rates come from and let data determine its variance (scale). Again, in practical terms this means that for the smallest scale our uncertainty about the rate is minimal and distribution matches the Poisson processes with a fixed rate. Any increase in uncertainty (larger values for scale parameter), mean broader distribution that is capable to account for more extreme values.
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-26-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-30-1.pdf}
 
 \hypertarget{ordered-categorical}{%
 \section{Ordered categorical}\label{ordered-categorical}}
@@ -976,7 +1110,7 @@ Pr(y_i \leq k) = \frac{e^{\alpha_k}}{1 + e^{\alpha_k}}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-27-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-31-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1022,7 +1156,7 @@ Pr(y_i \leq k) = \frac{e^{\alpha_k}}{1 + e^{\alpha_k}}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-28-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-32-1.pdf}
 
 \hypertarget{instrumental-variables}{%
 \chapter{Instrumental Variables}\label{instrumental-variables}}
@@ -1039,11 +1173,11 @@ My understanding is that instrumental variables are unicorns. They are immensely
 
 One of the examples, which you can find online, is an effect of military experience on wages. Conceptually, everything is simple, you just want to know a direct effect of military experience on wages.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-31-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-35-1} \end{center}
 
 However, in practice both a decision to join military \emph{and} choices of career can be cause by the same set of unobserved factors. If you come from a family with military background, this will affect both your decision join military and the kind of career you want to pursue. If you are patriotic and want to serve the country, you might opt for both military and lower-earning career in public sector. Conversely, if you are interested in becoming a successful lawyer, going into military might be more of a hindrance than of help. In short, we have a backdoor path through unobserved variables and we have no easy way to close it.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-32-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-36-1} \end{center}
 
 \hypertarget{draft-as-an-instrumental-variable}{%
 \section*{Draft as an instrumental variable}\label{draft-as-an-instrumental-variable}}
@@ -1055,7 +1189,7 @@ In this case, during the Vietnam war people were drafted based on their assigned
 
 The DAG it creates is the following
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-33-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-37-1} \end{center}
 
 As you can see, we are still not able to close the backdoor path between \emph{military experience} and \emph{wages} because the randomization is not perfect. You will see how we can still overcome this problem using two-stage least squares (the default approach you find almost everywhere, referred to as ``two-stage worst squares'' by McElreath) and using covariance of residuals (as in the book).
 
@@ -1065,7 +1199,7 @@ As you can see, we are still not able to close the backdoor path between \emph{m
 
 The main idea is two split our DAG into two halves and estimated the effects one by one, hence, ``two-stage''. First, use draft number to \emph{predict} the military experience.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-34-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-38-1} \end{center}
 
 The linear model is
 \[ME \sim Normal(\widehat{ME}, \sigma_{ME})\\
@@ -1079,7 +1213,7 @@ As draft number is independent from unobserved variables due to the lottery, the
 
 Now, for the second stage, we use \emph{predicted} military experience, as it is independent of the unobserved variables and, therefore, we do not need to close the backdoor path!
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-35-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-39-1} \end{center}
 
 The model is, again, simple but do note that in two-stage least squares we are using \emph{predicted} military experience \(\widehat{ME}\)!
 \[CW \sim Normal(\widehat{CW}, \sigma_{CW})\\
@@ -1126,11 +1260,11 @@ This is an extreme case of when we ignore the fact that people (monkeys, countri
 
 In the plot below, measurement for each individual (distinguished by their position on y-axis) is plotted on x-axis (black circles). But using a single intercept (vertical line) in the model, means all of them get an average height (blue open circles).
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-38-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-42-1} \end{center}
 
 Another way to view the same data is by plotting raw data (y-axis) vs.~used estimates (x-axis). The vertical line denotes the population mean, whereas the diagonal line implies that estimates are equal to the data.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-39-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-43-1} \end{center}
 
 \hypertarget{everyone-is-unique-independent-parameters}{%
 \section{Everyone is unique (independent parameters)}\label{everyone-is-unique-independent-parameters}}
@@ -1144,11 +1278,11 @@ This is the approach taken by paired t-test and repeated measures ANOVA. Note th
 
 In the plot below, measurement for each individual (distinguished by their position on y-axis) is plotted on x-axis (black circles). You cannot see black circles because they are covered by open blue circles --- the estimates used by the model.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-40-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-44-1} \end{center}
 
 Here is another representation of the same data with all dots lying on the diagonal (estimate is equal to data). The vertical blue line still denotes the population mean this information is not used for estimates.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-41-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-45-1} \end{center}
 
 \hypertarget{people-are-different-but-belong-to-a-population-pooled-parameters}{%
 \section{People are different but belong to a population (pooled parameters)}\label{people-are-different-but-belong-to-a-population-pooled-parameters}}
@@ -1162,9 +1296,9 @@ A more balanced approach is to combine data from an individual and population. T
 
 The basic idea is the ``regression to the mean'', so that unusual-looking individuals are probably more average than they appear. In other words, they are so unusual because of the noise during that particular measurement. During a next measurement the noise will be different, probably not so extreme, and the individual will appear to be more normal. The pull of extreme observations toward the mean is the same as one from a static prior. The main difference is that we use \emph{adaptive} priors and determine how typical/unusual an observation is based on all observations themselves, \emph{including} the extreme ones. As with ``normal'' priors, the influence of adaptive prior is most pronounced for extreme, unreliable observations, or observations with small amount of data. They are easier to overfit and, hence, benefit most from regularizing priors.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-42-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-46-1} \end{center}
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-43-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-47-1} \end{center}
 
 \hypertarget{people-are-different-but-belong-to-a-group-within-a-population-multilevel-clusters-of-pooled-parameters}{%
 \section{People are different but belong to a group within a population (multilevel clusters of pooled parameters)}\label{people-are-different-but-belong-to-a-group-within-a-population-multilevel-clusters-of-pooled-parameters}}
@@ -1181,9 +1315,9 @@ For an individual, it allows to pool information across a more relevant group. F
 
 In the plots below, notice that sex cluster distributions are tighter than a single population distribution above. Also notice how individual observers are pulled toward the group mean and, again, the pull is proportional to how atypical a value is.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-44-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-48-1} \end{center}
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-45-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-49-1} \end{center}
 
 \hypertarget{people-are-similar-to-some-but-different-to-others-gaussian-process}{%
 \section{People are similar to some but different to others (Gaussian process)}\label{people-are-similar-to-some-but-different-to-others-gaussian-process}}
@@ -1200,15 +1334,15 @@ where \(D_{ij}\) is the distance between individuals (see the book for further d
 
 Generally speaking, the idea is that contribution of observations is proportional to their distance to the individual in question. It also means that there are no discrete cluster. Rather, each observation gets its own distance-based population distribution which it is judged against. Note, however, that parameter \(\rho\) adjusts the effect of the distance making it more or less relevant. Thus, the distance can be ignored by the model (via smaller value of \(\rho\)) meaning that all observations/individuals contribute equally to the population distribution (relative to an individual), i.e., a given intercept is correlated with everybody else. Conversely, larger values of \(\rho\) mean that only nearest neighbors are taken into account.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-46-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-50-1} \end{center}
 
 In the example below, the distance between individuals is determined by the distance on the vertical axis. The first plot use \(\rho=1\) that samples most observations (dot size reflect the \(K\) used in the MVNormal). It produces a fairly broad population distribution and shift the first participant to the \emph{right}.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-48-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-52-1} \end{center}
 
 The second plot uses the same distance measure but \(\rho=10\) meaning that it is the close neighbors that affect the estimate. Here, the population distribution is much tighter and the estimate for the first participant is shifted to the \emph{left}.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-49-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-53-1} \end{center}
 
 \hypertarget{people-are-different-but-belong-to-a-population-in-which-parameters-are-correlated-correlated-pooled-parameters}{%
 \section{People are different but belong to a population in which parameters are correlated (correlated pooled parameters)}\label{people-are-different-but-belong-to-a-population-in-which-parameters-are-correlated-correlated-pooled-parameters}}
@@ -1229,10 +1363,10 @@ Here, the pulling forces are a bit more complicated than during a single paramet
 
 One way to think about \protect\hyperlink{loss-functions}{loss functions} is as if they are rubber bands\footnote{As Hook's law is a first-order linear approximation, this metaphor works fully only if we assume L1 distance, i.e., that error increases / probability decreases linearly with distance. Still you could imagine a better rubber band whose force will be proportional to the squared (L2) distance, as for the normal likelihood.} (black vertical segments) connecting observations (white dots) with its corresponding mean (red dots) on the regression line. Each band tries to pull the mean and, therefore, the regression line towards the observation and the final estimate is simply a minimal energy state: The total sum of pulling forces is minimal, so that any movement of the regression line would decrease the stretch for sum dots but will produce way more pulling for other dots, increasing the overall force. This is the ``usual'' way that we performed the regression analysis assuming that \emph{same} rubber bands connect every dot with the regression line.
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-52-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-56-1.pdf}
 Within this metaphor, measurement error is incorporated as additional inferred value (blue dots, true value of a measurement) that is connected to the observed value via a \emph{custom} rubber band (colored) whose strength depends on the measurement error. I.e., large measurement errors make for a very weak stretchable bands, whereas high certainty leads to very small and strong bands. Note the connectivity pattern: observed value --- (via custom rubber band) --- (estimated) true value --- (via common rubber band) --- mean on the regression line. Here, dots with smaller measurement error will pull the regression line much stronger towards the observed value, whereas dots with large error will tolerate having regression line even very far away.
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-53-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-57-1.pdf}
 
 Note that in some cases, information about measurement error is incorporated directly. For example, in binomial likelihood the number of successes and the total number of observations determine not only the proportion of success but also confidence about that value.
 
@@ -1244,14 +1378,14 @@ The purpose of this note is to give an intuition about what generalized additive
 \hypertarget{generalized-additive-models-an-uxfcber-brief-introduction}{%
 \section{Generalized Additive Models: An Über-brief Introduction}\label{generalized-additive-models-an-uxfcber-brief-introduction}}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-54-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-58-1.pdf}
 
 Imagine that you have a (completely made up!) data set shown aboe that describes probability of consuming an ice-cream as a function of age. As you can see, it is twisty curve, so a simpler linear regression won't do. If we do not have an idea about the process(es) that generated this data, we might at least smooth it to see the underlying relationship more clearly. You can do this in a number of ways using a running median, loess, etc., but we will focus on GAMs as they have an advantage of being (generalized) linear models, which makes it easy to incorporate them into bigger generalized linear models.
 
 The idea of the GAM is to approximate a dependence as a sum of basis functions. In the example below, all basis functions are \emph{identical} but cover \emph{different} parts of the space. However, you can have it the other way around with \emph{different} basis functions covering \emph{identical} (the entire) space.
 
 In the example below, basis functions are cubic regression splines that are centered on ``knots''. Each tent has its own coefficient that determines its height and, also, the transition between knots. A \emph{wigliness} parameter determines how different coefficients can be, the more different they are, the wigglier will be the line, hence the name. Accordingly, wigliness of \emph{zero} produces a straight horizontal line (all coefficients must be the same). Wigliness of infinity means that coefficients can take any value and fit the data as closely as possible. As you can see, smoothing makes it much easier to see the underlying relationship.
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-55-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-59-1.pdf}
 
 \hypertarget{what-are-gams-good-for}{%
 \section{What are GAMs good for?}\label{what-are-gams-good-for}}
@@ -1334,14 +1468,14 @@ When you first encounter continuous distribution, one of the initially confusing
 
 There is another way of thinking about this via \emph{cumulative mass function}. It tells a cumulative (total) probability of observing a height of a tower that is equal or smaller than a chosen value.
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-57-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-61-1.pdf}
 As you can see, a cumulative probability of observing a tower of zero height (or lower) is 0.2. We if consider height of 1, it bumps cumulative probability to 0.4 (Pr(height=0) + Pr(height=1) = 0.2 + 0.2 = 0.4). Going up to 2 makes it 0.6, to 3 --- 0.8 and, finally, the cumulative probability of me building a tower of height of 4 \emph{or lower} is 1 (100\%!). The latter includes \emph{all} possible tower heights, so the probability you observe one of them is 100\%. Note that for each height the \emph{probability mass} tells you by how much the cumulative probability will increase. This probability mass as an change of cumulative probability will become important later.
 
 Note that cumulative probability can only grow and \emph{must} be between 0 and 1, as all probabilities cannot be negative and must sum up to 1 (otherwise, we call them plausibilities). Below is the same plot but now it includes impossible heights of -1 and 5. Their probabilities are 0, so the cumulative probability does not grow.
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-58-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-62-1.pdf}
 
 But what if I build a ``tower'' out of \emph{very fine sand}? For simplicity, let us assume that its height is also within a 0 to 4 (cubes height) range. But now, there are way more heights that my tower can have. If my sand is super fine, as is individual grains are infinitesimally small, there are \emph{infinite} numbers of possible heights. Knowing that they are all equally likely sort of helps but you cannot compute a probability for each individual height: 1/N, where N=∞ mean 1/∞ ≈ 0. This is the annoying thing about infinities, they make computing things really hard\footnote{People tend to be scared of calculus which is all about limits when things become either infinitesimally small or large.}. So, what do you do if you cannot compute a probability for an individual event/value (height)? You can still compute the \emph{cumulative probability} of a tower being smaller or equal to a particular height! This is the cumulative function that you saw earlier, but the steps are now so fine that you cannot talk about sums but only about integrals. This is why it is now called the cumulative \emph{density} function (CDF).
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-59-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-63-1.pdf}
 
 Note that it looks fairly similar to the previous plot with cumulative probability for discrete events. It still grows from 0 to 1 but the steps are much finer. Yet we can still tell the probability of observing a tower of a height that is equal to or less than this. We start of at zero, because you cannot observe towers of negative height, so \emph{all} tower heights from negative infinity up to zero have a total cumulative probability of 0\footnote{Keep in mind that these values are based on our example of me building a tower. In other circumstances, negative values are possible.}. If we pick the height of 4, then the \emph{cumulative} probability of observing a tower that is equal-or-less is 1 because \emph{all} must be that or smaller (that is how we defined it, there cannot be a tower higher than 4!). If we pick the middle of the interval (height = 2), the \emph{cumulative} probability of observing a tower that is equal-or-smaller is 0.5. This is because we are using a uniform distribution, so half splitting height in half also gives us 50\% chance. As you can see, cumulative probability density behaves the same way as the cumulative probability mass in the example above. Both are fairly straightforward, as long as you appreciate that they are about \emph{all} outcomes up to the point of interest, not just a single event.
 
@@ -1351,7 +1485,7 @@ What about the probability \emph{density} function (PDF)? Recall that the probab
 \[\frac{\delta CDF}{\delta height} = \frac{1}{4}\]
 
 Thus, we can now plot both CDF and PDF.
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-60-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-64-1.pdf}
 You can reverse the logic and say that the cumulative density function is an \emph{integral} of PDF, i.e., area under the curve up to each point. So, the total area under PDF (blue line) should end up being 1 (final value of CDF). This is easy to check for a rectangular like that, just multiply its width (height range of 4) by its height (probability density value of 0.25) and get that 1. Note that if you restrict your height=2 then CDF values is 0.5 and the area under blue line (PDF) is also 0.5 (compute!).
 
 In the example above, probability density is constant at 0.25 and that makes it look ``normal'', at least not surprising. But what if we restrict my tower-building, so I cannot build anything taller than 0.5 cubes (or meters, units are of little relevance here). Now, the CDF formula is (check!):
@@ -1360,7 +1494,7 @@ In the example above, probability density is constant at 0.25 and that makes it 
 and for PDF:
 \[\frac{\delta CDF}{\delta height} = 2\]
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-61-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-65-1.pdf}
 
 Our constant PDF value is 2! Way above one, how come? Think about the slope and think about the area of rectangle: if its 0.5 units wide it must be 2 units tall to make are equal to 1. The point of this is probability density \emph{is not} a probability and that you should not care about \emph{absolute} values of probability density, only about \emph{relative} values. If you feel that ``adding up'' values larger than 1 should not give you 1 at the end, yes, it is very counter-intuitive. Integrals, as other things that have to do with infinitely small or large numbers, are counter-intuitive. Thus, ignore the units, ignore the absolute values, just keep in mind that whenever it is higher, the more probable that specific value is. (But, again, there is no way to compute a meaningful probability for a \emph{single} value).
 
@@ -1413,7 +1547,7 @@ Let us start by replicating top subplots in figure 5.9. Note that 1) I used freq
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-63-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-67-1.pdf}
 
 So, once again, we see that there is no clear relationship is evident if we consider neocortex percent while ignoring body mass of an animal and, vice versa, when we look only at the log body mass ignoring the cortex. Let us reduce our state of ignorance by splitting individual species into three groups based on their similarity in neocortex percentage. Note that I have put no extra care into the grouping process apart from ensuring that all groups have roughly the same number of species. Also note that connecting lines have no specific meaning and I've added them only to make visual grouping of dots of the same color easier.
 
@@ -1449,7 +1583,7 @@ So, once again, we see that there is no clear relationship is evident if we cons
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-64-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-68-1.pdf}
 
 Once we group species either by their their neocortex percent, you can immediately see the pattern. The pattern on the left is trivial as it merely shows our grouping based on low (red), medium (green), and high (blue) percentage of neocortex. However, when we look at the right plot, we see how species with similar neocortex percentage cluster nicely together and this way you can see a nice negative correlation between log body mass and milk energy \emph{within each group}. This is because the same \emph{absolute} log body mass corresponds to different \emph{relative} log body mass with each group. I.e., a vertical slice through body mass leads to different values of milk energy \emph{because} these values come from different neocortex percent groups. To summarize, we can see that log body mass is informative \emph{only} if we know neocortex percent of an animal.
 
@@ -1474,7 +1608,7 @@ Let us try to visualize what multiple regression is doing. Keep in mind that thi
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-65-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-69-1.pdf}
 
 The plot above expresses the same idea as a counterfactual right bottom plot in figure 5.9. Where, the question was ``what is the effect of log body mass for \emph{all} species with an average neocortex percent'', so single very specific group of animals. Our plot merely extended that idea to three groups. To appreciate this the link, let us fit the model and plot same counterfactuals for each group that we identified.
 
@@ -1533,7 +1667,7 @@ The plot above expresses the same idea as a counterfactual right bottom plot in 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-66-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-70-1.pdf}
 
 And we can do this the other way around grouping species by their log body mass.
 
@@ -1562,7 +1696,7 @@ And we can do this the other way around grouping species by their log body mass.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-67-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-71-1.pdf}
 
 \hypertarget{a-warning-message}{%
 \section{A warning message}\label{a-warning-message}}

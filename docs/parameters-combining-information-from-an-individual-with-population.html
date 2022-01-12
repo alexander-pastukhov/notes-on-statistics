@@ -7,16 +7,16 @@
 <title>Chapter 10 Parameters: combining information from an individual with population | Notes on Statistics</title>
 <meta name="author" content="Alexander Pastukhov">
 <meta name="description" content="When we infer values of parameters, we must decide on how to combine information available for an individual “random effect” entry (e.g., participant) and information about the distribution of...">
-<meta name="generator" content="bookdown 0.23 with bs4_book()">
+<meta name="generator" content="bookdown 0.24 with bs4_book()">
 <meta property="og:title" content="Chapter 10 Parameters: combining information from an individual with population | Notes on Statistics">
 <meta property="og:type" content="book">
 <meta property="og:description" content="When we infer values of parameters, we must decide on how to combine information available for an individual “random effect” entry (e.g., participant) and information about the distribution of...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 10 Parameters: combining information from an individual with population | Notes on Statistics">
 <meta name="twitter:description" content="When we infer values of parameters, we must decide on how to combine information available for an individual “random effect” entry (e.g., participant) and information about the distribution of...">
-<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.10/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
-<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.2.5.1/tabs.js"></script><script src="libs/bs3compat-0.2.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
 <script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><link rel="stylesheet" href="bs4_style.css%20-%20style.css">
 </head>
 <body data-spy="scroll" data-target="#toc">
@@ -78,9 +78,9 @@
 \alpha \sim Normal(178, 9.5)\]</span></p>
 <p>This is an extreme case of when we ignore the fact that people (monkeys, countries, etc.) are different and, effectively, model everyone as a single typical average meta-individual. The information about variance within the sample is discarded.</p>
 <p>In the plot below, measurement for each individual (distinguished by their position on y-axis) is plotted on x-axis (black circles). But using a single intercept (vertical line) in the model, means all of them get an average height (blue open circles).</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;"></div>
 <p>Another way to view the same data is by plotting raw data (y-axis) vs. used estimates (x-axis). The vertical line denotes the population mean, whereas the diagonal line implies that estimates are equal to the data.</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-39-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-43-1.png" width="672" style="display: block; margin: auto;"></div>
 </div>
 <div id="everyone-is-unique-independent-parameters" class="section level2" number="10.2">
 <h2>
@@ -91,9 +91,9 @@
 \alpha_i \sim Normal(178, 9.5)\]</span></p>
 <p>This is the approach taken by paired t-test and repeated measures ANOVA. Note that it is likely to overfit the data, as we allow limited and noisy data to fully determine intercepts. Use of weak or flat priors (as in frequentist approach) is likely to make out-of-sample performance even worse.</p>
 <p>In the plot below, measurement for each individual (distinguished by their position on y-axis) is plotted on x-axis (black circles). You cannot see black circles because they are covered by open blue circles — the estimates used by the model.</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-40-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-44-1.png" width="672" style="display: block; margin: auto;"></div>
 <p>Here is another representation of the same data with all dots lying on the diagonal (estimate is equal to data). The vertical blue line still denotes the population mean this information is not used for estimates.</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-41-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-45-1.png" width="672" style="display: block; margin: auto;"></div>
 </div>
 <div id="people-are-different-but-belong-to-a-population-pooled-parameters" class="section level2" number="10.3">
 <h2>
@@ -105,8 +105,8 @@
 \alpha^{pop} \sim Normal(178, 9.5)\\
 \sigma^{\alpha} \sim Exponential(1)\]</span></p>
 <p>The basic idea is the “regression to the mean,” so that unusual-looking individuals are probably more average than they appear. In other words, they are so unusual because of the noise during that particular measurement. During a next measurement the noise will be different, probably not so extreme, and the individual will appear to be more normal. The pull of extreme observations toward the mean is the same as one from a static prior. The main difference is that we use <em>adaptive</em> priors and determine how typical/unusual an observation is based on all observations themselves, <em>including</em> the extreme ones. As with “normal” priors, the influence of adaptive prior is most pronounced for extreme, unreliable observations, or observations with small amount of data. They are easier to overfit and, hence, benefit most from regularizing priors.</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;"></div>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-43-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-46-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-47-1.png" width="672" style="display: block; margin: auto;"></div>
 </div>
 <div id="people-are-different-but-belong-to-a-group-within-a-population-multilevel-clusters-of-pooled-parameters" class="section level2" number="10.4">
 <h2>
@@ -120,8 +120,8 @@ alpha^{group} \sim Normal(\alpha^{pop}, \sigma^{pop}) \\
 \sigma^{\alpha}, \sigma^{group} \sim Exponential(1)\]</span></p>
 <p>For an individual, it allows to pool information across a more relevant group. For example, males tend to be taller than females, so it would make more sense to use female sub-population/group/cluster to decide on just how typical a given female is. Same goes for other types of clusters: e.g., students from a particular school are probably more similar in their knowledge on a particular subject (such as math) as compared to students from other schools. At the same time, we can still pull information across clusters, making our inferences about them more reliable as well. And, of course, you are not limited in the number of levels you can create: students within a school, schools within a district, districts within a city, etc.</p>
 <p>In the plots below, notice that sex cluster distributions are tighter than a single population distribution above. Also notice how individual observers are pulled toward the group mean and, again, the pull is proportional to how atypical a value is.</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-44-1.png" width="672" style="display: block; margin: auto;"></div>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-45-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-48-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-49-1.png" width="672" style="display: block; margin: auto;"></div>
 </div>
 <div id="people-are-similar-to-some-but-different-to-others-gaussian-process" class="section level2" number="10.5">
 <h2>
@@ -135,11 +135,11 @@ K_{ij} = = \eta^2 exp(−\rho^2D^2_{ij}) + \delta_{ij}\sigma^2 \\
 \alpha^{pop} \sim Normal(178, 9.5)\]</span></p>
 <p>where <span class="math inline">\(D_{ij}\)</span> is the distance between individuals (see the book for further details on the formula and Gaussian process in general).</p>
 <p>Generally speaking, the idea is that contribution of observations is proportional to their distance to the individual in question. It also means that there are no discrete cluster. Rather, each observation gets its own distance-based population distribution which it is judged against. Note, however, that parameter <span class="math inline">\(\rho\)</span> adjusts the effect of the distance making it more or less relevant. Thus, the distance can be ignored by the model (via smaller value of <span class="math inline">\(\rho\)</span>) meaning that all observations/individuals contribute equally to the population distribution (relative to an individual), i.e., a given intercept is correlated with everybody else. Conversely, larger values of <span class="math inline">\(\rho\)</span> mean that only nearest neighbors are taken into account.</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-46-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-50-1.png" width="672" style="display: block; margin: auto;"></div>
 <p>In the example below, the distance between individuals is determined by the distance on the vertical axis. The first plot use <span class="math inline">\(\rho=1\)</span> that samples most observations (dot size reflect the <span class="math inline">\(K\)</span> used in the MVNormal). It produces a fairly broad population distribution and shift the first participant to the <em>right</em>.</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-48-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-52-1.png" width="672" style="display: block; margin: auto;"></div>
 <p>The second plot uses the same distance measure but <span class="math inline">\(\rho=10\)</span> meaning that it is the close neighbors that affect the estimate. Here, the population distribution is much tighter and the estimate for the first participant is shifted to the <em>left</em>.</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-49-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-53-1.png" width="672" style="display: block; margin: auto;"></div>
 </div>
 <div id="people-are-different-but-belong-to-a-population-in-which-parameters-are-correlated-correlated-pooled-parameters" class="section level2" number="10.6">
 <h2>
@@ -185,7 +185,7 @@ K_{ij} = = \eta^2 exp(−\rho^2D^2_{ij}) + \delta_{ij}\sigma^2 \\
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2021-12-02.</p>
+    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-01-12.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

@@ -7,16 +7,16 @@
 <title>Chapter 9 Instrumental Variables | Notes on Statistics</title>
 <meta name="author" content="Alexander Pastukhov">
 <meta name="description" content="Disclaimer My understanding is that instrumental variables are unicorns. They are immensely powerful and can magically turn an observational study into, effectively, a randomize experiment...">
-<meta name="generator" content="bookdown 0.23 with bs4_book()">
+<meta name="generator" content="bookdown 0.24 with bs4_book()">
 <meta property="og:title" content="Chapter 9 Instrumental Variables | Notes on Statistics">
 <meta property="og:type" content="book">
 <meta property="og:description" content="Disclaimer My understanding is that instrumental variables are unicorns. They are immensely powerful and can magically turn an observational study into, effectively, a randomize experiment...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 9 Instrumental Variables | Notes on Statistics">
 <meta name="twitter:description" content="Disclaimer My understanding is that instrumental variables are unicorns. They are immensely powerful and can magically turn an observational study into, effectively, a randomize experiment...">
-<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.10/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
-<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.2.5.1/tabs.js"></script><script src="libs/bs3compat-0.2.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
 <script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><link rel="stylesheet" href="bs4_style.css%20-%20style.css">
 </head>
 <body data-spy="scroll" data-target="#toc">
@@ -76,9 +76,9 @@
 <h2>Can we estimate an effect of military experience on wages<a class="anchor" aria-label="anchor" href="#can-we-estimate-an-effect-of-military-experience-on-wages"><i class="fas fa-link"></i></a>
 </h2>
 <p>One of the examples, which you can find online, is an effect of military experience on wages. Conceptually, everything is simple, you just want to know a direct effect of military experience on wages.</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;"></div>
 <p>However, in practice both a decision to join military <em>and</em> choices of career can be cause by the same set of unobserved factors. If you come from a family with military background, this will affect both your decision join military and the kind of career you want to pursue. If you are patriotic and want to serve the country, you might opt for both military and lower-earning career in public sector. Conversely, if you are interested in becoming a successful lawyer, going into military might be more of a hindrance than of help. In short, we have a backdoor path through unobserved variables and we have no easy way to close it.</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-32-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-36-1.png" width="672" style="display: block; margin: auto;"></div>
 </div>
 <div id="draft-as-an-instrumental-variable" class="section level2 unnumbered">
 <h2>Draft as an instrumental variable<a class="anchor" aria-label="anchor" href="#draft-as-an-instrumental-variable"><i class="fas fa-link"></i></a>
@@ -86,14 +86,14 @@
 <p>If we would be able to perform a <em>randomized</em> experiment, things would be easy: Take similar people and randomly send / not send them to military, observe the effect of this on their career and wages. Now, <em>we</em> cannot do it but, perhaps, we can find a situation it was actually done and use it for our advantage. This makes the whole situation a sort of a hybrid: we <em>observe</em> an outcome of <em>randomization</em> that someone else did for their own purposes</p>
 <p>In this case, during the Vietnam war people were drafted based on their assigned draft numbers. The latter were determined by your date of birth but the relationship between the birth day within a year and the draft number was <a href="https://en.wikipedia.org/wiki/Draft_lottery_(1969)">randomized through the lottery</a>. In addition, the order <em>within</em> a day was randomized through lottery of initials. The purpose was to create a perfect randomization where any background (apart from you being male and being eligible for military service) had no effect on whether or not your were drafted. And, although the lottery was created to address inequalities, it created an almost perfect randomized experiment for us to use. Almost, because some people with early numbers avoided being drafted through various means, whereas some people with later draft numbers volunteered and were enlisted.</p>
 <p>The DAG it creates is the following</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-37-1.png" width="672" style="display: block; margin: auto;"></div>
 <p>As you can see, we are still not able to close the backdoor path between <em>military experience</em> and <em>wages</em> because the randomization is not perfect. You will see how we can still overcome this problem using two-stage least squares (the default approach you find almost everywhere, referred to as “two-stage worst squares” by McElreath) and using covariance of residuals (as in the book).</p>
 </div>
 <div id="two-stage-least-squares" class="section level2 unnumbered">
 <h2>Two-stage least squares<a class="anchor" aria-label="anchor" href="#two-stage-least-squares"><i class="fas fa-link"></i></a>
 </h2>
 <p>The main idea is two split our DAG into two halves and estimated the effects one by one, hence, “two-stage.” First, use draft number to <em>predict</em> the military experience.</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-34-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;"></div>
 <p>The linear model is
 <span class="math display">\[ME \sim Normal(\widehat{ME}, \sigma_{ME})\\
 \widehat{ME} = \alpha_{ME} + \beta_{DN} \cdot DN\]</span></p>
@@ -102,7 +102,7 @@
 Here, the difference between the <em>predicted</em> military experience (note the hat above <span class="math inline">\(\widehat{ME}\)</span>) and the actual one is described by <span class="math inline">\(\epsilon_{ME}\)</span>: residuals that come from a normal distribution that is centered at 0 with standard deviation of <span class="math inline">\(sigma_{ME}\)</span>, which is implicit in this format. Note that <em>both</em> versions express same variables and encode the same dependence but differ in whether the residuals (<span class="math inline">\(epsilon\)</span>) or the standard deviation of the distribution they come from (<span class="math inline">\(sigma\)</span>) are implicit or explicit.</p>
 <p>As draft number is independent from unobserved variables due to the lottery, the <em>predicted</em> military experience is <em>also</em> independent from them. All the dependence gets transferred to the <em>residuals</em> instead, because residuals are variance that our <em>signal</em> cannot explain (that point will become important later on).</p>
 <p>Now, for the second stage, we use <em>predicted</em> military experience, as it is independent of the unobserved variables and, therefore, we do not need to close the backdoor path!</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-39-1.png" width="672" style="display: block; margin: auto;"></div>
 <p>The model is, again, simple but do note that in two-stage least squares we are using <em>predicted</em> military experience <span class="math inline">\(\widehat{ME}\)</span>!
 <span class="math display">\[CW \sim Normal(\widehat{CW}, \sigma_{CW})\\
 \widehat{CW} = \alpha_{CW} + \beta_{ME} \cdot \widehat{CW}\\
@@ -153,7 +153,7 @@ or\\
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2021-12-02.</p>
+    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-01-12.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
