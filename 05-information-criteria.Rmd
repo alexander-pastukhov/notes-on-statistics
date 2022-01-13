@@ -165,7 +165,7 @@ $$lppd =\frac{(\mu - \epsilon) + (\mu + \epsilon)}{2}$$
 $$lppd =\frac{2 \cdot \mu}{2}$$
 $$lppd = \mu$$
 
-What about $lppd_IS$?
+What about $lppd_{IS}$?
 $$lppd_{IS} = \frac{2}{\frac{1}{p_1} + \frac{1}{p_2}}$$
 
 $$lppd_{IS} = \frac{2}{\frac{1}{\mu - \epsilon} + \frac{1}{\mu + \epsilon}}$$
