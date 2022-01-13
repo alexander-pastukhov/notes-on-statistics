@@ -68,9 +68,9 @@
 <span class="header-section-number">11</span> Incorporating measurement error: a rubber band metaphor<a class="anchor" aria-label="anchor" href="#incorporating-measurement-error-a-rubber-band-metaphor"><i class="fas fa-link"></i></a>
 </h1>
 <p>One way to think about <a href="loss-functions.html#loss-functions">loss functions</a> is as if they are rubber bands<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;As Hook’s law is a first-order linear approximation, this metaphor works fully only if we assume L1 distance, i.e., that error increases / probability decreases linearly with distance. Still you could imagine a better rubber band whose force will be proportional to the squared (L2) distance, as for the normal likelihood.&lt;/p&gt;"><sup>27</sup></a> (black vertical segments) connecting observations (white dots) with its corresponding mean (red dots) on the regression line. Each band tries to pull the mean and, therefore, the regression line towards the observation and the final estimate is simply a minimal energy state: The total sum of pulling forces is minimal, so that any movement of the regression line would decrease the stretch for sum dots but will produce way more pulling for other dots, increasing the overall force. This is the “usual” way that we performed the regression analysis assuming that <em>same</em> rubber bands connect every dot with the regression line.</p>
-<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-56-1.png" width="672">
+<p><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-58-1.png" width="672">
 Within this metaphor, measurement error is incorporated as additional inferred value (blue dots, true value of a measurement) that is connected to the observed value via a <em>custom</em> rubber band (colored) whose strength depends on the measurement error. I.e., large measurement errors make for a very weak stretchable bands, whereas high certainty leads to very small and strong bands. Note the connectivity pattern: observed value — (via custom rubber band) — (estimated) true value — (via common rubber band) — mean on the regression line. Here, dots with smaller measurement error will pull the regression line much stronger towards the observed value, whereas dots with large error will tolerate having regression line even very far away.</p>
-<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-57-1.png" width="672"></div>
+<div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-59-1.png" width="672"></div>
 <p>Note that in some cases, information about measurement error is incorporated directly. For example, in binomial likelihood the number of successes and the total number of observations determine not only the proportion of success but also confidence about that value.</p>
 
 </div>
@@ -97,7 +97,7 @@ Within this metaphor, measurement error is incorporated as additional inferred v
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-01-12.</p>
+    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-01-13.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

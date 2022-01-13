@@ -6,7 +6,7 @@
 ]{book}
 \title{Notes on Statistics}
 \author{Alexander Pastukhov}
-\date{2022-01-12}
+\date{2022-01-13}
 
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
@@ -675,14 +675,14 @@ So, what are you supposed to do with this new knowledge? You do not take fitted 
 \hypertarget{information-criteria}{%
 \chapter{Information Criteria}\label{information-criteria}}
 
-These are notes on information criteria, presented in chapter 7 of the Statistical Rethinking book. The purpose of this note is to provide some intuition about the information criteria presented in the ``Statistical Rethinking'' book. I deliberately oversimplified and overgeneralized certain aspects to paint a ``bigger picture''.
+These are notes on information criteria. Their purpose is to provide some intuition about the information criteria, supplementing information presented in chapter 7 of the \emph{Statistical Rethinking} book by Richard McElreath. I deliberately oversimplified and overgeneralized certain aspects to paint a ``bigger picture''.
 
 \hypertarget{deviance}{%
 \section{Deviance}\label{deviance}}
 
 In the chapter, deviance is introduced as an estimate for KL-divergence, which in turn is a relative entropy, i.e., the difference between cross-entropy and actual entropy of events. Keep that in mind but you could look at deviance itself as a straightforward goodness-of-fit measure, similar to squared residuals (RMSE, Root Mean Square Error) and coefficient of determination \(R^2\). In both cases, you have difference between model prediction (the regression line) and an actual data point. In ordinary least squares (OLS) approach, you quantify this imperfection of prediction by squaring residuals. You sum up all residuals to get the sum of squared residuals (\(SS_{res}\)) and then you can compute \(R^2\) by comparing it to the total sum of residuals in the data (\(SS_{total}\)):
 \[R^2 = 1 - \frac{SS_{res}}{SS_{total}} = \frac{SS_{total} - SS_{res}}{SS_{total}}\]
-As the total sum of residuals \(SS_{res}\) gets close to zero, the fraction gets close to 1. The disadvantage of squared residuals and \(R^2\) is that tricky to use with non-metric data, such as binomial, ordered categorical data, etc., or when deviations from the prediction might be asymmetric (binomial data, response times, etc.). Instead, you can use use likelihood to compute the probability that a data point comes from a distribution defined by a model. Then, you compute the (total) joint probability by multiplying all probabilities or, better still, by computing the sum of their log-transform (log likelihood)\footnote{Mathematically equivalent but the sum of logs is far more numerically stable.}. Then, you can compare the observed log likelihood to the highest theoretically possible log likelihood for a \emph{saturated model} (\(\Theta_s\)), which has as many parameters as there are data points, so that it predicts each point perfectly. This is the original definition of (total) \emph{deviance}:
+As the total sum of residuals \(SS_{res}\) gets close to zero, the fraction gets close to 1. The disadvantage of squared residuals and \(R^2\) is that tricky to use with non-metric data, such as binomial, ordered categorical data, etc., or when deviations from the prediction might be asymmetric (binomial data, response times, etc.). Instead, you can use likelihood to compute the probability that a data point comes from a distribution defined by a model. Then, you compute the (total) joint probability by multiplying all probabilities or, better still, by computing the sum of their log-transform (log likelihood)\footnote{Mathematically equivalent but the sum of logs is far more numerically stable.}. Then, you can compare the observed log likelihood to the highest theoretically possible log likelihood for a \emph{saturated model} (\(\Theta_s\)), which has as many parameters as there are data points, so that it predicts each point perfectly. This is the original definition of (total) \emph{deviance}:
 \[D = -2 \cdot (log(p(y|\Theta)) - log(p(y|\Theta_s)))\]
 
 Recall that \(log(\frac{a}{b}) = log(a) - log(b)\), so we can rearrange it and see that it is a log-ratio of likelihoods:
@@ -815,7 +815,8 @@ This looks like some bizarre re-arrangement of the terms but it ends up producin
 \begin{Highlighting}[]
 \NormalTok{p }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.2}\NormalTok{, }\FloatTok{0.2}\NormalTok{, }\FloatTok{0.2}\NormalTok{) }\CommentTok{\# mean = 0.2, variance = 0}
 \NormalTok{logp }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(p)}
-\FunctionTok{cat}\NormalTok{(}\StringTok{"mean = "}\NormalTok{, }\FunctionTok{mean}\NormalTok{(p), }\StringTok{", variance of log(p) = "}\NormalTok{, rethinking}\SpecialCharTok{::}\FunctionTok{var2}\NormalTok{(logp), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\AttributeTok{sep =} \StringTok{""}\NormalTok{)}
+\NormalTok{lppd }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\FunctionTok{sum}\NormalTok{(p)}\SpecialCharTok{/}\FunctionTok{length}\NormalTok{(p))}
+\NormalTok{lppd\_IS }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\DecValTok{1} \SpecialCharTok{/}\NormalTok{ ( (}\DecValTok{1} \SpecialCharTok{/} \FunctionTok{length}\NormalTok{(p)) }\SpecialCharTok{*} \FunctionTok{sum}\NormalTok{( }\DecValTok{1}\SpecialCharTok{/}\NormalTok{ p)))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -823,33 +824,13 @@ This looks like some bizarre re-arrangement of the terms but it ends up producin
 ## mean = 0.2, variance of log(p) = 0
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{lppd }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\FunctionTok{sum}\NormalTok{(p)}\SpecialCharTok{/}\FunctionTok{length}\NormalTok{(p))}
-\NormalTok{lppd\_IS }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\DecValTok{1} \SpecialCharTok{/}\NormalTok{ ( (}\DecValTok{1} \SpecialCharTok{/} \FunctionTok{length}\NormalTok{(p)) }\SpecialCharTok{*} \FunctionTok{sum}\NormalTok{( }\DecValTok{1}\SpecialCharTok{/}\NormalTok{ p)))}
-\FunctionTok{cat}\NormalTok{(}\StringTok{"lppd    ="}\NormalTok{, lppd, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{) }
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ## lppd    = -1.609438
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{cat}\NormalTok{(}\StringTok{"lppd\_IS ="}\NormalTok{, lppd\_IS, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ## lppd_IS = -1.609438
 \end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{cat}\NormalTok{(}\StringTok{"lppd {-} lppd\_IS = "}\NormalTok{, lppd }\SpecialCharTok{{-}}\NormalTok{ lppd\_IS, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{verbatim}
 ## lppd - lppd_IS =  0
@@ -861,7 +842,8 @@ Now let us keep \emph{mean} the same but very slightly increase \emph{variance}.
 \begin{Highlighting}[]
 \NormalTok{p }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.19}\NormalTok{, }\FloatTok{0.2}\NormalTok{, }\FloatTok{0.21}\NormalTok{)}
 \NormalTok{logp }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(p)}
-\FunctionTok{cat}\NormalTok{(}\StringTok{"mean = "}\NormalTok{, }\FunctionTok{mean}\NormalTok{(p), }\StringTok{", variance of log(p) = "}\NormalTok{, rethinking}\SpecialCharTok{::}\FunctionTok{var2}\NormalTok{(logp), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\AttributeTok{sep =} \StringTok{""}\NormalTok{)}
+\NormalTok{lppd }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\FunctionTok{sum}\NormalTok{(p)}\SpecialCharTok{/}\FunctionTok{length}\NormalTok{(p))}
+\NormalTok{lppd\_IS }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\DecValTok{1} \SpecialCharTok{/}\NormalTok{ ( (}\DecValTok{1} \SpecialCharTok{/} \FunctionTok{length}\NormalTok{(p)) }\SpecialCharTok{*} \FunctionTok{sum}\NormalTok{( }\DecValTok{1}\SpecialCharTok{/}\NormalTok{ p)))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -869,39 +851,46 @@ Now let us keep \emph{mean} the same but very slightly increase \emph{variance}.
 ## mean = 0.2, variance of log(p) = 0.001669798
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{lppd }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\FunctionTok{sum}\NormalTok{(p)}\SpecialCharTok{/}\FunctionTok{length}\NormalTok{(p))}
-\NormalTok{lppd\_IS }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\DecValTok{1} \SpecialCharTok{/}\NormalTok{ ( (}\DecValTok{1} \SpecialCharTok{/} \FunctionTok{length}\NormalTok{(p)) }\SpecialCharTok{*} \FunctionTok{sum}\NormalTok{( }\DecValTok{1}\SpecialCharTok{/}\NormalTok{ p)))}
-\FunctionTok{cat}\NormalTok{(}\StringTok{"lppd    ="}\NormalTok{, lppd, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{) }
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ## lppd    = -1.609438
 \end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{cat}\NormalTok{(}\StringTok{"lppd\_IS ="}\NormalTok{, lppd\_IS, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{verbatim}
 ## lppd_IS = -1.611107
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{cat}\NormalTok{(}\StringTok{"lppd {-} lppd\_IS = "}\NormalTok{, lppd }\SpecialCharTok{{-}}\NormalTok{ lppd\_IS, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ## lppd - lppd_IS =  0.001669449
 \end{verbatim}
 
-Increasing variance even further, increases the penalty
+To understand where does the penalty comes from, it was helpful for me to derive the solution for the case of just two values \([p_1, p_2]\). In this case you can define them as difference to the their mean, just as we did above: \(p_1 = \mu - \epsilon\) and \(p_2 = \mu + \epsilon\). The \(lppd\) should be trivially equal to \(\mu\):
+\[lppd = \frac{p_1 + p_2}{2}\]
+\[lppd =\frac{(\mu - \epsilon) + (\mu + \epsilon)}{2}\]
+\[lppd =\frac{2 \cdot \mu}{2}\]
+\[lppd = \mu\]
+
+What about \(lppd_IS\)?
+\[lppd_{IS} = \frac{2}{\frac{1}{p_1} + \frac{1}{p_2}}\]
+
+\[lppd_{IS} = \frac{2}{\frac{1}{\mu - \epsilon} + \frac{1}{\mu + \epsilon}}\]
+
+Bringing the two fractions to a common denominator we get
+\[lppd_{IS} = \frac{2}{\frac{(\mu + \epsilon) + (\mu - \epsilon)}{(\mu + \epsilon)(\mu - \epsilon)}}\]
+Opening the brackets in the numerator
+\[lppd_{IS} = \frac{2}{\frac{2 \cdot \mu }{(\mu + \epsilon)(\mu - \epsilon)}}\]
+Now we can get flip the bottom fraction
+\[lppd_{IS} = \frac{2 \cdot \frac{(\mu + \epsilon)(\mu - \epsilon)}{2 \cdot \mu}}{\frac{2 \cdot \mu }{(\mu + \epsilon)(\mu - \epsilon)} \cdot \frac{(\mu + \epsilon)(\mu - \epsilon)}{2 \cdot \mu}} \]
+
+\[lppd_{IS} = 2 \cdot \frac{(\mu + \epsilon)(\mu - \epsilon)}{2 \cdot \mu}\]
+The two goes away
+\[lppd_{IS} = \frac{(\mu + \epsilon)(\mu - \epsilon)}{\mu}\]
+Opening the brackets in the numerator
+\[lppd_{IS} = \frac{\mu^2 + \mu\epsilon - \mu\epsilon - \epsilon^2}{\mu}\]
+Simplifying
+\[lppd_{IS} = \frac{\mu^2 - \epsilon^2}{\mu}\]
+\[lppd_{IS} = \mu - \frac{\epsilon^2}{\mu}\]
+
+Thus when variance (\(\epsilon\), deviation from the mean) increases, the \(lppd_{IS}\) decreases
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -915,7 +904,8 @@ Increasing variance even further, increases the penalty
          \AttributeTok{Kind =} \StringTok{"lppd"}\NormalTok{),}
   \FunctionTok{tibble}\NormalTok{(}\AttributeTok{Variance =}\NormalTok{ purrr}\SpecialCharTok{::}\FunctionTok{map\_dbl}\NormalTok{(delta, }\SpecialCharTok{\textasciitilde{}}\FunctionTok{var2}\NormalTok{(}\FunctionTok{log}\NormalTok{(}\FunctionTok{create\_p}\NormalTok{(.)))),}
        \AttributeTok{LPPD =}\NormalTok{ purrr}\SpecialCharTok{::}\FunctionTok{map\_dbl}\NormalTok{(delta, }\SpecialCharTok{\textasciitilde{}}\FunctionTok{log}\NormalTok{(}\DecValTok{1} \SpecialCharTok{/}\NormalTok{ ( (}\DecValTok{1} \SpecialCharTok{/} \FunctionTok{length}\NormalTok{(}\FunctionTok{create\_p}\NormalTok{(.))) }\SpecialCharTok{*} \FunctionTok{sum}\NormalTok{( }\DecValTok{1}\SpecialCharTok{/} \FunctionTok{create\_p}\NormalTok{(.))))),}
-       \AttributeTok{Kind =} \StringTok{"lppd\_IS"}\NormalTok{))}
+       \AttributeTok{Kind =} \StringTok{"lppd\_IS"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{SD =} \FunctionTok{sqrt}\NormalTok{(Variance))}
 
 \NormalTok{together\_plot }\OtherTok{\textless{}{-}} 
   \FunctionTok{ggplot}\NormalTok{(lppd\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Variance, }\AttributeTok{y=}\NormalTok{LPPD, }\AttributeTok{color=}\NormalTok{Kind)) }\SpecialCharTok{+} 
@@ -934,7 +924,7 @@ Increasing variance even further, increases the penalty
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-28-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-30-1.pdf}
 
 Compare the \(var log p(y_i|\Theta_s)\), which is a WAIC penalty term, with the decrease due to variance-based importance ratios. As you can see the two are very close and, therefore, will produce very similar estimates of out-of-sample performance. A \emph{Pareto smoothed} importance sampling has an advantage over WAIC is that it less keen on reducing the performance based on a few samples, which are smoothed away. Still, both methods should identify the same problematic (high variance) data points that you should pay closer attention to.
 
@@ -1085,7 +1075,7 @@ In practical terms, this means that parameter \(\theta\) controls the width of t
 
 The idea is the same: We do not have enough information to compute the rate of events, so instead, we compute the mean of the Gamma distribution rates come from and let data determine its variance (scale). Again, in practical terms this means that for the smallest scale our uncertainty about the rate is minimal and distribution matches the Poisson processes with a fixed rate. Any increase in uncertainty (larger values for scale parameter), mean broader distribution that is capable to account for more extreme values.
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-30-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-32-1.pdf}
 
 \hypertarget{ordered-categorical}{%
 \section{Ordered categorical}\label{ordered-categorical}}
@@ -1110,7 +1100,7 @@ Pr(y_i \leq k) = \frac{e^{\alpha_k}}{1 + e^{\alpha_k}}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-31-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-33-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1156,7 +1146,7 @@ Pr(y_i \leq k) = \frac{e^{\alpha_k}}{1 + e^{\alpha_k}}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-32-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-34-1.pdf}
 
 \hypertarget{instrumental-variables}{%
 \chapter{Instrumental Variables}\label{instrumental-variables}}
@@ -1173,11 +1163,11 @@ My understanding is that instrumental variables are unicorns. They are immensely
 
 One of the examples, which you can find online, is an effect of military experience on wages. Conceptually, everything is simple, you just want to know a direct effect of military experience on wages.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-35-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-37-1} \end{center}
 
 However, in practice both a decision to join military \emph{and} choices of career can be cause by the same set of unobserved factors. If you come from a family with military background, this will affect both your decision join military and the kind of career you want to pursue. If you are patriotic and want to serve the country, you might opt for both military and lower-earning career in public sector. Conversely, if you are interested in becoming a successful lawyer, going into military might be more of a hindrance than of help. In short, we have a backdoor path through unobserved variables and we have no easy way to close it.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-36-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-38-1} \end{center}
 
 \hypertarget{draft-as-an-instrumental-variable}{%
 \section*{Draft as an instrumental variable}\label{draft-as-an-instrumental-variable}}
@@ -1189,7 +1179,7 @@ In this case, during the Vietnam war people were drafted based on their assigned
 
 The DAG it creates is the following
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-37-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-39-1} \end{center}
 
 As you can see, we are still not able to close the backdoor path between \emph{military experience} and \emph{wages} because the randomization is not perfect. You will see how we can still overcome this problem using two-stage least squares (the default approach you find almost everywhere, referred to as ``two-stage worst squares'' by McElreath) and using covariance of residuals (as in the book).
 
@@ -1199,7 +1189,7 @@ As you can see, we are still not able to close the backdoor path between \emph{m
 
 The main idea is two split our DAG into two halves and estimated the effects one by one, hence, ``two-stage''. First, use draft number to \emph{predict} the military experience.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-38-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-40-1} \end{center}
 
 The linear model is
 \[ME \sim Normal(\widehat{ME}, \sigma_{ME})\\
@@ -1213,7 +1203,7 @@ As draft number is independent from unobserved variables due to the lottery, the
 
 Now, for the second stage, we use \emph{predicted} military experience, as it is independent of the unobserved variables and, therefore, we do not need to close the backdoor path!
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-39-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-41-1} \end{center}
 
 The model is, again, simple but do note that in two-stage least squares we are using \emph{predicted} military experience \(\widehat{ME}\)!
 \[CW \sim Normal(\widehat{CW}, \sigma_{CW})\\
@@ -1260,11 +1250,11 @@ This is an extreme case of when we ignore the fact that people (monkeys, countri
 
 In the plot below, measurement for each individual (distinguished by their position on y-axis) is plotted on x-axis (black circles). But using a single intercept (vertical line) in the model, means all of them get an average height (blue open circles).
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-42-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-44-1} \end{center}
 
 Another way to view the same data is by plotting raw data (y-axis) vs.~used estimates (x-axis). The vertical line denotes the population mean, whereas the diagonal line implies that estimates are equal to the data.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-43-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-45-1} \end{center}
 
 \hypertarget{everyone-is-unique-independent-parameters}{%
 \section{Everyone is unique (independent parameters)}\label{everyone-is-unique-independent-parameters}}
@@ -1278,11 +1268,11 @@ This is the approach taken by paired t-test and repeated measures ANOVA. Note th
 
 In the plot below, measurement for each individual (distinguished by their position on y-axis) is plotted on x-axis (black circles). You cannot see black circles because they are covered by open blue circles --- the estimates used by the model.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-44-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-46-1} \end{center}
 
 Here is another representation of the same data with all dots lying on the diagonal (estimate is equal to data). The vertical blue line still denotes the population mean this information is not used for estimates.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-45-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-47-1} \end{center}
 
 \hypertarget{people-are-different-but-belong-to-a-population-pooled-parameters}{%
 \section{People are different but belong to a population (pooled parameters)}\label{people-are-different-but-belong-to-a-population-pooled-parameters}}
@@ -1296,9 +1286,9 @@ A more balanced approach is to combine data from an individual and population. T
 
 The basic idea is the ``regression to the mean'', so that unusual-looking individuals are probably more average than they appear. In other words, they are so unusual because of the noise during that particular measurement. During a next measurement the noise will be different, probably not so extreme, and the individual will appear to be more normal. The pull of extreme observations toward the mean is the same as one from a static prior. The main difference is that we use \emph{adaptive} priors and determine how typical/unusual an observation is based on all observations themselves, \emph{including} the extreme ones. As with ``normal'' priors, the influence of adaptive prior is most pronounced for extreme, unreliable observations, or observations with small amount of data. They are easier to overfit and, hence, benefit most from regularizing priors.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-46-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-48-1} \end{center}
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-47-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-49-1} \end{center}
 
 \hypertarget{people-are-different-but-belong-to-a-group-within-a-population-multilevel-clusters-of-pooled-parameters}{%
 \section{People are different but belong to a group within a population (multilevel clusters of pooled parameters)}\label{people-are-different-but-belong-to-a-group-within-a-population-multilevel-clusters-of-pooled-parameters}}
@@ -1315,9 +1305,9 @@ For an individual, it allows to pool information across a more relevant group. F
 
 In the plots below, notice that sex cluster distributions are tighter than a single population distribution above. Also notice how individual observers are pulled toward the group mean and, again, the pull is proportional to how atypical a value is.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-48-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-50-1} \end{center}
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-49-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-51-1} \end{center}
 
 \hypertarget{people-are-similar-to-some-but-different-to-others-gaussian-process}{%
 \section{People are similar to some but different to others (Gaussian process)}\label{people-are-similar-to-some-but-different-to-others-gaussian-process}}
@@ -1334,15 +1324,15 @@ where \(D_{ij}\) is the distance between individuals (see the book for further d
 
 Generally speaking, the idea is that contribution of observations is proportional to their distance to the individual in question. It also means that there are no discrete cluster. Rather, each observation gets its own distance-based population distribution which it is judged against. Note, however, that parameter \(\rho\) adjusts the effect of the distance making it more or less relevant. Thus, the distance can be ignored by the model (via smaller value of \(\rho\)) meaning that all observations/individuals contribute equally to the population distribution (relative to an individual), i.e., a given intercept is correlated with everybody else. Conversely, larger values of \(\rho\) mean that only nearest neighbors are taken into account.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-50-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-52-1} \end{center}
 
 In the example below, the distance between individuals is determined by the distance on the vertical axis. The first plot use \(\rho=1\) that samples most observations (dot size reflect the \(K\) used in the MVNormal). It produces a fairly broad population distribution and shift the first participant to the \emph{right}.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-52-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-54-1} \end{center}
 
 The second plot uses the same distance measure but \(\rho=10\) meaning that it is the close neighbors that affect the estimate. Here, the population distribution is much tighter and the estimate for the first participant is shifted to the \emph{left}.
 
-\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-53-1} \end{center}
+\begin{center}\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-55-1} \end{center}
 
 \hypertarget{people-are-different-but-belong-to-a-population-in-which-parameters-are-correlated-correlated-pooled-parameters}{%
 \section{People are different but belong to a population in which parameters are correlated (correlated pooled parameters)}\label{people-are-different-but-belong-to-a-population-in-which-parameters-are-correlated-correlated-pooled-parameters}}
@@ -1363,10 +1353,10 @@ Here, the pulling forces are a bit more complicated than during a single paramet
 
 One way to think about \protect\hyperlink{loss-functions}{loss functions} is as if they are rubber bands\footnote{As Hook's law is a first-order linear approximation, this metaphor works fully only if we assume L1 distance, i.e., that error increases / probability decreases linearly with distance. Still you could imagine a better rubber band whose force will be proportional to the squared (L2) distance, as for the normal likelihood.} (black vertical segments) connecting observations (white dots) with its corresponding mean (red dots) on the regression line. Each band tries to pull the mean and, therefore, the regression line towards the observation and the final estimate is simply a minimal energy state: The total sum of pulling forces is minimal, so that any movement of the regression line would decrease the stretch for sum dots but will produce way more pulling for other dots, increasing the overall force. This is the ``usual'' way that we performed the regression analysis assuming that \emph{same} rubber bands connect every dot with the regression line.
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-56-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-58-1.pdf}
 Within this metaphor, measurement error is incorporated as additional inferred value (blue dots, true value of a measurement) that is connected to the observed value via a \emph{custom} rubber band (colored) whose strength depends on the measurement error. I.e., large measurement errors make for a very weak stretchable bands, whereas high certainty leads to very small and strong bands. Note the connectivity pattern: observed value --- (via custom rubber band) --- (estimated) true value --- (via common rubber band) --- mean on the regression line. Here, dots with smaller measurement error will pull the regression line much stronger towards the observed value, whereas dots with large error will tolerate having regression line even very far away.
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-57-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-59-1.pdf}
 
 Note that in some cases, information about measurement error is incorporated directly. For example, in binomial likelihood the number of successes and the total number of observations determine not only the proportion of success but also confidence about that value.
 
@@ -1378,14 +1368,14 @@ The purpose of this note is to give an intuition about what generalized additive
 \hypertarget{generalized-additive-models-an-uxfcber-brief-introduction}{%
 \section{Generalized Additive Models: An Über-brief Introduction}\label{generalized-additive-models-an-uxfcber-brief-introduction}}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-58-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-60-1.pdf}
 
 Imagine that you have a (completely made up!) data set shown aboe that describes probability of consuming an ice-cream as a function of age. As you can see, it is twisty curve, so a simpler linear regression won't do. If we do not have an idea about the process(es) that generated this data, we might at least smooth it to see the underlying relationship more clearly. You can do this in a number of ways using a running median, loess, etc., but we will focus on GAMs as they have an advantage of being (generalized) linear models, which makes it easy to incorporate them into bigger generalized linear models.
 
 The idea of the GAM is to approximate a dependence as a sum of basis functions. In the example below, all basis functions are \emph{identical} but cover \emph{different} parts of the space. However, you can have it the other way around with \emph{different} basis functions covering \emph{identical} (the entire) space.
 
 In the example below, basis functions are cubic regression splines that are centered on ``knots''. Each tent has its own coefficient that determines its height and, also, the transition between knots. A \emph{wigliness} parameter determines how different coefficients can be, the more different they are, the wigglier will be the line, hence the name. Accordingly, wigliness of \emph{zero} produces a straight horizontal line (all coefficients must be the same). Wigliness of infinity means that coefficients can take any value and fit the data as closely as possible. As you can see, smoothing makes it much easier to see the underlying relationship.
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-59-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-61-1.pdf}
 
 \hypertarget{what-are-gams-good-for}{%
 \section{What are GAMs good for?}\label{what-are-gams-good-for}}
@@ -1468,14 +1458,14 @@ When you first encounter continuous distribution, one of the initially confusing
 
 There is another way of thinking about this via \emph{cumulative mass function}. It tells a cumulative (total) probability of observing a height of a tower that is equal or smaller than a chosen value.
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-61-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-63-1.pdf}
 As you can see, a cumulative probability of observing a tower of zero height (or lower) is 0.2. We if consider height of 1, it bumps cumulative probability to 0.4 (Pr(height=0) + Pr(height=1) = 0.2 + 0.2 = 0.4). Going up to 2 makes it 0.6, to 3 --- 0.8 and, finally, the cumulative probability of me building a tower of height of 4 \emph{or lower} is 1 (100\%!). The latter includes \emph{all} possible tower heights, so the probability you observe one of them is 100\%. Note that for each height the \emph{probability mass} tells you by how much the cumulative probability will increase. This probability mass as an change of cumulative probability will become important later.
 
 Note that cumulative probability can only grow and \emph{must} be between 0 and 1, as all probabilities cannot be negative and must sum up to 1 (otherwise, we call them plausibilities). Below is the same plot but now it includes impossible heights of -1 and 5. Their probabilities are 0, so the cumulative probability does not grow.
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-62-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-64-1.pdf}
 
 But what if I build a ``tower'' out of \emph{very fine sand}? For simplicity, let us assume that its height is also within a 0 to 4 (cubes height) range. But now, there are way more heights that my tower can have. If my sand is super fine, as is individual grains are infinitesimally small, there are \emph{infinite} numbers of possible heights. Knowing that they are all equally likely sort of helps but you cannot compute a probability for each individual height: 1/N, where N=∞ mean 1/∞ ≈ 0. This is the annoying thing about infinities, they make computing things really hard\footnote{People tend to be scared of calculus which is all about limits when things become either infinitesimally small or large.}. So, what do you do if you cannot compute a probability for an individual event/value (height)? You can still compute the \emph{cumulative probability} of a tower being smaller or equal to a particular height! This is the cumulative function that you saw earlier, but the steps are now so fine that you cannot talk about sums but only about integrals. This is why it is now called the cumulative \emph{density} function (CDF).
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-63-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-65-1.pdf}
 
 Note that it looks fairly similar to the previous plot with cumulative probability for discrete events. It still grows from 0 to 1 but the steps are much finer. Yet we can still tell the probability of observing a tower of a height that is equal to or less than this. We start of at zero, because you cannot observe towers of negative height, so \emph{all} tower heights from negative infinity up to zero have a total cumulative probability of 0\footnote{Keep in mind that these values are based on our example of me building a tower. In other circumstances, negative values are possible.}. If we pick the height of 4, then the \emph{cumulative} probability of observing a tower that is equal-or-less is 1 because \emph{all} must be that or smaller (that is how we defined it, there cannot be a tower higher than 4!). If we pick the middle of the interval (height = 2), the \emph{cumulative} probability of observing a tower that is equal-or-smaller is 0.5. This is because we are using a uniform distribution, so half splitting height in half also gives us 50\% chance. As you can see, cumulative probability density behaves the same way as the cumulative probability mass in the example above. Both are fairly straightforward, as long as you appreciate that they are about \emph{all} outcomes up to the point of interest, not just a single event.
 
@@ -1485,7 +1475,7 @@ What about the probability \emph{density} function (PDF)? Recall that the probab
 \[\frac{\delta CDF}{\delta height} = \frac{1}{4}\]
 
 Thus, we can now plot both CDF and PDF.
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-64-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-66-1.pdf}
 You can reverse the logic and say that the cumulative density function is an \emph{integral} of PDF, i.e., area under the curve up to each point. So, the total area under PDF (blue line) should end up being 1 (final value of CDF). This is easy to check for a rectangular like that, just multiply its width (height range of 4) by its height (probability density value of 0.25) and get that 1. Note that if you restrict your height=2 then CDF values is 0.5 and the area under blue line (PDF) is also 0.5 (compute!).
 
 In the example above, probability density is constant at 0.25 and that makes it look ``normal'', at least not surprising. But what if we restrict my tower-building, so I cannot build anything taller than 0.5 cubes (or meters, units are of little relevance here). Now, the CDF formula is (check!):
@@ -1494,7 +1484,7 @@ In the example above, probability density is constant at 0.25 and that makes it 
 and for PDF:
 \[\frac{\delta CDF}{\delta height} = 2\]
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-65-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-67-1.pdf}
 
 Our constant PDF value is 2! Way above one, how come? Think about the slope and think about the area of rectangle: if its 0.5 units wide it must be 2 units tall to make are equal to 1. The point of this is probability density \emph{is not} a probability and that you should not care about \emph{absolute} values of probability density, only about \emph{relative} values. If you feel that ``adding up'' values larger than 1 should not give you 1 at the end, yes, it is very counter-intuitive. Integrals, as other things that have to do with infinitely small or large numbers, are counter-intuitive. Thus, ignore the units, ignore the absolute values, just keep in mind that whenever it is higher, the more probable that specific value is. (But, again, there is no way to compute a meaningful probability for a \emph{single} value).
 
@@ -1547,7 +1537,7 @@ Let us start by replicating top subplots in figure 5.9. Note that 1) I used freq
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-67-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-69-1.pdf}
 
 So, once again, we see that there is no clear relationship is evident if we consider neocortex percent while ignoring body mass of an animal and, vice versa, when we look only at the log body mass ignoring the cortex. Let us reduce our state of ignorance by splitting individual species into three groups based on their similarity in neocortex percentage. Note that I have put no extra care into the grouping process apart from ensuring that all groups have roughly the same number of species. Also note that connecting lines have no specific meaning and I've added them only to make visual grouping of dots of the same color easier.
 
@@ -1583,7 +1573,7 @@ So, once again, we see that there is no clear relationship is evident if we cons
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-68-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-70-1.pdf}
 
 Once we group species either by their their neocortex percent, you can immediately see the pattern. The pattern on the left is trivial as it merely shows our grouping based on low (red), medium (green), and high (blue) percentage of neocortex. However, when we look at the right plot, we see how species with similar neocortex percentage cluster nicely together and this way you can see a nice negative correlation between log body mass and milk energy \emph{within each group}. This is because the same \emph{absolute} log body mass corresponds to different \emph{relative} log body mass with each group. I.e., a vertical slice through body mass leads to different values of milk energy \emph{because} these values come from different neocortex percent groups. To summarize, we can see that log body mass is informative \emph{only} if we know neocortex percent of an animal.
 
@@ -1608,7 +1598,7 @@ Let us try to visualize what multiple regression is doing. Keep in mind that thi
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-69-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-71-1.pdf}
 
 The plot above expresses the same idea as a counterfactual right bottom plot in figure 5.9. Where, the question was ``what is the effect of log body mass for \emph{all} species with an average neocortex percent'', so single very specific group of animals. Our plot merely extended that idea to three groups. To appreciate this the link, let us fit the model and plot same counterfactuals for each group that we identified.
 
@@ -1667,7 +1657,7 @@ The plot above expresses the same idea as a counterfactual right bottom plot in 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-70-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-72-1.pdf}
 
 And we can do this the other way around grouping species by their log body mass.
 
@@ -1696,7 +1686,7 @@ And we can do this the other way around grouping species by their log body mass.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-71-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-73-1.pdf}
 
 \hypertarget{a-warning-message}{%
 \section{A warning message}\label{a-warning-message}}

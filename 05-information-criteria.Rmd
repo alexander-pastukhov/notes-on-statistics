@@ -6,12 +6,12 @@ library(rethinking)
 library(tidyverse)
 ```
 
-These are notes on information criteria, presented in chapter 7 of the Statistical Rethinking book. The purpose of this note is to provide some intuition about the information criteria presented in the "Statistical Rethinking" book. I deliberately oversimplified and overgeneralized certain aspects to paint a "bigger picture".
+These are notes on information criteria. Their purpose is to provide some intuition about the information criteria, supplementing information presented in chapter 7 of the _Statistical Rethinking_ book by Richard McElreath. I deliberately oversimplified and overgeneralized certain aspects to paint a "bigger picture".
 
 ## Deviance
 In the chapter, deviance is introduced as an estimate for KL-divergence, which in turn is a relative entropy, i.e., the difference between cross-entropy and actual entropy of events. Keep that in mind but you could look at deviance itself as a straightforward goodness-of-fit measure, similar to squared residuals (RMSE, Root Mean Square Error) and coefficient of determination $R^2$. In both cases, you have difference between model prediction (the regression line) and an actual data point. In ordinary least squares (OLS) approach, you quantify this imperfection of prediction by squaring residuals. You sum up all residuals to get the sum of squared residuals ($SS_{res}$) and then you can compute $R^2$ by comparing it to the total sum of residuals in the data ($SS_{total}$):
 $$R^2 = 1 - \frac{SS_{res}}{SS_{total}} = \frac{SS_{total} - SS_{res}}{SS_{total}}$$
-As the total sum of residuals $SS_{res}$ gets close to zero, the fraction gets close to 1. The disadvantage of squared residuals and $R^2$ is that tricky to use with non-metric data, such as binomial, ordered categorical data, etc., or when deviations from the prediction might be asymmetric (binomial data, response times, etc.). Instead, you can use use likelihood to compute the probability that a data point comes from a distribution defined by a model. Then, you compute the (total) joint probability by multiplying all probabilities or, better still, by computing the sum of their log-transform (log likelihood)^[Mathematically equivalent but the sum of logs is far more numerically stable.]. Then, you can compare the observed log likelihood to the highest theoretically possible log likelihood for a _saturated model_ ($\Theta_s$), which has as many parameters as there are data points, so that it predicts each point perfectly. This is the original definition of (total) _deviance_:
+As the total sum of residuals $SS_{res}$ gets close to zero, the fraction gets close to 1. The disadvantage of squared residuals and $R^2$ is that tricky to use with non-metric data, such as binomial, ordered categorical data, etc., or when deviations from the prediction might be asymmetric (binomial data, response times, etc.). Instead, you can use likelihood to compute the probability that a data point comes from a distribution defined by a model. Then, you compute the (total) joint probability by multiplying all probabilities or, better still, by computing the sum of their log-transform (log likelihood)^[Mathematically equivalent but the sum of logs is far more numerically stable.]. Then, you can compare the observed log likelihood to the highest theoretically possible log likelihood for a _saturated model_ ($\Theta_s$), which has as many parameters as there are data points, so that it predicts each point perfectly. This is the original definition of (total) _deviance_:
 $$D = -2 \cdot (log(p(y|\Theta)) - log(p(y|\Theta_s)))$$
 
 Recall that $log(\frac{a}{b}) = log(a) - log(b)$, so we can rearrange it and see that it is a log-ratio of likelihoods:
@@ -133,9 +133,12 @@ This looks like some bizarre re-arrangement of the terms but it ends up producin
 ```{r}
 p <- c(0.2, 0.2, 0.2) # mean = 0.2, variance = 0
 logp <- log(p)
-cat("mean = ", mean(p), ", variance of log(p) = ", rethinking::var2(logp), "\n", sep = "")
 lppd <- log(sum(p)/length(p))
 lppd_IS <- log(1 / ( (1 / length(p)) * sum( 1/ p)))
+```
+
+```{r echo=FALSE}
+cat("mean = ", mean(p), ", variance of log(p) = ", rethinking::var2(logp), "\n", sep = "")
 cat("lppd    =", lppd, "\n") 
 cat("lppd_IS =", lppd_IS, "\n")
 cat("lppd - lppd_IS = ", lppd - lppd_IS, "\n")
@@ -145,15 +148,45 @@ Now let us keep _mean_ the same but very slightly increase _variance_. As you ca
 ```{r}
 p <- c(0.19, 0.2, 0.21)
 logp <- log(p)
-cat("mean = ", mean(p), ", variance of log(p) = ", rethinking::var2(logp), "\n", sep = "")
 lppd <- log(sum(p)/length(p))
 lppd_IS <- log(1 / ( (1 / length(p)) * sum( 1/ p)))
+```
+
+```{r echo=FALSE}
+cat("mean = ", mean(p), ", variance of log(p) = ", rethinking::var2(logp), "\n", sep = "")
 cat("lppd    =", lppd, "\n") 
 cat("lppd_IS =", lppd_IS, "\n")
 cat("lppd - lppd_IS = ", lppd - lppd_IS, "\n")
 ```
 
-Increasing variance even further, increases the penalty
+To understand where does the penalty comes from, it was helpful for me to derive the solution for the case of just two values $[p_1, p_2]$. In this case you can define them as difference to the their mean, just as we did above: $p_1 = \mu - \epsilon$ and $p_2 = \mu + \epsilon$. The $lppd$ should be trivially equal to $\mu$:
+$$lppd = \frac{p_1 + p_2}{2}$$
+$$lppd =\frac{(\mu - \epsilon) + (\mu + \epsilon)}{2}$$
+$$lppd =\frac{2 \cdot \mu}{2}$$
+$$lppd = \mu$$
+
+What about $lppd_IS$?
+$$lppd_{IS} = \frac{2}{\frac{1}{p_1} + \frac{1}{p_2}}$$
+
+$$lppd_{IS} = \frac{2}{\frac{1}{\mu - \epsilon} + \frac{1}{\mu + \epsilon}}$$
+
+Bringing the two fractions to a common denominator we get
+$$lppd_{IS} = \frac{2}{\frac{(\mu + \epsilon) + (\mu - \epsilon)}{(\mu + \epsilon)(\mu - \epsilon)}}$$
+Opening the brackets in the numerator
+$$lppd_{IS} = \frac{2}{\frac{2 \cdot \mu }{(\mu + \epsilon)(\mu - \epsilon)}}$$
+Now we can get flip the bottom fraction
+$$lppd_{IS} = \frac{2 \cdot \frac{(\mu + \epsilon)(\mu - \epsilon)}{2 \cdot \mu}}{\frac{2 \cdot \mu }{(\mu + \epsilon)(\mu - \epsilon)} \cdot \frac{(\mu + \epsilon)(\mu - \epsilon)}{2 \cdot \mu}} $$
+
+$$lppd_{IS} = 2 \cdot \frac{(\mu + \epsilon)(\mu - \epsilon)}{2 \cdot \mu}$$
+The two goes away
+$$lppd_{IS} = \frac{(\mu + \epsilon)(\mu - \epsilon)}{\mu}$$
+Opening the brackets in the numerator
+$$lppd_{IS} = \frac{\mu^2 + \mu\epsilon - \mu\epsilon - \epsilon^2}{\mu}$$
+Simplifying
+$$lppd_{IS} = \frac{\mu^2 - \epsilon^2}{\mu}$$
+$$lppd_{IS} = \mu - \frac{\epsilon^2}{\mu}$$
+
+Thus when variance ($\epsilon$, deviation from the mean) increases, the $lppd_{IS}$ decreases
 ```{r}
 delta <- seq(0.0, 0.19, length.out = 100)
 
@@ -165,7 +198,8 @@ lppd_df <- bind_rows(
          Kind = "lppd"),
   tibble(Variance = purrr::map_dbl(delta, ~var2(log(create_p(.)))),
        LPPD = purrr::map_dbl(delta, ~log(1 / ( (1 / length(create_p(.))) * sum( 1/ create_p(.))))),
-       Kind = "lppd_IS"))
+       Kind = "lppd_IS")) %>%
+  mutate(SD = sqrt(Variance))
 
 together_plot <- 
   ggplot(lppd_df, aes(x=Variance, y=LPPD, color=Kind)) + 
