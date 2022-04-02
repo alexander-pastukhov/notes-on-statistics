@@ -57,7 +57,7 @@ Our goal is to recover both the cut-points and the normal distribution using onl
 
 
 ## Conceptual problem with linear models: we change out mind about what responses correspond to.
-If we use a linear model (a _t_-test, an ANOVA, linear-mixed models, etc.) to fit responses as an outcome (dependent) variable, we change the narrative. Recall that our original (and very intuitive) conceptualization was that they reflect a many-to-one mapping between an underlying continuous variable and a discrete (ordered categorical) response. Instead, linear models assume a _one-to-one_ mapping between the internal variable and observed responses. For example, a linear model postulates that for a 7-point Likert scale participant _could have_ responded with 6.5, 3.14, or 2.71828 but, for whatever reason (sheer luck?), we only observed a handful of integer values. 
+If we use a linear model (a _t_-test, a repeated-measures ANOVA, linear-mixed models, etc.) to fit responses as an outcome (dependent) variable, we change the narrative. Recall that our original (and very intuitive) conceptualization was that they reflect a many-to-one mapping between an underlying continuous variable and a discrete (ordered categorical) response. Instead, linear models assume a _one-to-one_ mapping between the internal variable and observed responses. For example, a linear model postulates that for a 7-point Likert scale participant _could have_ responded with 6.5, 3.14, or 2.71828 but, for whatever reason (sheer luck?), we only observed a handful of integer values. 
 
 Notice that this is _not_ how we think participants behave. I think everyone^[Never say always!] would object to the idea that the limited repertoire of responses is due to endogenous processing rather than exogenous limitations imposed by an experimental design. Yet, this is how a _linear model_ thinks about it and, if you are not careful, it is easy to miss this change in the narrative. It is, however, important as it means that estimates produced by a linear model are about that alternative one-to-one kind of responses, not the many-to-one that you had in mind! That alternative is not a bad story per se, it is just a _different_ story that should not be confused with the original one.
 
@@ -67,5 +67,5 @@ This may sound too conceptual but I suspect that few people, who use linear mode
 
 ## A technical problem: Heteroscedacity.
 
-## Can we even compute mean, if cut-points are not equdistant?
+## Another technical problem: Can we even compute mean, if cut-points are not equdistant?
 
