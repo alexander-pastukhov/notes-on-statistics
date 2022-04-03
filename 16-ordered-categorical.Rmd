@@ -65,15 +65,17 @@ This change in the narrative of what responses correspond to is also a problem i
 
 This may sound too conceptual but I suspect that few people, who use linear models on Likert-scale data, realize that their model is not doing what they think it is doing and, erroneously!, interpret one-to-one linear-model estimates as many-to-one. The difference may or may not be crucial but the question is: Why employ a model that does something different to what you need to begin with? Remember, using an appropriate model and interpreting it correctly is _your_ job, not that of a mathematical model or nor is it a job of a software package. 
 
-## A technical problem: Data that bunches up.
-When you use a linear model, you must assume that residuals are normally distributed. This is something that you may not be sure of _before_ you fit a specific model, as it is residuals not the data that must be normally distributed. However, is some cases you may be fairly certain that this will not be the case, such as when a variable has only a limited range of values and the mean (model prediction) is close to one of these limits. Whenever you have observations that are close to that hard limit, they will "bunch up" against it because they cannot go lower or higher than that (see the figure below for illustration).
+## A technical problem: Data that bunches up near a range limit.
+When you use a linear model, you assume that residuals are normally distributed. This is something that you may not be sure of _before_ you fit a specific model, as it is residuals not the data that must be normally distributed. However, in some cases you may be fairly certain that this will not be the case, such as when a variable has only a limited range of values and the mean (the model prediction) is close to one of these limits. Whenever you have observations that are close to that hard limit, they will "bunch up" against it because they cannot go lower or higher than that (see the figure below for illustration).
 
-Note that the presence of the limit per se is not a deal breaker for using linear models. Most physical measures cannot be negative^[Try coming up with one and don't say "temperature"!] but as long your observations are far away from it, you are fine.
+```{r}
+# Illustrate change in skeweness via beta
+```
 
-and are i.i.d.: Independent and Identically Distributed. This assumption becomes problematic if your variable has a hard upper and/or lower limit. The data points near the limit will "bunch up". Imagine some physical measure, e.g., an average height of objects that is close to zero, e.g., 1 cm. There is simply more opportunities to be larger than 1 cm compared to being  
+Note that the presence of the limit per se is not a deal breaker for using linear models. Most physical measures cannot be negative^[Try coming up with one and don't say "temperature"!] but as long your observations are sufficiently far away from it, you are fine. You cannot have a negative height but you certainly can use linear models to model adult height as, for example, an average female height in USA 164±6.4 cm. In other words, the mean is more than 25 standards deviations away from the range limit of zero and can be safely ignored.
 
+Unfortunately, Likert-scale data lives on extremely limited range. Even a 7-point Likert scale does not give you much of a wiggle room and routinely used 5-point scales are even narrower. This means that unless the mean is smack in the middle (e.g., at four for a 7-point scale), you are getting closer to one of the limits and your residuals become either positively (when approaching a lower limit) or negatively (for the upper one) skewed. In other words, the residuals are _systematically_ not normally distributed and their distributions depends on the mean. This clearly violates an assumtion of normality of residuals and of their conditional i.i.d. (Independent and Identically Distributed). This is a deal break for parametric frequentist statistics (a _t_-test, a repeated-measures ANOVA, linear-mixed models), so that inferences are unreliable and are most probably not to be trusted. Note that this problem is specific to parametric frequentist methods and is not critical if you use Bayesian or non-parametric bootstrapping/permutation methods.
 
-Height of an adult female in USA is 164±6.4 cm. 
 
 ## Another technical problem: Can we even compute mean, if cut-points are not equdistant?
 
