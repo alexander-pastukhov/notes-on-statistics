@@ -2,6 +2,7 @@
 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
+library(rethinking)
 library(tidyverse)
 ```
 
@@ -56,7 +57,7 @@ ggplot() +
 Our goal is to recover both the cut-points and the normal distribution using only observed responses.
 
 
-## Conceptual problem with linear models: we change out mind about what responses correspond to.
+## Conceptual problem with linear models: we change our mind about what responses correspond to.
 If we use a linear model (a _t_-test, a repeated-measures ANOVA, linear-mixed models, etc.) to fit responses as an outcome (dependent) variable, we change the narrative. Recall that our original (and very intuitive) conceptualization was that they reflect a many-to-one mapping between an underlying continuous variable and a discrete (ordered categorical) response. Instead, linear models assume a _one-to-one_ mapping between the internal variable and observed responses. For example, a linear model postulates that for a 7-point Likert scale participant _could have_ responded with 6.5, 3.14, or 2.71828 but, for whatever reason (sheer luck?), we only observed a handful of integer values. 
 
 Notice that this is _not_ how we think participants behave. I think everyone^[Never say always!] would object to the idea that the limited repertoire of responses is due to endogenous processing rather than exogenous limitations imposed by an experimental design. Yet, this is how a _linear model_ thinks about it and, if you are not careful, it is easy to miss this change in the narrative. It is, however, important as it means that estimates produced by a linear model are about that alternative one-to-one kind of responses, not the many-to-one that you had in mind! That alternative is not a bad story per se, it is just a _different_ story that should not be confused with the original one.
@@ -66,16 +67,24 @@ This change in the narrative of what responses correspond to is also a problem i
 This may sound too conceptual but I suspect that few people, who use linear models on Likert-scale data, realize that their model is not doing what they think it is doing and, erroneously!, interpret one-to-one linear-model estimates as many-to-one. The difference may or may not be crucial but the question is: Why employ a model that does something different to what you need to begin with? Remember, using an appropriate model and interpreting it correctly is _your_ job, not that of a mathematical model or nor is it a job of a software package. 
 
 ## A technical problem: Data that bunches up near a range limit.
-When you use a linear model, you assume that residuals are normally distributed. This is something that you may not be sure of _before_ you fit a specific model, as it is residuals not the data that must be normally distributed. However, in some cases you may be fairly certain that this will not be the case, such as when a variable has only a limited range of values and the mean (the model prediction) is close to one of these limits. Whenever you have observations that are close to that hard limit, they will "bunch up" against it because they cannot go lower or higher than that (see the figure below for illustration).
+When you use a linear model, you assume that residuals are normally distributed. This is something that you may not be sure of _before_ you fit a specific model, as it is residuals not the data that must be normally distributed. However, in some cases you may be fairly certain that this will not be the case, such as when a variable has only a limited range of values and the mean (the model prediction) is close to one of these limits. Whenever you have observations that are close to that hard limit, they will "bunch up" against it because they cannot go lower or higher than that. See the figure below for an illustration of how it happens if a _continuous_ variable $x$ is restricted to 1 to 7 range^[Note that for skewed distributions their mode is different from the mean!].
+```{r echo=FALSE}
+x <- seq(0, 1, length.out = 100)
+mu <- c(2, 4, 5)
+curves_df <- purrr::map_dfr(mu, ~tibble(y = rethinking::dbeta2(x, (. - 1)/ 6, 10), x = x * 6 + 1, `μ`= as.character(.)))
 
-```{r}
-# Illustrate change in skeweness via beta
+ggplot(data = curves_df, aes(x = x, y = y, color = `μ`)) + 
+  geom_line() +
+  ylab("Probability density") +
+  scale_x_continuous("Continuous variable with 1..7 range", breaks = 1:7)
 ```
 
-Note that the presence of the limit per se is not a deal breaker for using linear models. Most physical measures cannot be negative^[Try coming up with one and don't say "temperature"!] but as long your observations are sufficiently far away from it, you are fine. You cannot have a negative height but you certainly can use linear models to model adult height as, for example, an average female height in USA 164±6.4 cm. In other words, the mean is more than 25 standards deviations away from the range limit of zero and can be safely ignored.
+Note that the presence of a limit is not a deal breaker for using linear models per se. Most physical measures cannot be negative^[Try coming up with one and don't say "temperature"!] but as long your observations are sufficiently far away from it, you are fine. You cannot have a negative height but you certainly can use linear models for adult height as, for example, an average female height in USA 164±6.4 cm. In other words, the mean is more than 25 standards deviations away from the range limit of zero and the latter can be safely ignored.
 
-Unfortunately, Likert-scale data lives on extremely limited range. Even a 7-point Likert scale does not give you much of a wiggle room and routinely used 5-point scales are even narrower. This means that unless the mean is smack in the middle (e.g., at four for a 7-point scale), you are getting closer to one of the limits and your residuals become either positively (when approaching a lower limit) or negatively (for the upper one) skewed. In other words, the residuals are _systematically_ not normally distributed and their distributions depends on the mean. This clearly violates an assumtion of normality of residuals and of their conditional i.i.d. (Independent and Identically Distributed). This is a deal break for parametric frequentist statistics (a _t_-test, a repeated-measures ANOVA, linear-mixed models), so that inferences are unreliable and are most probably not to be trusted. Note that this problem is specific to parametric frequentist methods and is not critical if you use Bayesian or non-parametric bootstrapping/permutation methods.
+Unfortunately, Likert-scale data combines an extremely limited range with a very coarse step. Even a 7-point Likert scale does not give you much of a wiggle room and routinely used 5-point scales are even narrower. This means that unless the mean is smack in the middle (e.g., at four for a 7-point scale), you are getting closer to one of the limits and your residuals become either positively (when approaching a lower limit) or negatively (for the upper one) skewed. In other words, the residuals are _systematically_ not normally distributed and their distributions depends on the mean. This clearly violates an assumption of normality of residuals and of their conditional i.i.d. (Independent and Identically Distributed). This is a deal breaker for parametric frequentist statistics (a _t_-test, a repeated-measures ANOVA, linear-mixed models), so that inferences are unreliable and are most probably not to be trusted.
+
+## Another technical problem: Can we assume that cut-points are placed at equal intervals?
+The skewed residuals described are a fundamental problem for parametric frequentist methods but is not critical if you use Bayesian or non-parametric bootstrapping/permutation linear models. Does this mean it is safe to use them? Probably not because when you use responses directly, you assume that participants place cut-points for responses in an orderly fashion with equal intervals between them. If that is the case, you can assume, for example, that $(4 + 4) / 2$ is equal to $(3 + 5) / 2)$ to $(2 + 6) / 2$ to $(1 + 7)/ 2$. However, what if this is _not_ the case, what if the cut-points (responses) are not placed at equal intervals? Then our basic arithmetic stops working! Take a look at the figure below.
 
 
-## Another technical problem: Can we even compute mean, if cut-points are not equdistant?
 
