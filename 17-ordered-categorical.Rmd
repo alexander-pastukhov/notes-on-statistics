@@ -2,6 +2,7 @@
 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
+library(patchwork)
 library(rethinking)
 library(tidyverse)
 ```
@@ -79,12 +80,46 @@ ggplot(data = curves_df, aes(x = x, y = y, color = `μ`)) +
   scale_x_continuous("Continuous variable with 1..7 range", breaks = 1:7)
 ```
 
-Note that the presence of a limit is not a deal breaker for using linear models per se. Most physical measures cannot be negative^[Try coming up with one and don't say "temperature"!] but as long your observations are sufficiently far away from it, you are fine. You cannot have a negative height but you certainly can use linear models for adult height as, for example, an average female height in USA 164±6.4 cm. In other words, the mean is more than 25 standards deviations away from the range limit of zero and the latter can be safely ignored.
+Note that the presence of a limit is not a deal breaker for using linear models per se. Most physical measures cannot be negative^[Try coming up with one and don't say "temperature"!] but as long your observations are sufficiently far away from zero, you are fine. You cannot have a negative height but you certainly can use linear models for adult height as, for example, an average female height in USA 164±6.4 cm. In other words, the mean is more than 25 standards deviations away from the range limit of zero and the latter can be safely ignored.
 
-Unfortunately, Likert-scale data combines an extremely limited range with a very coarse step. Even a 7-point Likert scale does not give you much of a wiggle room and routinely used 5-point scales are even narrower. This means that unless the mean is smack in the middle (e.g., at four for a 7-point scale), you are getting closer to one of the limits and your residuals become either positively (when approaching a lower limit) or negatively (for the upper one) skewed. In other words, the residuals are _systematically_ not normally distributed and their distributions depends on the mean. This clearly violates an assumption of normality of residuals and of their conditional i.i.d. (Independent and Identically Distributed). This is a deal breaker for parametric frequentist statistics (a _t_-test, a repeated-measures ANOVA, linear-mixed models), so that inferences are unreliable and are most probably not to be trusted.
+Unfortunately, Likert-scale data combines an extremely limited range with a very coarse step. Even a 7-point Likert scale does not give you much of a wiggle room and routinely used 5-point scales are even narrower. This means that unless the mean is smack in the middle (e.g., at four for a 7-point scale) and the distribution is very narrow, you are getting closer to one of the limits and your residuals become either positively (when approaching a lower limit) or negatively (for the upper one) skewed. In other words, the residuals are _systematically_ not normally distributed and their distributions depends on the mean. This clearly violates an assumption of normality of residuals and of their conditional i.i.d. (Independent and Identically Distributed). This is a deal breaker for parametric frequentist statistics (a _t_-test, a repeated-measures ANOVA, linear-mixed models), so that inferences become unreliable and should not to be trusted.
 
-## Another technical problem: Can we assume that cut-points are placed at equal intervals?
-The skewed residuals described are a fundamental problem for parametric frequentist methods but is not critical if you use Bayesian or non-parametric bootstrapping/permutation linear models. Does this mean it is safe to use them? Probably not because when you use responses directly, you assume that participants place cut-points for responses in an orderly fashion with equal intervals between them. If that is the case, you can assume, for example, that $(4 + 4) / 2$ is equal to $(3 + 5) / 2)$ to $(2 + 6) / 2$ to $(1 + 7)/ 2$. However, what if this is _not_ the case, what if the cut-points (responses) are not placed at equal intervals? Then our basic arithmetic stops working! Take a look at the figure below.
+## Another technical problem: Can we assume that responses correspond to real numbers?
+The skewed residuals described above are a fundamental problem for parametric frequentist methods but is not critical if you use Bayesian or non-parametric bootstrapping/permutation linear models. Does this mean it is safe to use them? Probably not because when you use responses directly, you assume a direct correspondence between a response label (e.g., "4") and a real number $4$. If that is the case, you can assume that $(4 + 4) / 2$ is equal to $(3 + 5) / 2$ to $(2 + 6) / 2$ to $(1 + 7)/ 2$. However, what if this is _not_ the case, what if the cut-points (responses) do not correspond to the real numbers that you've picked? Then our basic arithmetic stops working! Take a look at the figure below where "real value" of responses is not an integer.
+
+```{r echo=FALSE}
+cutpoints <- c(0.05, 0.1, 0.3, 0.6, 0.8, 0.9)
+responses <- c(4, 2)
+
+plot_cutpoints_sum <- function(cutpoints, responses, title){
+  actual_responses <- cutpoints[responses]
+  response_label <- c("average", responses)
+  
+  ggplot() +
+    scale_x_continuous(name = "Intensity to Response", breaks = 1:length(response_label), labels = response_label) +
+    scale_y_continuous(name = "Signal intensity", breaks = c(0, cutpoints, 1), labels = c("Minimal\nsignal", cutpoints, "Maximal\nsignal"), limits=c(0, 1),
+                       sec.axis = dup_axis(name="Cut points", breaks = cutpoints, labels = 1:6)) +
+    coord_flip() +
+    geom_bar(data = tibble(x=1 + (1:length(actual_responses)), y=actual_responses), aes(x=x, y=y), stat="identity") +
+    geom_bar(data = tibble(x=1, y=mean(cutpoints[responses])), aes(x=x, y=y), stat="identity", fill = "darkgreen") +
+    
+    geom_hline(yintercept = cutpoints, color = "white") +
+    labs(title = title) + 
+    theme(panel.grid.minor.y = element_blank(), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
+}
+
+
+plot_cutpoints_sum(cutpoints, c(4, 2), "(2 + 4)/2 > 3") / 
+plot_cutpoints_sum(cutpoints, c(6, 2), "(6 + 2)/2 < 4")
+```
+
+Unless you _know_ response levels correspond to the selected real number and that the simple arithmetic holds, you are in danger of computing nonsense. This problem is more obvious when individual response levels are labelled, e.g., `"Strongly disagree"`, `"Disagree"`, `"Neither disagree, nor agree"`, `"Agree"`, `"Strongly agree"`. What is an average of `"Strongly disagree"` and `"Strongly agree"`? Is it the same as an average of `"Disagree"` and `"Agree"`? Is increase from `"Strongly disagree"` to `"Disagree"` identical to that from `"Neither disagree, nor agree"` to `"Agree"`? The answer is "who knows?!" but in my experience scales are rarely truly linear as people tend to avoid extremes and have their own idea about range of internal variables levels that correspond to a particular response. 
+
+Even when scale levels are explicitly named, it is very common to "convert" them to numbers because you cannot ask computer to compute an average of `"Disagree"` and `"Agree"` (it will flatly refuse to do this) but it will compute an average of $2$ and $4$! And the will be no error! And it will return $3$! Problem solved, right? Not really. Yes, the computer will not complain but this is because it has no idea what $2$ and $4$ stand for, you give it real numbers, it will do the math. So, if you pretend that `"Disagree"` and `"Agree"` correspond directly to $2$ and $4$ it will certainly _look like_ normal math. And imagine that the numbers are $2$ and $5$ (so, `"Disagree"` and `"Strongly agree"`), the computer will return an average value of $3.5$ and it will be even easier to convince yourself that your responses are real numbers (see, there is a _decimal point_ where!), just like linear models assume. Unfortunately, you are not fooling the computer (it seriously does not care), you are fooling yourself. Your math might check out, if responses do correspond to the real numbers you've picked, or it might not. And there will be no warning or an error, just some numbers that you will interpret at face value and reach possibly erroneous conclusions. Again, the problem is that you wouldn't know whether the numbers you are looking at are valid or nonsense and the same dilemma (valid or nonsense?) will be applicable to any inferences and conclusions that you draw from them. In short, a direct correspondence between response levels and real numbers is a _very_ strong assumption that should be validated, not taken on pure faith.
+
+## Solution: an ordered logit/probit model
+
+
 
 
 
