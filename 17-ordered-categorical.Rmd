@@ -52,7 +52,6 @@ ggplot() +
   facet_wrap(label~., ncol=1) + 
   theme(strip.background = element_blank(),  strip.text.x = element_blank()) +
   scale_y_continuous(name = "", breaks = NULL)
-
 ```
 
 Given this conceptualization, our goal is to recover both the cut-points and the normal distribution using only observed responses.
@@ -62,6 +61,44 @@ Given this conceptualization, our goal is to recover both the cut-points and the
 A very common approach is to fit Likert-scale data using a linear model (a _t_-test, a repeated-measures ANOVA, linear-mixed models, etc.) while assuming that responses correspond directly to real numbers. In other words, when participants responded very unattractive", or "not confident at all", or "do not agree at all" they literally meant a real number $1.0$. When they used the middle (let's say the third) option "neither agree, nor disagree" they literally meant $3.0$. This assumption appears to simplify our life dramatically but at the expense of changing the narrative.
 
 Recall that our original (and very intuitive) conceptualization was that responses reflect a many-to-one mapping between an underlying continuous variable and a discrete (ordered categorical) response. But by converting them directly to numbers and using them as an outcome variable of a linear model we assume a _one-to-one_ mapping between the internal variable and observed responses. This means that from a linear model point of view, for a 7-point Likert scale _any_ real value is a valid and possible response and therefore participant _could have_ responded with 6.5, 3.14, or 2.71828 but, for whatever reason (sheer luck?), we only observed a handful of (integer) values.
+
+```{r echo=FALSE}
+x <- seq(0, 7, length.out = 500)
+gaussians <- 
+  tibble(x = x, label = "2") %>%
+  mutate(y = dnorm(x, mean = 2.5, sd = 1)) %>%
+  mutate(Response = ifelse(x == 0, 1, ceiling(x)),
+         Response = ifelse(Response > 7, 7, Response),
+         Response = factor(Response, levels = 1:7),
+         IsFour = Response == 4)
+
+ggplot() +
+  geom_ribbon(data=gaussians, aes(x=x, ymax=y, fill=IsFour), ymin=0, show.legend = FALSE) +
+  geom_vline(xintercept = 1:6) +
+  geom_vline(xintercept = c(0, 7), color="black", size=1)+ 
+  scale_x_continuous(name = "Signal intensity", breaks = c(0, 7), labels = c("Minimal signal", "Maximal signal"), limits = c(-0.5, 7.5),
+                     sec.axis = dup_axis(name="Cut points", breaks = 1:6, labels = 1:6)) + 
+  theme(strip.background = element_blank(),  strip.text.x = element_blank()) +
+  scale_y_continuous(name = "", breaks = NULL) +
+  scale_fill_manual(values = c("gray", "red")) + 
+  labs(title = "Many-to-one mapping", 
+       subtitle = 'Likelihood of response correspond to the area under the curve.')
+
+ggplot() +
+  geom_ribbon(data=gaussians, aes(x=x, ymax=y), ymin=0, fill="gray") +
+  geom_vline(xintercept = 1:6) +
+  geom_vline(xintercept = c(0, 7), color="black", size=1)+
+  geom_segment(data = NULL, aes(x = 4, y = 0, xend = 4, yend = dnorm(4, mean = 2.5, sd = 1)),color = "red") +
+  geom_point(data = NULL, aes(x = 4, y = dnorm(4, mean = 2.5, sd = 1)), color = "red", size=3) +
+  scale_x_continuous(name = "Signal intensity", breaks = c(0, 7), labels = c("Minimal signal", "Maximal signal"), limits = c(-0.5, 7.5),
+                     sec.axis = dup_axis(name="Cut points", breaks = 1:6, labels = 1:6)) + 
+  theme(strip.background = element_blank(),  strip.text.x = element_blank()) +
+  scale_y_continuous(name = "", breaks = NULL) +
+  labs(title = "One-to-one mapping", 
+       subtitle = 'Likelihood of response correspond to probablity density for value 4 (red dot).')
+
+```
+
 
 Notice that this is _not_ how we think participants behave. I think everyone^[Never say always!] would object to the idea that the limited repertoire of responses is due to endogenous processing rather than exogenous limitations imposed by an experimental design. Yet, this is how a _linear model_ thinks about it (given the outcome variable you gave it) and, if you are not careful, it is easy to miss this change in the narrative. It is, however, important as it means that estimates produced by such model are about that alternative one-to-one kind of responses, not the many-to-one that you had in mind! That alternative is not a bad story per se, it is just a _different_ story that should not be confused with the original one.
 
@@ -86,7 +123,7 @@ The presence of a limit is not a deal breaker for using linear models per se. Mo
 
 Unfortunately, Likert-scale data combines an extremely limited range with a very coarse step. Even a 7-point Likert scale does not give you much of a wiggle room and routinely used 5-point scales are even narrower. This means that unless the mean is smack in the middle (e.g., at four for a 7-point scale) and the distribution is very narrow, you are getting closer to one of the limits and your residuals become either positively (when approaching a lower limit) or negatively (for the upper one) skewed. In other words, the residuals are _systematically_ not normally distributed and their distributions depends on the mean. This clearly violates an assumption of normality of residuals and of their conditional i.i.d. (Independent and Identically Distributed). This is a deal breaker for parametric frequentist statistics (a _t_-test, a repeated-measures ANOVA, linear-mixed models), so that inferences become unreliable and should not to be trusted.
 
-## Another technical problem: Can we assume that responses correspond to real numbers?
+## Another technical problem: Can we assume that responses correspond to real numbers that we picked?
 The skewed residuals described above are a fundamental problem for parametric frequentist methods but is not critical if you use Bayesian or non-parametric bootstrapping/permutation linear models. Does this mean it is safe to use them? Probably not. When you use responses directly, you assume a direct correspondence between a response label (e.g., "agree") and a real number $4.0$. If that is the case, you can assume that $(4 + 4) / 2$ is equal to $(3 + 5) / 2$ to $(2 + 6) / 2$ to $(1 + 7)/ 2$. However, what if this is _not_ the case, what if the cut-points (responses) do not correspond to the real numbers that you've picked? Then our basic arithmetic stops working! Take a look at the figure below where "real value" of responses is not an integer.
 
 ```{r echo=FALSE}
