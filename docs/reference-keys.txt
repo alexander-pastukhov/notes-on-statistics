@@ -67,3 +67,9 @@ probability-mass-versus-probability-density
 effective-degrees-of-freedom-number-of-parameters
 multiple-regression---masked-relationship
 a-warning-message
+ordered-categorical-data-i.e.-likert-scales
+conceptualization-of-responses-internal-continuous-variable-discritized-into-external-responses-via-a-set-of-cut-points
+conceptual-problem-with-linear-models-we-change-our-mind-about-what-responses-correspond-to.
+a-technical-problem-data-that-bunches-up-near-a-range-limit.
+another-technical-problem-can-we-assume-that-responses-correspond-to-real-numbers-that-we-picked
+solution-an-ordered-logitprobit-model

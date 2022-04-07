@@ -6,15 +6,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Chapter 17 Multiple regression - Masked relationship | Notes on Statistics</title>
 <meta name="author" content="Alexander Pastukhov">
-<meta name="description" content="These notes are on section 5.2 “Masked relationship” from chapter 5 “The Many Variables &amp; The Spurious Waffles.” This section introduces is a mirror twin of section 5.1 on spurious associations....">
+<meta name="description" content="These notes are on section 5.2 “Masked relationship” from chapter 5 “The Many Variables &amp; The Spurious Waffles”. This section introduces is a mirror twin of section 5.1 on spurious associations....">
 <meta name="generator" content="bookdown 0.24 with bs4_book()">
 <meta property="og:title" content="Chapter 17 Multiple regression - Masked relationship | Notes on Statistics">
 <meta property="og:type" content="book">
-<meta property="og:description" content="These notes are on section 5.2 “Masked relationship” from chapter 5 “The Many Variables &amp; The Spurious Waffles.” This section introduces is a mirror twin of section 5.1 on spurious associations....">
+<meta property="og:description" content="These notes are on section 5.2 “Masked relationship” from chapter 5 “The Many Variables &amp; The Spurious Waffles”. This section introduces is a mirror twin of section 5.1 on spurious associations....">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 17 Multiple regression - Masked relationship | Notes on Statistics">
-<meta name="twitter:description" content="These notes are on section 5.2 “Masked relationship” from chapter 5 “The Many Variables &amp; The Spurious Waffles.” This section introduces is a mirror twin of section 5.1 on spurious associations....">
-<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="twitter:description" content="These notes are on section 5.2 “Masked relationship” from chapter 5 “The Many Variables &amp; The Spurious Waffles”. This section introduces is a mirror twin of section 5.1 on spurious associations....">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.13/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
 <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
 <script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><link rel="stylesheet" href="bs4_style.css%20-%20style.css">
@@ -56,6 +56,7 @@
 <li><a class="" href="probability-mass-versus-probability-density.html"><span class="header-section-number">15</span> Probability mass versus probability density</a></li>
 <li><a class="" href="effective-degrees-of-freedom-number-of-parameters.html"><span class="header-section-number">16</span> Effective degrees of freedom / number of parameters</a></li>
 <li><a class="active" href="multiple-regression---masked-relationship.html"><span class="header-section-number">17</span> Multiple regression - Masked relationship</a></li>
+<li><a class="" href="ordered-categorical-data-i.e.-likert-scales.html"><span class="header-section-number">18</span> Ordered Categorical Data, i.e., Likert-scales</a></li>
 </ul>
 
         <div class="book-extra">
@@ -67,8 +68,8 @@
 <h1>
 <span class="header-section-number">17</span> Multiple regression - Masked relationship<a class="anchor" aria-label="anchor" href="#multiple-regression---masked-relationship"><i class="fas fa-link"></i></a>
 </h1>
-<p>These notes are on section 5.2 “Masked relationship” from chapter 5 “The Many Variables &amp; The Spurious Waffles.” This section introduces is a mirror twin of section 5.1 on <a href="spurious-association.html#spurious-association">spurious associations</a>. The latter explores how each of two predictors can have a strong relationship with an outcome variable <em>if fitted individually</em> but how only one of them retains that relationship when both predictors are used in multiple regression. Section 5.2 is concerned with the exact opposite. When we look at the association between each predictor variable (<em>neocortex percent</em> and <em>log body mass</em>) and the richness of milk <em>individually</em>, we find nothing. However, when you use <em>both</em> simultaneously via multiple regression, we find that both are strongly associated with the outcome variable.</p>
-<p>The key to understanding this are figure 5.9 (particularly, the bottom counterfactual plots) and an explanation on page 151 that coefficients of regression model shows that “species that have high neocortex percent <em>for their body mass</em> have higher milk energy” and “species with high body mass <em>for their neocortex percent</em> have lower milk energy.” In other words, if you take several species with very similar body mass, you expect those with higher percent of neocortex to have richer milk. Conversely, if you handpick several species with very similar neocortex percentage, you expect that the larger ones will have a less energetic milk. But because these two predictor variables are correlated, this relationship is easy to see only when you fix one of them. Figure 5.9 tries to show that but we can do better by (artificially) grouping the data looking at relationship between each predictor variable and the milk energy individually.</p>
+<p>These notes are on section 5.2 “Masked relationship” from chapter 5 “The Many Variables &amp; The Spurious Waffles”. This section introduces is a mirror twin of section 5.1 on <a href="spurious-association.html#spurious-association">spurious associations</a>. The latter explores how each of two predictors can have a strong relationship with an outcome variable <em>if fitted individually</em> but how only one of them retains that relationship when both predictors are used in multiple regression. Section 5.2 is concerned with the exact opposite. When we look at the association between each predictor variable (<em>neocortex percent</em> and <em>log body mass</em>) and the richness of milk <em>individually</em>, we find nothing. However, when you use <em>both</em> simultaneously via multiple regression, we find that both are strongly associated with the outcome variable.</p>
+<p>The key to understanding this are figure 5.9 (particularly, the bottom counterfactual plots) and an explanation on page 151 that coefficients of regression model shows that “species that have high neocortex percent <em>for their body mass</em> have higher milk energy” and “species with high body mass <em>for their neocortex percent</em> have lower milk energy”. In other words, if you take several species with very similar body mass, you expect those with higher percent of neocortex to have richer milk. Conversely, if you handpick several species with very similar neocortex percentage, you expect that the larger ones will have a less energetic milk. But because these two predictor variables are correlated, this relationship is easy to see only when you fix one of them. Figure 5.9 tries to show that but we can do better by (artificially) grouping the data looking at relationship between each predictor variable and the milk energy individually.</p>
 <p>Let us start by replicating top subplots in figure 5.9. Note that 1) I used frequentist linear model fit with flat priors via <code>geom_smooth()</code> and, therefore, 2) the stripes correspond to standard error rather than 89% credible interval. However, the two are close enough in this case for illustration purposes.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">milk</span><span class="op">)</span>
@@ -148,7 +149,7 @@
   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html">xlim</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">coord_equal</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-71-1.png" width="672"></div>
-<p>The plot above expresses the same idea as a counterfactual right bottom plot in figure 5.9. Where, the question was “what is the effect of log body mass for <em>all</em> species with an average neocortex percent,” so single very specific group of animals. Our plot merely extended that idea to three groups. To appreciate this the link, let us fit the model and plot same counterfactuals for each group that we identified.</p>
+<p>The plot above expresses the same idea as a counterfactual right bottom plot in figure 5.9. Where, the question was “what is the effect of log body mass for <em>all</em> species with an average neocortex percent”, so single very specific group of animals. Our plot merely extended that idea to three groups. To appreciate this the link, let us fit the model and plot same counterfactuals for each group that we identified.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">m5.7</span> <span class="op">&lt;-</span> <span class="fu">quap</span><span class="op">(</span>
   <span class="fu"><a href="https://rdrr.io/r/base/list.html">alist</a></span><span class="op">(</span>
@@ -228,51 +229,13 @@
 <h2>
 <span class="header-section-number">17.1</span> A warning message<a class="anchor" aria-label="anchor" href="#a-warning-message"><i class="fas fa-link"></i></a>
 </h2>
-<p>Do these two examples (spriouos associations and masked relationship) mean that putting <em>all</em> variables into a model is always a good idea because “magic?” Unfortunately, no. These examples were handpicked by McElreath to show the power of multiple regression. He can also handpick an example when mindlessly throwing variables into a model would lead to a disaster, a.k.a. <a href="https://elevanth.org/blog/2021/06/15/regression-fire-and-dangerous-things-1-3/">Causal Salad</a> (watch his <a href="https://youtu.be/KNPYUVmY3NM"><strong>three hour talk</strong></a> on that on YouTube). The take home message is same as before: Models are golems, they can help you understand the process you are investigating but they won’t understand it for you! It is your job to think about causal relationship using statistical inferences merely as an aid, not as an oracle.</p>
+<p>Do these two examples (spriouos associations and masked relationship) mean that putting <em>all</em> variables into a model is always a good idea because “magic”? Unfortunately, no. These examples were handpicked by McElreath to show the power of multiple regression. He can also handpick an example when mindlessly throwing variables into a model would lead to a disaster, a.k.a. <a href="https://elevanth.org/blog/2021/06/15/regression-fire-and-dangerous-things-1-3/">Causal Salad</a> (watch his <a href="https://youtu.be/KNPYUVmY3NM"><strong>three hour talk</strong></a> on that on YouTube). The take home message is same as before: Models are golems, they can help you understand the process you are investigating but they won’t understand it for you! It is your job to think about causal relationship using statistical inferences merely as an aid, not as an oracle.</p>
 
 </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   <div class="chapter-nav">
 <div class="prev"><a href="effective-degrees-of-freedom-number-of-parameters.html"><span class="header-section-number">16</span> Effective degrees of freedom / number of parameters</a></div>
-<div class="empty"></div>
+<div class="next"><a href="ordered-categorical-data-i.e.-likert-scales.html"><span class="header-section-number">18</span> Ordered Categorical Data, i.e., Likert-scales</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
@@ -295,7 +258,7 @@
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-01-13.</p>
+    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-04-07.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

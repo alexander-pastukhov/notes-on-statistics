@@ -161,11 +161,11 @@ As noted above, even when scale levels are explicitly named, it is very common t
 Above I have summarized the problems of using linear models when assuming that responses correspond to real numbers. Instead, you should use ordered [logistic](https://en.wikipedia.org/wiki/Ordered_logit)/[probit](https://en.wikipedia.org/wiki/Ordered_probit#:~:text=In%20statistics%2C%20ordered%20probit%20is,fair%2C%20good%2C%20excellent).) models. They are built using the many-to-one mapping conceptualization using a set of cut-points. The latter can be fixed or, better still, fitted as part of the model. Both models assume that the distribution of the underlying continuous variable is normal and, therefore, both the continuous variable and cut points live on the infinite real number line that is transformed to 0..1 range via either logit or probit link function. The latter step is, strictly speaking, not necessary but makes it easier to understand relative positions of cut points and changes in continuous variable (that we translate into discrete responses via cut points).
 
 ```{r echo=FALSE}
-z_breakpoints <- seq(0, 1, length.out = 7) #c(0.2, 0.4, 0.6, 0.8, 1.0)
+z_breakpoints <- seq(0, 1, length.out = 8)[2:8] #c(0.2, 0.4, 0.6, 0.8, 1.0)
 z_intensity <- c(0.25, 0.62)
 response <- purrr::map_dbl(z_intensity, ~min(which(z_breakpoints>=.)))
 
-breakpoints <- rethinking::logit(z_breakpoints[1:4])
+breakpoints <- rethinking::logit(z_breakpoints[1:(length(z_breakpoints) - 1)])
 intensity <- rethinking::logit(z_intensity)
 
 ggplot() +
@@ -174,7 +174,7 @@ ggplot() +
   # geom_bar(data = tibble(x=1:length(z_intensity), y=z_intensity), aes(x=x, y=y), stat="identity") +
   geom_point(data = tibble(x=1:length(z_intensity), y=z_intensity), aes(x=x, y=y), size=5, color="red") +
   scale_y_continuous(name = "Signal intensity", 
-                     sec.axis = dup_axis(name="Cut points", breaks = z_breakpoints, labels = sprintf("\u2190%d", 1:5))) + 
+                     sec.axis = dup_axis(name="Cut points", breaks = z_breakpoints, labels = sprintf("\u2190%d", 1:length(z_breakpoints)))) + 
   scale_x_continuous(name = "Intensity to Response", breaks = 1:length(z_intensity), labels = sprintf("%.2f\u2192%d", z_intensity, response), limits = c(0.5, 2.5)) +
   coord_flip() +
   labs(subtitle="Cut points and intensity on 0..1 range")
@@ -185,8 +185,8 @@ ggplot() +
   geom_hline(yintercept = breakpoints) +
 #   geom_bar(data = tibble(x=1:length(intensity), y=intensity), aes(x=x, y=y), stat="identity") +
   geom_point(data = tibble(x=1:length(intensity), y=intensity), aes(x=x, y=y), size=5, color="red") +
-  scale_y_continuous(name = "Signal intensity", limits = c(-2, 2),
-                     sec.axis = dup_axis(name="Cut points", breaks = breakpoints, labels = sprintf("\u2190%d", 1:4))) + 
+  scale_y_continuous(name = "Signal intensity", limits = c(-2.5, 2.5),
+                     sec.axis = dup_axis(name="Cut points", breaks = breakpoints, labels = sprintf("\u2190%d", 1:length(breakpoints)))) + 
   scale_x_continuous(name = "Intensity to Response", breaks = 1:length(intensity), labels = sprintf("%.2f\u2192%d", intensity, response)) +
   coord_flip() +
   labs(subtitle="Same cut points and intensity but after logit transformation.")
