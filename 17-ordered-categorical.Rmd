@@ -63,9 +63,21 @@ Given this conceptualization, our goal is to recover both the cut-points and the
 
 
 ## Conceptual problem with linear models: we change our mind about what responses correspond to.
-A very common approach is to fit Likert-scale data using a linear model (a _t_-test, a repeated-measures ANOVA, linear-mixed models, etc.) while assuming that responses correspond directly to real numbers. In other words, when participants responded "very unattractive", or "not confident at all", or "do not agree at all" they literally meant a real number $1.0$. When they used the middle (let's say the third) option "neither agree, nor disagree" they literally meant $3.0$. This assumption appears to simplify our life dramatically but at the expense of changing the narrative.
+A very common approach is to fit Likert-scale data using a linear model (a _t_-test, a repeated-measures ANOVA, linear-mixed models, etc.) while assuming that responses correspond directly to real numbers. In other words, when participants responded "very unattractive", or "not confident at all", or "do not agree at all" they literally meant a real number $1.0$. When they used the middle (let's say the third) option "neither agree, nor disagree" they literally meant $3.0$. 
 
-Recall that our original (and very intuitive) conceptualization was that responses reflect a many-to-one mapping between an underlying continuous variable and a discrete (ordered categorical) response. But by converting them directly to numbers and using them as an outcome variable of a linear model we assume a _one-to-one_ mapping between the internal variable and observed responses. This means that from a linear model point of view, for a 7-point Likert scale _any_ real value is a valid and possible response and therefore participant _could have_ responded with 6.5, 3.14, or 2.71828 but, for whatever reason (sheer luck?), we only observed a handful of (integer) values.
+```{r echo=FALSE}
+tibble(x = 1:5,
+       label = c("Strongly\ndisagree", "Disagree", "Neither agree,\nnor disagree", "Agree", "Strongly\nagree")) %>%
+ggplot(aes(x = x)) +
+  geom_point(y = 0) +
+  geom_text(aes(label = label), y = 1, vjust=0.5) +
+  geom_segment(aes(xend = x), y = 0.9, yend=0.1, arrow = arrow()) +
+  scale_x_continuous(name = NULL, breaks = 1:5, labels = sprintf("%.1f", 1:5), limits = c(0.5, 5.5)) +
+  scale_y_continuous(name = NULL, breaks = NULL, limits = c(0, 1.1)) +
+  theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
+```
+
+This assumption appears to simplify our life dramatically but at the expense of changing the narrative. Recall that our original (and very intuitive) conceptualization was that responses reflect a many-to-one mapping between an underlying continuous variable and a discrete (ordered categorical) response. But by converting them directly to numbers and using them as an outcome variable of a linear model we assume a _one-to-one_ mapping between the internal variable and observed responses. This means that from a linear model point of view, for a 7-point Likert scale _any_ real value is a valid and possible response and therefore participant _could have_ responded with 6.5, 3.14, or 2.71828 but, for whatever reason (sheer luck?), we only observed a handful of (integer) values.
 
 ```{r echo=FALSE}
 x <- seq(0, 7, length.out = 500)
@@ -163,7 +175,15 @@ As noted above, even when scale levels are explicitly named, it is very common t
 
 ## Solution: an ordered logit/probit model
 
-Above I have summarized the problems of using linear models when assuming that responses correspond to real numbers. Instead, you should use ordered [logistic](https://en.wikipedia.org/wiki/Ordered_logit)/[probit](https://en.wikipedia.org/wiki/Ordered_probit#:~:text=In%20statistics%2C%20ordered%20probit%20is,fair%2C%20good%2C%20excellent).) models. They are built using the many-to-one mapping conceptualization using a set of cut-points. The latter can be fixed or, better still, fitted as part of the model. Both models assume that the distribution of the underlying continuous variable is normal and, therefore, both the continuous variable and cut points live on the infinite real number line that is transformed to 0..1 range via either logit or probit link function. The latter step is, strictly speaking, not necessary but makes it easier to understand relative positions of cut points and changes in continuous variable (that we translate into discrete responses via cut points).
+Above I have summarized the problems of using linear models when assuming that responses correspond to real numbers. Instead, you should use ordered [logistic](https://en.wikipedia.org/wiki/Ordered_logit)/[probit](https://en.wikipedia.org/wiki/Ordered_probit#:~:text=In%20statistics%2C%20ordered%20probit%20is,fair%2C%20good%2C%20excellent).) models. They are built using the many-to-one mapping conceptualization using a set of cut-points. The latter can be fixed or, better still, fitted as part of the model. Both models assume that the distribution of the underlying continuous variable is normal and, therefore, both the continuous variable and cut points live on the infinite real number line that is transformed to 0..1 range via either logit or probit link function. The latter step is, strictly speaking, not necessary but makes things easier both for math and for understanding. 
+
+From a mathematical point of view, using logit and probit makes it easy to compute the area under the curve that is between two cut points. Logit or probit are cumulative functions, so for a standard normal distribution (centered at $0$ with standard deviation of $1$) they compute an area under the curve starting from $-\infty$ up to some point $k_i$. Therefore, if we want to compute an area between two cut points $k_{i-1}$ and $k_i$, we can do it as $logit(k_{i})-logit(k_{i-1})$ (same goes for probit).
+
+```{r echo}
+# figure for logit 
+```
+
+Transforming from real space to 0..1 range also makes it easier to understand relative positions of cut points and changes in continuous variable (that we translate into discrete responses via cut points).
 
 ```{r echo=FALSE}
 z_breakpoints <- seq(0, 1, length.out = 8)[2:8] #c(0.2, 0.4, 0.6, 0.8, 1.0)
