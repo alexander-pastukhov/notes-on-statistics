@@ -7,17 +7,21 @@
 <title>Chapter 7 Bayesian vs. fequentist statisics | Notes on Statistics</title>
 <meta name="author" content="Alexander Pastukhov">
 <meta name="description" content="I suspect that many student who read “Statistical Rethinking” have a feeling that it is something completely different from what they have been learning in “traditional” statistics classes. That...">
-<meta name="generator" content="bookdown 0.24 with bs4_book()">
+<meta name="generator" content="bookdown 0.26 with bs4_book()">
 <meta property="og:title" content="Chapter 7 Bayesian vs. fequentist statisics | Notes on Statistics">
 <meta property="og:type" content="book">
 <meta property="og:description" content="I suspect that many student who read “Statistical Rethinking” have a feeling that it is something completely different from what they have been learning in “traditional” statistics classes. That...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 7 Bayesian vs. fequentist statisics | Notes on Statistics">
 <meta name="twitter:description" content="I suspect that many student who read “Statistical Rethinking” have a feeling that it is something completely different from what they have been learning in “traditional” statistics classes. That...">
-<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.13/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
 <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
-<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><link rel="stylesheet" href="bs4_style.css%20-%20style.css">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="bs4_style.css%20-%20style.css">
 </head>
 <body data-spy="scroll" data-target="#toc">
 
@@ -68,7 +72,7 @@
 <h1>
 <span class="header-section-number">7</span> Bayesian vs. fequentist statisics<a class="anchor" aria-label="anchor" href="#bayesian-vs.-fequentist-statisics"><i class="fas fa-link"></i></a>
 </h1>
-<p>I suspect that many student who read “Statistical Rethinking” have a feeling that it is something completely different from what they have been learning in “traditional” statistics classes. That Bayesian approach is more “hands-on” and complicated, whereas “normal” statistics is simpler and easy to work with even it is “less powerful.”<a href="ordered-categorical-data-i.e.-likert-scales.html#fn22" class="footnote-ref" id="fnref22"><sup>22</sup></a> Thus, the purpose of this note is to walk you through a typical statistical analysis and focus on practical differences and, more importantly, similarity of the two approaches.</p>
+<p>I suspect that many student who read “Statistical Rethinking” have a feeling that it is something completely different from what they have been learning in “traditional” statistics classes. That Bayesian approach is more “hands-on” and complicated, whereas “normal” statistics is simpler and easy to work with even it is “less powerful.”<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Not really.&lt;/p&gt;"><sup>22</sup></a> Thus, the purpose of this note is to walk you through a typical statistical analysis and focus on practical differences and, more importantly, similarity of the two approaches.</p>
 <div id="choice-of-likelihood-both" class="section level2" number="7.1">
 <h2>
 <span class="header-section-number">7.1</span> Choice of likelihood (both)<a class="anchor" aria-label="anchor" href="#choice-of-likelihood-both"><i class="fas fa-link"></i></a>
@@ -82,7 +86,7 @@
 \cdots \\
 \sigma \sim Exponential(1)
 \]</span></p>
-<p>This decision is neither Bayesian, nor frequentist. This is a decision about the model that best describes the data, so it is independent of the inference method you will use. This is a decision that you are making even if you are using “prepackaged” statistical tests like the t-test or ANOVA that assume normally distributed residuals<a href="ordered-categorical-data-i.e.-likert-scales.html#fn23" class="footnote-ref" id="fnref23"><sup>23</sup></a>.</p>
+<p>This decision is neither Bayesian, nor frequentist. This is a decision about the model that best describes the data, so it is independent of the inference method you will use. This is a decision that you are making even if you are using “prepackaged” statistical tests like the t-test or ANOVA that assume normally distributed residuals<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Admittedly, in this case people often start with the statistical test and see whether data is suitable rather than the other way around.&lt;/p&gt;"><sup>23</sup></a>.</p>
 </div>
 <div id="linear-model-both" class="section level2" number="7.2">
 <h2>
@@ -97,13 +101,13 @@ y_i \sim Normal(\mu_i, \sigma) \\
 \cdots
 \]</span>
 Again, this is neither Bayesian, nor frequentist decision, it is a linear model decision. Chapters 4-6 and 8 concentrate on how to make this decision using directed-acyclic graphs (DAGs) and introduce concepts of multicollinearity, colliders and bias they can produce, backdoor paths and how to identify them, etc. They explain how you can make educated decision on which predictors to use based on your knowledge of the field or of the problem. At this stage you also decide on whether to normalize data, as it could make interpreting the model easier.</p>
-<p>You always have to make this decision. For example, if you use the (repeated measures) ANOVA, you do need to decide which factors to use, whether to include interactions, should you transform the data to make coefficients directly interpretable, do you use a link function, etc.<a href="ordered-categorical-data-i.e.-likert-scales.html#fn24" class="footnote-ref" id="fnref24"><sup>24</sup></a></p>
+<p>You always have to make this decision. For example, if you use the (repeated measures) ANOVA, you do need to decide which factors to use, whether to include interactions, should you transform the data to make coefficients directly interpretable, do you use a link function, etc.<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;However, you do see cases when one simply throws all factors and interactions into the pot with little regard for an underlying causal model or interpretability of the coefficients.&lt;/p&gt;"><sup>24</sup></a></p>
 </div>
 <div id="priors-optional-for-bayesian" class="section level2" number="7.3">
 <h2>
 <span class="header-section-number">7.3</span> Priors (optional for Bayesian)<a class="anchor" aria-label="anchor" href="#priors-optional-for-bayesian"><i class="fas fa-link"></i></a>
 </h2>
-<p>Priors are a Bayesian way to regularize the model, so this is something you do need to think about when doing Bayesian statistics<a href="ordered-categorical-data-i.e.-likert-scales.html#fn25" class="footnote-ref" id="fnref25"><sup>25</sup></a>. In a model this part would look something like this
+<p>Priors are a Bayesian way to regularize the model, so this is something you do need to think about when doing Bayesian statistics<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Modern packages like &lt;em&gt;brms&lt;/em&gt; make it easy for you by deducing a set of reasonable priors for you. However, it is always a good idea to double-check them.&lt;/p&gt;"><sup>25</sup></a>. In a model this part would look something like this
 <span class="math display">\[
 y_i \sim Normal(\mu_i, \sigma) \\
 \mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso \\
@@ -111,7 +115,7 @@ y_i \sim Normal(\mu_i, \sigma) \\
 \beta_{x1} \sim Exponential(1) \\
 \cdots}
 \]</span></p>
-<p>This is probably a decision that students worry about the most as it feels more subjective and arbitrary than other decisions, such as choice of the likelihood or predictors. Chapter 4 through 7 gave you multiple examples that there is nothing particularly arbitrary about these choices and that you can come up with a set of justifiable priors based on what you know about the topic or based on how your pre-processed the data<a href="ordered-categorical-data-i.e.-likert-scales.html#fn26" class="footnote-ref" id="fnref26"><sup>26</sup></a>.</p>
+<p>This is probably a decision that students worry about the most as it feels more subjective and arbitrary than other decisions, such as choice of the likelihood or predictors. Chapter 4 through 7 gave you multiple examples that there is nothing particularly arbitrary about these choices and that you can come up with a set of justifiable priors based on what you know about the topic or based on how your pre-processed the data<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;In my experience, people tend to worry about priors for data unseen. Some kind of data of which you know absolutely nothing, hence, have trouble deducing priors. In practice, you always know something about the topic and the data. If not, you should read on it instead of using flat priors!&lt;/p&gt;"><sup>26</sup></a>.</p>
 <p>Still, I think for a lot of people “normal” statistics with its flat priors feels simpler and also more objective and, therefore, more trustworthy (“we did not favor any specific range of values!”). If that is the case then use flat priors (but see the side note below) making Bayesian and frequentists models identical! For me, though, writing it down explicitly makes one realize that range <span class="math inline">\(-\infty, +\infty\)</span> is remarkably large to the point of being an obvious overkill
 <span class="math display">\[
 y_i \sim Normal(\mu_i, \sigma) \\
@@ -163,6 +167,7 @@ y_i \sim Normal(\mu_i, \sigma) \\
 
 </div>
 </div>
+
   <div class="chapter-nav">
 <div class="prev"><a href="information-criteria.html"><span class="header-section-number">6</span> Information Criteria</a></div>
 <div class="next"><a href="mixtures.html"><span class="header-section-number">8</span> Mixtures</a></div>
@@ -196,7 +201,7 @@ y_i \sim Normal(\mu_i, \sigma) \\
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-04-08.</p>
+    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-04-26.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

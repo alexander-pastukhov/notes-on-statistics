@@ -117,7 +117,7 @@
 
 \title{Notes on Statistics}
 \author{Alexander Pastukhov}
-\date{2022-04-08}
+\date{2022-04-26}
 
 \begin{document}
 \maketitle
@@ -1716,11 +1716,13 @@ Given this conceptualization, our goal is to recover both the cut-points and the
 \hypertarget{conceptual-problem-with-linear-models-we-change-our-mind-about-what-responses-correspond-to.}{%
 \section{Conceptual problem with linear models: we change our mind about what responses correspond to.}\label{conceptual-problem-with-linear-models-we-change-our-mind-about-what-responses-correspond-to.}}
 
-A very common approach is to fit Likert-scale data using a linear model (a \emph{t}-test, a repeated-measures ANOVA, linear-mixed models, etc.) while assuming that responses correspond directly to real numbers. In other words, when participants responded ``very unattractive'', or ``not confident at all'', or ``do not agree at all'' they literally meant a real number \(1.0\). When they used the middle (let's say the third) option ``neither agree, nor disagree'' they literally meant \(3.0\). This assumption appears to simplify our life dramatically but at the expense of changing the narrative.
+A very common approach is to fit Likert-scale data using a linear model (a \emph{t}-test, a repeated-measures ANOVA, linear-mixed models, etc.) while assuming that responses correspond directly to real numbers. In other words, when participants responded ``very unattractive'', or ``not confident at all'', or ``do not agree at all'' they literally meant a real number \(1.0\). When they used the middle (let's say the third) option ``neither agree, nor disagree'' they literally meant \(3.0\).
 
-Recall that our original (and very intuitive) conceptualization was that responses reflect a many-to-one mapping between an underlying continuous variable and a discrete (ordered categorical) response. But by converting them directly to numbers and using them as an outcome variable of a linear model we assume a \emph{one-to-one} mapping between the internal variable and observed responses. This means that from a linear model point of view, for a 7-point Likert scale \emph{any} real value is a valid and possible response and therefore participant \emph{could have} responded with 6.5, 3.14, or 2.71828 but, for whatever reason (sheer luck?), we only observed a handful of (integer) values.
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-77-1.pdf}
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-77-1.pdf} \includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-77-2.pdf}
+This assumption appears to simplify our life dramatically but at the expense of changing the narrative. Recall that our original (and very intuitive) conceptualization was that responses reflect a many-to-one mapping between an underlying continuous variable and a discrete (ordered categorical) response. But by converting them directly to numbers and using them as an outcome variable of a linear model we assume a \emph{one-to-one} mapping between the internal variable and observed responses. This means that from a linear model point of view, for a 7-point Likert scale \emph{any} real value is a valid and possible response and therefore participant \emph{could have} responded with 6.5, 3.14, or 2.71828 but, for whatever reason (sheer luck?), we only observed a handful of (integer) values.
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-78-1.pdf} \includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-78-2.pdf}
 
 Notice that this is \emph{not} how we think participants behave. I think everyone\footnote{Never say always!} would object to the idea that the limited repertoire of responses is due to endogenous processing rather than exogenous limitations imposed by an experimental design. Yet, this is how a \emph{linear model} thinks about it (given the outcome variable you gave it) and, if you are not careful, it is easy to miss this change in the narrative. It is, however, important as it means that estimates produced by such model are about that alternative one-to-one kind of responses, not the many-to-one that you had in mind! That alternative is not a bad story per se, it is just a \emph{different} story that should not be confused with the original one.
 
@@ -1732,7 +1734,7 @@ This may sound too conceptual but I suspect that few people, who use linear mode
 \section{A technical problem: Data that bunches up near a range limit.}\label{a-technical-problem-data-that-bunches-up-near-a-range-limit.}}
 
 When you use a linear model, you assume that residuals are normally distributed. This is something that you may not be sure of \emph{before} you fit a specific model, as it is residuals not the data that must be normally distributed. However, in some cases you may be fairly certain that this will not be the case, such as when a variable has only a limited range of values and the mean (the model prediction) is close to one of these limits. Whenever you have observations that are close to that hard limit, they will ``bunch up'' against it because they cannot go lower or higher than that. See the figure below for an illustration of how it happens if a \emph{continuous} variable \(x\) is restricted to 1 to 7 range\footnote{Note that for skewed distributions their mode is different from the mean!}.
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-78-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-79-1.pdf}
 
 The presence of a limit is not a deal breaker for using linear models per se. Most physical measures cannot be negative\footnote{Try coming up with one and don't say ``temperature''!} but as long your observations are sufficiently far away from zero, you are fine. You cannot have a negative height but you certainly can use linear models for adult height as, for example, an average female height in USA 164±6.4 cm. In other words, the mean is more than 25 standards deviations away from the range limit of zero and the latter can be safely ignored.
 
@@ -1743,7 +1745,7 @@ Unfortunately, Likert-scale data combines an extremely limited range with a very
 
 The skewed residuals described above are a fundamental problem for parametric frequentist methods but is not critical if you use Bayesian or non-parametric bootstrapping/permutation linear models. Does this mean it is safe to use them? Probably not. When you use responses directly, you assume a direct correspondence between a response label (e.g., ``agree'') and a real number \(4.0\). If that is the case, you can assume that \((4 + 4) / 2\) is equal to \((3 + 5) / 2\) to \((2 + 6) / 2\) to \((1 + 7)/ 2\). However, what if this is \emph{not} the case, what if the cut-points (responses) do not correspond to the real numbers that you've picked? Then our basic arithmetic stops working the way you think! Take a look at the figure below where ``real value'' of responses is not an integer.
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-79-1.pdf}
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-80-1.pdf}
 
 Unless you \emph{know} that response levels correspond to the selected real number and that the simple arithmetic holds, you are in danger of computing nonsense. This problem is more obvious when individual response levels are labelled, e.g., \texttt{"Strongly\ disagree"}, \texttt{"Disagree"}, \texttt{"Neither\ disagree,\ nor\ agree"}, \texttt{"Agree"}, \texttt{"Strongly\ agree"}. What is an average of \texttt{"Strongly\ disagree"} and \texttt{"Strongly\ agree"}? Is it the same as an average of \texttt{"Disagree"} and \texttt{"Agree"}? Is increase from \texttt{"Strongly\ disagree"} to \texttt{"Disagree"} identical to that from \texttt{"Neither\ disagree,\ nor\ agree"} to \texttt{"Agree"}? The answer is ``who knows?!'' but in my experience scales are rarely truly linear as people tend to avoid extremes and have their own idea about range of internal variables levels that correspond to a particular response.
 
@@ -1752,11 +1754,21 @@ As noted above, even when scale levels are explicitly named, it is very common t
 \hypertarget{solution-an-ordered-logitprobit-model}{%
 \section{Solution: an ordered logit/probit model}\label{solution-an-ordered-logitprobit-model}}
 
-Above I have summarized the problems of using linear models when assuming that responses correspond to real numbers. Instead, you should use ordered \href{https://en.wikipedia.org/wiki/Ordered_logit}{logistic}/\href{https://en.wikipedia.org/wiki/Ordered_probit\#:~:text=In\%20statistics\%2C\%20ordered\%20probit\%20is,fair\%2C\%20good\%2C\%20excellent}{probit}.) models. They are built using the many-to-one mapping conceptualization using a set of cut-points. The latter can be fixed or, better still, fitted as part of the model. Both models assume that the distribution of the underlying continuous variable is normal and, therefore, both the continuous variable and cut points live on the infinite real number line that is transformed to 0..1 range via either logit or probit link function. The latter step is, strictly speaking, not necessary but makes it easier to understand relative positions of cut points and changes in continuous variable (that we translate into discrete responses via cut points).
+Above I have summarized the problems of using linear models when assuming that responses correspond to real numbers. Instead, you should use ordered \href{https://en.wikipedia.org/wiki/Ordered_logit}{logistic}/\href{https://en.wikipedia.org/wiki/Ordered_probit\#:~:text=In\%20statistics\%2C\%20ordered\%20probit\%20is,fair\%2C\%20good\%2C\%20excellent}{probit}.) models. They are built using the many-to-one mapping conceptualization using a set of cut-points. The latter can be fixed or, better still, fitted as part of the model. Both models assume that the distribution of the underlying continuous variable is normal and, therefore, both the continuous variable and cut points live on the infinite real number line that is transformed to 0..1 range via either logit or probit link function. The latter step is, strictly speaking, not necessary but makes things easier both for math and for understanding.
 
-\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-80-1.pdf}
+From a mathematical point of view, using logit and probit makes it easy to compute the area under the curve that is between two cut points. Logit or probit are cumulative functions, so for a standard normal distribution (centered at \(0\) with standard deviation of \(1\)) they compute an area under the curve starting from \(-\infty\) up to some point \(k_i\). Therefore, if we want to compute an area between two cut points \(k_{i-1}\) and \(k_i\), we can do it as \(logit(k_{i})-logit(k_{i-1})\) (same goes for probit).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# figure for logit }
+\end{Highlighting}
+\end{Shaded}
+
+Transforming from real space to 0..1 range also makes it easier to understand relative positions of cut points and changes in continuous variable (that we translate into discrete responses via cut points).
 
 \includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-81-1.pdf}
+
+\includegraphics{notes-on-statistical-rethinking_files/figure-latex/unnamed-chunk-82-1.pdf}
 
   \bibliography{book.bib}
 

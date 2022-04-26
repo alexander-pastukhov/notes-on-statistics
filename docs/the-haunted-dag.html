@@ -7,17 +7,21 @@
 <title>Chapter 5 The haunted DAG | Notes on Statistics</title>
 <meta name="author" content="Alexander Pastukhov">
 <meta name="description" content="These are notes on section 6.3.2 The haunted DAG that demonstrates how collider bias can arise, if one of the variables is unobserved and we do not realize that the have a collider in our DAG. The...">
-<meta name="generator" content="bookdown 0.24 with bs4_book()">
+<meta name="generator" content="bookdown 0.26 with bs4_book()">
 <meta property="og:title" content="Chapter 5 The haunted DAG | Notes on Statistics">
 <meta property="og:type" content="book">
 <meta property="og:description" content="These are notes on section 6.3.2 The haunted DAG that demonstrates how collider bias can arise, if one of the variables is unobserved and we do not realize that the have a collider in our DAG. The...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 5 The haunted DAG | Notes on Statistics">
 <meta name="twitter:description" content="These are notes on section 6.3.2 The haunted DAG that demonstrates how collider bias can arise, if one of the variables is unobserved and we do not realize that the have a collider in our DAG. The...">
-<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.13/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
 <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
-<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><link rel="stylesheet" href="bs4_style.css%20-%20style.css">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="bs4_style.css%20-%20style.css">
 </head>
 <body data-spy="scroll" data-target="#toc">
 
@@ -85,7 +89,7 @@ where, <span class="math inline">\(\beta_G^\prime = \beta_P + \beta_G\)</span> a
 <p>What if we ignore <code>Neighborhood</code>? This means that we explicitly set <span class="math inline">\(\beta_N = 0\)</span> and that is the point when the sum of coefficients starts causing us problems. Recall that the model fits <span class="math inline">\(\beta_P + \beta_N\)</span> and not each term separately. Thus, setting one of them to 0 does not upset the model, as it can always compensate with the <em>other</em> coefficient. Here, that <em>other</em> coefficient is <span class="math inline">\(\beta_P\)</span>, so its value now is that of the “true” sum: <span class="math inline">\(\beta_P = \beta_P^{true} + \beta_N^{true}\)</span>.</p>
 <p>Unfortunately for us, <span class="math inline">\(\beta_P\)</span> appears at <em>two</em> places, as it is also used to quantify effect of grandparents:
 <span class="math display">\[(\beta_P + \beta_G) G\]</span></p>
-<p>Originally, it reflected only the influence of parents, so it was not a problem. But now it is artificially inflated <a href="ordered-categorical-data-i.e.-likert-scales.html#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a> as it stands for influence of both parents <em>and</em> neighborhood. Problem? Not for a model that fits a <em>sum</em>. How do you make sure that <em>the sum</em> still adds up? You change <em>other</em> coefficients! Here, we can still wiggle <span class="math inline">\(\beta_G\)</span> so that everything adds up. Given that
+<p>Originally, it reflected only the influence of parents, so it was not a problem. But now it is artificially inflated <a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;In general, changed depending on the effect signs of individual effects.&lt;/p&gt;"><sup>14</sup></a> as it stands for influence of both parents <em>and</em> neighborhood. Problem? Not for a model that fits a <em>sum</em>. How do you make sure that <em>the sum</em> still adds up? You change <em>other</em> coefficients! Here, we can still wiggle <span class="math inline">\(\beta_G\)</span> so that everything adds up. Given that
 <span class="math display">\[\beta_P = \beta_P^{true} + \beta_N^{true}\]</span>
 model just needs to subtract that same <span class="math inline">\(\beta_N^{true}\)</span> and get our sum back. So
 <span class="math display">\[\beta_P + \beta_G = (\beta_P^{true} + \beta_N^{true}) + (\beta_G^{true} - \beta_N^{true})\]</span></p>
@@ -93,6 +97,7 @@ model just needs to subtract that same <span class="math inline">\(\beta_N^{true
 <p>So, what are you supposed to do with this new knowledge? You do not take fitted model coefficients at their face value. You always have a fine-print “Only assuming that my small world is correct and it probably is not” at the back of your head. You think of several models and think of ways to tease out the true relationship. DAGs and statistical models can help you, but they cannot do magic and tell the “real truth” by themselves.</p>
 
 </div>
+
   <div class="chapter-nav">
 <div class="prev"><a href="spurious-association.html"><span class="header-section-number">4</span> Multiple regression - Spurious association</a></div>
 <div class="next"><a href="information-criteria.html"><span class="header-section-number">6</span> Information Criteria</a></div>
@@ -115,7 +120,7 @@ model just needs to subtract that same <span class="math inline">\(\beta_N^{true
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-04-08.</p>
+    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-04-26.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
