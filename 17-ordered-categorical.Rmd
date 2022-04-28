@@ -187,15 +187,13 @@ df <-
   mutate(y = dnorm(x, 0, 1),
          ylogit = rethinking::inv_logit(x))
 
-
-
 ggplot(df, aes(x = x, y = y)) +
   geom_ribbon(data = df %>% filter(x < cutpoints[2]),
               aes(ymax = y, ymin = 0), fill = "red") +
   geom_vline(xintercept = cutpoints, color = "darkgray", size = 1) +
   geom_line() +
-  geom_segment(data = NULL, x = -1, xend = -0.55, y = dnorm(-0.5), yend = dnorm(-0.5), arrow = arrow(length = unit(0.03, "npc"))) +
-  geom_label(data = NULL, x = -1.1, y = dnorm(-0.5), label = "inv_logit(0) = 0.5", hjust=1) +
+  geom_segment(data = NULL, x = -0.55, xend = -0.05, y = dnorm(0), yend = dnorm(0), arrow = arrow(length = unit(0.03, "npc"))) +
+  geom_label(data = NULL, x = -0.55, y = dnorm(0), label = "inv_logit(0) = 0.5", hjust=1) +
   ylab("PDF") +
   scale_x_continuous(breaks = -3:3, sec.axis = dup_axis(name = "Cut points", breaks = cutpoints, labels = c("\u21901", "\u21902", "\u21903", "\u21904 5\u2192")))
 
@@ -205,8 +203,8 @@ ggplot(df, aes(x = x, y = y)) +
               aes(ymax = y, ymin = 0), fill = "red") +
   geom_vline(xintercept = cutpoints, color = "darkgray", size = 1) +
   geom_line() +
-  geom_segment(data = NULL, x = 1, xend = 0.55, y = dnorm(0.5), yend = dnorm(0.5), arrow = arrow(length = unit(0.03, "npc"))) +
-  geom_label(data = NULL, x = 1.1, y = dnorm(-0.5), label = "inv_logit(1.1) = 0.75", hjust=0) +
+  geom_segment(data = NULL, x = 1.5, xend = 1.1, y = dnorm(1.1), yend = dnorm(1.1), arrow = arrow(length = unit(0.03, "npc"))) +
+  geom_label(data = NULL, x = 1.55, y = dnorm(1.1), label = "inv_logit(1.1) = 0.75", hjust=0) +
   ylab("PDF") +
   scale_x_continuous(breaks = -3:3, sec.axis = dup_axis(name = "Cut points", breaks = cutpoints, labels = c("\u21901", "\u21902", "\u21903", "\u21904 5\u2192")))
 ```
@@ -258,7 +256,8 @@ response <- purrr::map_dbl(z_intensity, ~min(which(z_breakpoints>=.)))
 breakpoints <- rethinking::logit(z_breakpoints[1:(length(z_breakpoints) - 1)])
 intensity <- rethinking::logit(z_intensity)
 
-ggplot() +
+zero_one_range_plot <-
+  ggplot() +
   geom_hline(yintercept = z_breakpoints) +
   geom_hline(yintercept = c(0, 1), color="black", size=1)+ 
   # geom_bar(data = tibble(x=1:length(z_intensity), y=z_intensity), aes(x=x, y=y), stat="identity") +
@@ -267,19 +266,57 @@ ggplot() +
                      sec.axis = dup_axis(name="Cut points", breaks = z_breakpoints, labels = sprintf("\u2190%d", 1:length(z_breakpoints)))) + 
   scale_x_continuous(name = "Intensity to Response", breaks = 1:length(z_intensity), labels = sprintf("%.2f\u2192%d", z_intensity, response), limits = c(0.5, 2.5)) +
   coord_flip() +
-  labs(subtitle="Cut points and intensity on 0..1 range")
-```
+  labs(title = "Evenly spaced on 0..1 range", 
+       subtitle="Cut points and intensity on 0..1 range")
 
-```{r echo=FALSE}
-ggplot() +
+real_values_plot <-
+  ggplot() +
   geom_hline(yintercept = breakpoints) +
 #   geom_bar(data = tibble(x=1:length(intensity), y=intensity), aes(x=x, y=y), stat="identity") +
   geom_point(data = tibble(x=1:length(intensity), y=intensity), aes(x=x, y=y), size=5, color="red") +
   scale_y_continuous(name = "logit(Signal intensity)", limits = c(-2.5, 2.5),
                      sec.axis = dup_axis(name="Cut points", breaks = breakpoints, labels = sprintf("\u2190%d", 1:length(breakpoints)))) + 
-  scale_x_continuous(name = "Intensity to Response", breaks = 1:length(intensity), labels = sprintf("%.2f\u2192%d", intensity, response)) +
+  scale_x_continuous(name = "Intensity to Response", breaks = 1:length(intensity), labels = sprintf("%.2f\u2192%d", intensity, response), limits = c(0.5, 2.5)) +
   coord_flip() +
   labs(subtitle="Same cut points and intensity but after logit transformation.")
+
+zero_one_range_plot / real_values_plot
 ```
 
 
+```{r echo=FALSE}
+breakpoints <-  seq(-2.5, 2.5, length.out = 6)
+z_breakpoints <- c(rethinking::inv_logit(breakpoints), 1.0)
+# z_breakpoints <- seq(0, 1, length.out = 8)[2:8] #c(0.2, 0.4, 0.6, 0.8, 1.0)
+z_intensity <- c(0.25, 0.62)
+response <- purrr::map_dbl(z_intensity, ~min(which(z_breakpoints>=.)))
+
+# breakpoints <- rethinking::logit(z_breakpoints[1:(length(z_breakpoints) - 1)])
+intensity <- rethinking::logit(z_intensity)
+
+zero_one_range_plot <-
+  ggplot() +
+  geom_hline(yintercept = z_breakpoints) +
+  geom_hline(yintercept = c(0, 1), color="black", size=1)+ 
+  # geom_bar(data = tibble(x=1:length(z_intensity), y=z_intensity), aes(x=x, y=y), stat="identity") +
+  geom_point(data = tibble(x=1:length(z_intensity), y=z_intensity), aes(x=x, y=y), size=5, color="red") +
+  scale_y_continuous(name = "Signal intensity", 
+                     sec.axis = dup_axis(name="Cut points", breaks = z_breakpoints, labels = sprintf("\u2190%d", 1:length(z_breakpoints)))) + 
+  scale_x_continuous(name = "Intensity to Response", breaks = 1:length(z_intensity), labels = sprintf("%.2f\u2192%d", z_intensity, response), limits = c(0.5, 2.5)) +
+  coord_flip() +
+  labs(title = "Evenly spaced on real number line",
+       subtitle="Cut points and intensity on 0..1 range")
+
+real_values_plot <-
+  ggplot() +
+  geom_hline(yintercept = breakpoints) +
+#   geom_bar(data = tibble(x=1:length(intensity), y=intensity), aes(x=x, y=y), stat="identity") +
+  geom_point(data = tibble(x=1:length(intensity), y=intensity), aes(x=x, y=y), size=5, color="red") +
+  scale_y_continuous(name = "logit(Signal intensity)", limits = c(-2.5, 2.5),
+                     sec.axis = dup_axis(name="Cut points", breaks = breakpoints, labels = sprintf("\u2190%d", 1:length(breakpoints)))) + 
+  scale_x_continuous(name = "Intensity to Response", breaks = 1:length(intensity), labels = sprintf("%.2f\u2192%d", intensity, response), limits = c(0.5, 2.5)) +
+  coord_flip() +
+  labs(subtitle="Same cut points and intensity but after logit transformation.")
+
+zero_one_range_plot / real_values_plot
+```
