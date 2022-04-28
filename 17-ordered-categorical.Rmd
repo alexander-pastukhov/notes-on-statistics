@@ -320,3 +320,15 @@ real_values_plot <-
 
 zero_one_range_plot / real_values_plot
 ```
+
+## Using ordered logit/probit models
+There are several R packages that implement regression models for ordinal data including specialized packages [ordinal](https://cran.r-project.org/package=ordinal), [oglmx](https://cran.r-project.org/package=oglmx), as well as via a [ordered](https://cran.r-project.org/web/packages/brms/vignettes/brms_monotonic.html) option in [brms](https://cran.r-project.org/package=brms) package.
+
+From coding point of view, fitting an ordered logit/probit the model is easy as fitting any other regression model. However, the presence of the link function complicates its understanding as all parameters interact^[The usual curse of generalized linear models and, probably, one of the reasons while people tend to stick to linear models even if they are potentially or clearly invalid.]. My suggestion would be not to try to interpret the parameters directly but to plot a triptych
+
+1. Compute posterior predictions and compare their distribution with behavioral data to understand how well the model fits the data.
+2. Visualize cut points on a 0..1 range to understand the mapping between continuous intensity and discrete responses.
+3. Visualize and compare changes in continuous intensity on a 0..1 range adding cut points to facilitate understanding.
+
+
+
