@@ -1,3 +1,6 @@
+fig:unnamed-chunk-85
+fig:unnamed-chunk-86
+fig:unnamed-chunk-87
 precis
 loss-functions
 loss-function-the-concept
@@ -73,3 +76,4 @@ conceptual-problem-with-linear-models-we-change-our-mind-about-what-responses-co
 a-technical-problem-data-that-bunches-up-near-a-range-limit.
 another-technical-problem-can-we-assume-that-responses-correspond-to-real-numbers-that-we-picked
 solution-an-ordered-logitprobit-model
+using-ordered-logitprobit-models
