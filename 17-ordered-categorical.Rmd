@@ -32,7 +32,7 @@ ggplot() +
   labs(subtitle="Many-to-one mapping of a continuous variable on categorical responses")
 ```
 
-As per usual, we assume that even when we use the same stimulus and ask the same question, participant's internal continuous response varies from trial to trial due to noise. We model this by assuming that on a given trial a value is drawn from a normal distribution centered at the "true" intensity level^[Here, I will assume that cut points are fixed and it is parameters of the normal distribution that get adjusted. The actual implementation of ordered logit/probit models has it the other way around, so that intensity always comes from a normal distribution centered at $0$ and with a standard deviation of $1$ and it is cut-points that get adjusted. The two are mostly mathematically equivalent but I find the former to be more intuitive.]. When the noisy intensity is converted to discrete responses, their variability will depend on the location (mean) and the width (standard deviation) of this distribution. The broader this distribution and / or closer it is to a cut point, the more activity will "spill over" a cut point into adjacent regions and more variable discrete responses will be.
+As per usual, even when we use the same stimulus and ask the same question, participant's internal continuous response varies from trial to trial due to noise. We model this by assuming that on a given trial a value is drawn from a normal distribution centered at the "true" intensity level^[Here, I will assume that cut points are fixed and it is parameters of the normal distribution that get adjusted. The actual implementation of ordered logit/probit models has it the other way around, so that intensity always comes from a normal distribution centered at $0$ and with a standard deviation of $1$ and it is cut-points that get adjusted. The two are mostly mathematically equivalent but I find the former to be more intuitive.]. When the noisy intensity is converted to discrete responses, their variability will depend on the location (mean) and the width (standard deviation) of this distribution. The broader this distribution and / or closer it is to a cut point, the more activity will "spill over" a cut point into adjacent regions and more variable discrete responses will be.
 
 ```{r echo=FALSE}
 x <- seq(0, 7, length.out = 500)
@@ -141,7 +141,7 @@ The presence of a limit is not a deal breaker for using linear models per se. Mo
 Unfortunately, Likert-scale data combines an extremely limited range with a very coarse step. Even a 7-point Likert scale does not give you much of a wiggle room and routinely used 5-point scales are even narrower. This means that unless the mean is smack in the middle (e.g., at four for a 7-point scale), you are getting closer to one of the limits and your residuals become either positively (when approaching a lower limit) or negatively (for the upper one) skewed. In other words, the residuals are _systematically_ not normally distributed and their distributions depends on the mean. This clearly violates an assumption of normality of residuals and of their conditional i.i.d. (Independent and Identically Distributed). This is a deal breaker for parametric frequentist statistics (a _t_-test, a repeated-measures ANOVA, linear-mixed models), as their inferences are built on that assumptions and, therefore, become unreliable and should not to be trusted.
 
 ## Another technical problem: Can we assume that responses correspond to real numbers that we picked?
-The skewed residuals described above are a fundamental problem for parametric frequentist methods but is not critical if you use Bayesian or non-parametric bootstrapping/permutation linear models. Does this mean it is safe to use them? Probably not. When you use responses directly, you assume a direct correspondence between a response label (e.g., "agree") and a real number $4.0$. If your responses do correspond to the real numbers you ahave picked, you can perform the usual arithmetic with them. E.g., you can assume that $(4.0 + 4.0) / 2$ is equal to $(3.0 + 5.0) / 2$ to $(2.0 + 6.0) / 2$ to $(1.0 + 7.0)/ 2$. However, what if this is _not_ the case, what if the responses do not correspond to the real numbers that you've picked? Then our basic arithmetic stops working the way you think! Take a look at the figure below where "real value" of responses is not an integer that we have picked for it.
+The skewed residuals described above are a fundamental problem for parametric frequentist methods but is not critical if you use Bayesian or non-parametric bootstrapping/permutation linear models. Does this mean it is safe to use them? Probably not. When you use responses directly, you assume a direct correspondence between a response label (e.g., "agree") and a real number $4.0$. If your responses do correspond to the real numbers you have picked, you can perform the usual arithmetic with them. E.g., you can assume that $(4.0 + 4.0) / 2$ is equal to $(3.0 + 5.0) / 2$ to $(2.0 + 6.0) / 2$ to $(1.0 + 7.0)/ 2$. However, what if this is _not_ the case, what if the responses do not correspond to the real numbers that you've picked? Then our basic arithmetic stops working the way you think! Take a look at the figure below where "real value" of responses is not an integer that we have picked for it.
 
 ```{r echo=FALSE}
 cutpoints <- c(0.05, 0.1, 0.3, 0.6, 0.8, 0.9)
@@ -175,9 +175,43 @@ As noted above, even when scale levels are explicitly named, it is very common t
 
 ## Solution: an ordered logit/probit model
 
-Sp far I have summarized problems of using linear models when assuming that responses correspond to real numbers. How can we solve them? By using ordered [logistic](https://en.wikipedia.org/wiki/Ordered_logit)/[probit](https://en.wikipedia.org/wiki/Ordered_probit#:~:text=In%20statistics%2C%20ordered%20probit%20is,fair%2C%20good%2C%20excellent).) models. They are built using the many-to-one mapping between a continuous variable that has a limited range (for simplicity it ranges from 0 to 1) and is discretized to match behavioral responses using a set of cut points. In principle, the latter can be fixed but in most cases they should be fitted as part of the model. Both logit ad probit models assume that the sampling distribution of the underlying continuous variable is normal and, therefore, both the continuous variable and cut points live on the infinite real number line that is transformed to 0..1 range via either logit or probit link function. Strictly speaking, the latter step is not necessary but makes things easier both for doing math and for understanding.
+So far I have summarized problems of using linear models when assuming that responses correspond to real numbers. How can we solve them? By using ordered [logistic](https://en.wikipedia.org/wiki/Ordered_logit)/[probit](https://en.wikipedia.org/wiki/Ordered_probit#:~:text=In%20statistics%2C%20ordered%20probit%20is,fair%2C%20good%2C%20excellent) models. They are built using the many-to-one mapping between a continuous variable that has a limited range (for simplicity it ranges from 0 to 1) and is discretized to match behavioral responses using a set of cut points. In principle, the latter can be fixed but in most cases they should be fitted as part of the model. Both logit and probit models assume that the sampling distribution of the underlying continuous variable is a standard normal and, therefore, both the continuous variable and cut points live on the infinite real number line that is transformed to 0..1 range via either logit or probit link function. Strictly speaking, the latter step is not necessary but makes things easier both for doing math and for understanding.
 
-From a mathematical point of view, using logit and probit makes it easy to compute the area under the curve between two cut points. Logit or probit are cumulative functions, so for a standard normal distribution (centered at $0$ with standard deviation of $1$) they compute an area under the curve starting from $-\infty$ up to some point $k_i$. Therefore, if we want to compute an area between two cut points $k_{i-1}$ and $k_i$, we can do it as $logit(k_{i})-logit(k_{i-1})$ (same goes for probit).
+From a mathematical point of view, using logit and probit makes it easy to compute the area under the curve between two cut points. Logit or probit are cumulative functions, so for a standard normal distribution (centered at $0$ with standard deviation of $1$) they compute an area under the curve starting from $-\infty$ up to some point $k_i$.
+
+```{r echo = FALSE}
+cutpoints <- c(-1.4, 0, 1.098612, 2.7)
+
+df <- 
+  tibble(x = seq(-3, 3, length.out = 1000)) %>%
+  mutate(y = dnorm(x, 0, 1),
+         ylogit = rethinking::inv_logit(x))
+
+
+
+ggplot(df, aes(x = x, y = y)) +
+  geom_ribbon(data = df %>% filter(x < cutpoints[2]),
+              aes(ymax = y, ymin = 0), fill = "red") +
+  geom_vline(xintercept = cutpoints, color = "darkgray", size = 1) +
+  geom_line() +
+  geom_segment(data = NULL, x = -1, xend = -0.55, y = dnorm(-0.5), yend = dnorm(-0.5), arrow = arrow(length = unit(0.03, "npc"))) +
+  geom_label(data = NULL, x = -1.1, y = dnorm(-0.5), label = "inv_logit(0) = 0.5", hjust=1) +
+  ylab("PDF") +
+  scale_x_continuous(breaks = -3:3, sec.axis = dup_axis(name = "Cut points", breaks = cutpoints, labels = c("\u21901", "\u21902", "\u21903", "\u21904 5\u2192")))
+
+
+ggplot(df, aes(x = x, y = y)) +
+  geom_ribbon(data = df %>% filter(x < cutpoints[3]),
+              aes(ymax = y, ymin = 0), fill = "red") +
+  geom_vline(xintercept = cutpoints, color = "darkgray", size = 1) +
+  geom_line() +
+  geom_segment(data = NULL, x = 1, xend = 0.55, y = dnorm(0.5), yend = dnorm(0.5), arrow = arrow(length = unit(0.03, "npc"))) +
+  geom_label(data = NULL, x = 1.1, y = dnorm(-0.5), label = "inv_logit(1.1) = 0.75", hjust=0) +
+  ylab("PDF") +
+  scale_x_continuous(breaks = -3:3, sec.axis = dup_axis(name = "Cut points", breaks = cutpoints, labels = c("\u21901", "\u21902", "\u21903", "\u21904 5\u2192")))
+```
+
+Therefore, if we want to compute an area between two cut points $k_{i-1}$ and $k_i$, we can do it as $logit(k_{i})-logit(k_{i-1})$ (same goes for probit).
 
 ```{r echo=FALSE}
 cutpoints <- c(-1.4, 0, 1.098612, 2.7)
