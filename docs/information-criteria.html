@@ -186,7 +186,7 @@ Substituting the <span class="math inline">\(r_i = \frac{1}{p(y_i|\Theta_s)}\)</
 <span class="math display">\[lppd_{IS} = \sum^N_{i=1} log \frac{\sum^S_{s=1}1}{\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]</span></p>
 <p><span class="math display">\[lppd_{IS} = \sum^N_{i=1} log \frac{S}{\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]</span>
 <span class="math display">\[lppd_{IS} = \sum^N_{i=1} log \frac{1}{\frac{1}{S}\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]</span></p>
-<p>This looks like some bizarre re-arrangement of the terms but it ends up producing a point-wise variance-based penalty very similar to WAIC. You can build your intuition for this by playing with easy to compute numbers. Let us take a vector where all values are the same, i.e., variance is zero and compute <span class="math inline">\(lppd\)</span> and <span class="math inline">\(lppd_{IS}\)</span>.</p>
+<p>This might look like some bizarre re-arrangement of the terms but it ends up producing a <a href="https://en.wikipedia.org/wiki/Harmonic_mean">harmonic mean</a>, so you get a point-wise variance-based penalty very similar to WAIC. You can build your intuition for this by playing with easy to compute numbers. Let us take a vector where all values are the same, i.e., variance is zero and compute <span class="math inline">\(lppd\)</span> and <span class="math inline">\(lppd_{IS}\)</span>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.2</span>, <span class="fl">0.2</span><span class="op">)</span> <span class="co"># mean = 0.2, variance = 0</span>
 <span class="va">logp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span>
@@ -196,7 +196,7 @@ Substituting the <span class="math inline">\(r_i = \frac{1}{p(y_i|\Theta_s)}\)</
 <pre><code>## lppd    = -1.609438</code></pre>
 <pre><code>## lppd_IS = -1.609438</code></pre>
 <pre><code>## lppd - lppd_IS =  0</code></pre>
-<p>Now let us keep <em>mean</em> the same but very slightly increase <em>variance</em>. As you can see that tiny increase in sample induces a small <em>decrease</em> in <span class="math inline">\(lppd_{IS}\)</span>, i.e., we assume that since the model is variable about this point, it probably has too much power leading to <em>in-sample</em> overfitting and, therefore, poor <em>out-of-sample</em> performance.</p>
+<p>Now let us keep <em>mean</em> the same but very slightly increase <em>variance</em>. As you can see that tiny increase in sample induces a small <em>decrease</em> in <span class="math inline">\(lppd_{IS}\)</span> (harmonic means is biased towards lower numbers compared to an arithmetic mean). Conceptually, this corresponds to an assumption that since the model is variable about this point, it probably has too much power leading to <em>in-sample</em> overfitting and, therefore, the lower values produced by the harmonic mean are indicative of poor expected <em>out-of-sample</em> performance.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.19</span>, <span class="fl">0.2</span>, <span class="fl">0.21</span><span class="op">)</span>
 <span class="va">logp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span>
@@ -310,7 +310,7 @@ here <span class="math inline">\(\frac{\Pr(D|M_{1})}{\Pr(D|M_{2})}\)</span> are 
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-04-29.</p>
+    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-05-17.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
