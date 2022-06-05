@@ -93,7 +93,7 @@ ggplot() +
   geom_segment(aes(x = 0, y = 0, xend = c(1, 0), yend = c(0, 1)), arrow = arrow(length = unit(0.03, "npc"))) +
   geom_point(aes(x=Z[85, 1], y=Z[85, 2]), color="red", size=3) +
   geom_point(aes(x=Z[75, 1], y=Z[75, 2]), color="blue", size=3) +
-  geom_label(aes(x = c(0, 1) * 1.2, y = c(1, 0) * 1.2, label = c("\U00ee", "\U0135")), color="blue") +
+  geom_label(aes(x = c(0, 1) * 1.2, y = c(1, 0) * 1.2, label = c("\U0135", "\U00ee"))) +
   coord_equal() +
   xlab("x") +
   ylab("y") +
@@ -107,7 +107,7 @@ ggplot() +
   geom_segment(aes(x = 0, y = 0, xend = L[1, ], yend = L[2, ]), arrow = arrow(length = unit(0.03, "npc"))) +
   geom_point(aes(x=M[85, 1], y=M[85, 2]), color="red", size=3) +
   geom_point(aes(x=M[75, 1], y=M[75, 2]), color="blue", size=3) +
-  geom_label(aes(x = L[, 2] * c(1.1, 1.25), y = L[, 1] * 1.1, label = c("\U00ee", "\U0135")), color="blue") +
+  geom_label(aes(x = L[, 2] * c(1.1, 1.25), y = L[, 1] * 1.1, label = c("\U0135", "\U00ee"))) +
   coord_equal() +
   xlab("x") +
   ylab("y") +
