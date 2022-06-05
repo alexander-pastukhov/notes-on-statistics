@@ -28,10 +28,10 @@ $$L I L^T =$$
 Applying rule #3 to multiply by an identity matrix
 $$L L^T = \Sigma$$
 
-The proof is very simple and you see that you must end up with a roughly the same^[Depending on how close $\mathbb{E}(ZZ^T)$ to $I$.] correlations. Unfortunately, although I can see _why_ this should work (because algebra), I do not get any intuition about _how_ it works. if you are like me, keep on reading for a more verbose and visual explanation.
+The proof is very simple and you see that you must end up with a roughly the same^[Depending on how close $\mathbb{E}(ZZ^T)$ to $I$.] correlations. Unfortunately, although I can see _why_ this should work (because algebra), I do not get any intuition about _how_ it works. If you are like me, keep on reading for a more verbose and visual explanation.
 
 ## More verbose and visual proof
-For me the critical part was to understand what exactly does the Cholesky decomposition perform, i.e., what information the matrix $L$holds and what kind of linear transformation it represents. First, let us think what a correlations matrix is:
+For me the critical part was to understand what exactly does the Cholesky decomposition perform, i.e., what information the matrix $L$ holds and what kind of linear transformation it represents. First, let us think what a correlations matrix is:
 $$\Sigma = \begin{vmatrix} corr(x, x) & corr(x, y) \\ corr (y, x) & corr(y, y) \end{vmatrix} $$
 
 Now we need to recall some linear algebra, namely that a dot product between to vectors is $x \cdot y = |x| |y| cos(\theta_{xy})$, where $|x|$ and $|y|$ are length of vectors $x$ and $y$, and $\theta_{xy}$ is an angle between them. Also note that $cos(\theta)$ corresponds to Pearson's correlation $\rho$. If $x$ and $v$ are z-scores with mean of zero and standard deviation of one then their length is $1$ then their dot product computes Pearson's correlation directly: 
