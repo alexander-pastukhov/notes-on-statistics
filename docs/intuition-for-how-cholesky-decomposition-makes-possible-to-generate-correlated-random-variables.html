@@ -98,13 +98,13 @@ Remembering that <span class="math inline">\(\mathbb{E}(ZZ^T) = I\)</span>
 <span class="math display">\[L I L^T =\]</span>
 Applying rule #3 to multiply by an identity matrix
 <span class="math display">\[L L^T = \Sigma\]</span></p>
-<p>The proof is very simple and you see that you must end up with a roughly the same<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;Depending on how close &lt;span class="math inline"&gt;\(\mathbb{E}(ZZ^T)\)&lt;/span&gt; to &lt;span class="math inline"&gt;\(I\)&lt;/span&gt;.&lt;/p&gt;'><sup>41</sup></a> correlations. Unfortunately, although I can see <em>why</em> this should work (because algebra), I do not get any intuition about <em>how</em> it works. if you are like me, keep on reading for a more verbose and visual explanation.</p>
+<p>The proof is very simple and you see that you must end up with a roughly the same<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;Depending on how close &lt;span class="math inline"&gt;\(\mathbb{E}(ZZ^T)\)&lt;/span&gt; to &lt;span class="math inline"&gt;\(I\)&lt;/span&gt;.&lt;/p&gt;'><sup>41</sup></a> correlations. Unfortunately, although I can see <em>why</em> this should work (because algebra), I do not get any intuition about <em>how</em> it works. If you are like me, keep on reading for a more verbose and visual explanation.</p>
 </div>
 <div id="more-verbose-and-visual-proof" class="section level2" number="19.2">
 <h2>
 <span class="header-section-number">19.2</span> More verbose and visual proof<a class="anchor" aria-label="anchor" href="#more-verbose-and-visual-proof"><i class="fas fa-link"></i></a>
 </h2>
-<p>For me the critical part was to understand what exactly does the Cholesky decomposition perform, i.e., what information the matrix <span class="math inline">\(L\)</span>holds and what kind of linear transformation it represents. First, let us think what a correlations matrix is:
+<p>For me the critical part was to understand what exactly does the Cholesky decomposition perform, i.e., what information the matrix <span class="math inline">\(L\)</span> holds and what kind of linear transformation it represents. First, let us think what a correlations matrix is:
 <span class="math display">\[\Sigma = \begin{vmatrix} corr(x, x) &amp; corr(x, y) \\ corr (y, x) &amp; corr(y, y) \end{vmatrix} \]</span></p>
 <p>Now we need to recall some linear algebra, namely that a dot product between to vectors is <span class="math inline">\(x \cdot y = |x| |y| cos(\theta_{xy})\)</span>, where <span class="math inline">\(|x|\)</span> and <span class="math inline">\(|y|\)</span> are length of vectors <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, and <span class="math inline">\(\theta_{xy}\)</span> is an angle between them. Also note that <span class="math inline">\(cos(\theta)\)</span> corresponds to Pearson’s correlation <span class="math inline">\(\rho\)</span>. If <span class="math inline">\(x\)</span> and <span class="math inline">\(v\)</span> are z-scores with mean of zero and standard deviation of one then their length is <span class="math inline">\(1\)</span> then their dot product computes Pearson’s correlation directly:
 <span class="math display">\[x \cdot y = |x| |y| cos(\theta_{xy}) = 1 \times 1 \times cos(\theta_{xy}) = cos(\theta_{xy})\]</span></p>
@@ -146,7 +146,7 @@ Applying rule #3 to multiply by an identity matrix
 <pre><code>##            [,1]       [,2]
 ## [1,] 1.00000000 0.01781367
 ## [2,] 0.01781367 1.00000000</code></pre>
-<p>Below is the plot of the original data. Note two highlighted points, here, values of x (positive for a red dot, negative for a lube one) are uncorrelated with values of y (roughly zero, which is why I have picked these two points).
+<p>Below is the plot of the original data. Note two highlighted points, here, values of x (positive for a red dot, negative for a blue one) are uncorrelated with values of y (roughly zero, which is why I have picked these two points).
 <img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-94-1.png" width="672">
 Now the same plot but for <span class="math inline">\(M = ZL\)</span>. Here, knowing <span class="math inline">\(x\)</span> coordinate allows you to predict <span class="math inline">\(y\)</span> as well.
 <img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-95-1.png" width="672"></p>
