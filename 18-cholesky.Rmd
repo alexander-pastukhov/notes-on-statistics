@@ -122,7 +122,7 @@ df <-
   data.frame(x = M[, 1], y = M[, 2], matrix = "M=ZL"))
 df$matrix <- factor(df$matrix, levels = c("Z", "M=ZL")) 
 ggplot() +
-  geom_segment(data=NULL, aes(x=Z[, 1], y=Z[, 2], xend=M[, 1], yend=M[, 2])) +
+  geom_segment(data=NULL, aes(x=Z[, 1], y=Z[, 2], xend=M[, 1], yend=M[, 2]), arrow = arrow(length = unit(0.03, "npc"))) +
   geom_point(data = df, aes(x = x, y = y, color = matrix)) +
   xlab("x") +
   ylab("y") +
