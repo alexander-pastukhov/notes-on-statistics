@@ -1,0 +1,48 @@
+# Intuition for how Cholesky decomposition makes generating correlated random variables possible 
+
+In chapter 14 of the "Statistical Rethinking", a Cholesky decomposition of a partial correlations matrix is used to generate _correlated_ random variables with matching partial correlations. For uninitiated the whole procedure looks magic but "It would be magic, except that it is just algebra." The purpose of these notes is to provide an intuition of how this works. I will present two explanations: A purely algebraic one and a more visual one. Unfortunately, both of them require knowledge of essentials of linear algebra. I would recommend the entire [Essense of linear algebra](https://youtu.be/fNk_zzaMoSs) series by Grant Sanderson, a.k.a. [3Blue1Brown](https://www.3blue1brown.com/) but at least first three videos are a must at least for the visual proof. These are bite-sized 10-15 minute videos that deep you a deep intuition about a single topic, so you can always watch them when you have a break.
+
+## Purely algebraic proof
+Below is a very brief description, for further details please refer to an excellent [post](https://mlisi.xyz/post/simulating-correlated-variables-with-the-cholesky-factorization) by [Matteo Lisi](https://mlisi.xyz/). Given that we have a correlations matrix $\Sigma$, we can use [Cholesky decomposition](https://en.wikipedia.org/wiki/Cholesky_decomposition):
+$$\Sigma = LL^T$$ 
+
+Next, we can generate a matrix of _uncorrelated_ random numbers $Z$ (e.g., z-scores from a standard normal distribution). Assuming that samples are uncorrelated then the covariance matrix is $\mathbb{E}(ZZ^T) = I$ (an identity matrix with $1$ on the diagonal and $0$ everywhere else). For the proof you need to remember that:
+
+1. order of factor is reversed if you apply transposition or inverse to the individual factors of a matrix product $(AB)^T = B^TA^T$,
+2. $\mathbb{E}(cX) = c\mathbb{E}(X)$ an expected value of a scaled quantity is equal to an expected value of the unscaled quantity times the scaling factor (e.g., $mean(3\cdot x) = 3\cdot mean(3)$)
+3. matrix multiplication by an identity matrix does not change anything $IM=M$ (this is just like multiplying a scalar by $1$: $1\cdot m = m$),
+
+Now, given that $M=LZ$ (we matrix multiply our uncorrelated with the Cholesky factor of the desired partial correlations matrix), we can compute partial correlations for these new values
+$$\mathbb{E}(MM^T) = \\
+\mathbb{E}((LZ)(LZ)^T) =$$
+Applying rule #1 to open the brackets:
+$$\mathbb{E}(L Z Z^T L^T) =$$
+Applying rule #2 to move constant $L$ out of expected value operator:
+$$L\mathbb{E}(Z Z^T) L^T =$$
+Remembering that $\mathbb{E}(ZZ^T) = I$
+$$L I L^T =$$
+Applying rule #3 to multiply by an identity matrix
+$$L L^T = \Sigma$$
+
+The proof is very simple and you see that you must end up with a roughly the same^[Depending on how close $\mathbb{E}(ZZ^T)$ to $I$.] partial correlations. Unfortunately, although I can see _why_ this should work and do not get any intuition about _how_ it works. if you are like me, keep on reading for a more verbose and visual explanation
+
+## More verbose and visual proof
+First, let us think what a correlations matrix is:
+$$\Sigma = \begin{vmatrix} corr(x, x) & corr(x, y) \\ corr (y, x) & corr(y, y) \end{vmatrix} $$
+
+Now we need some linear algebra, namely that a dot product between to vectors is $x \cdot y = |x| |y| cos(\theta_{xy})$, where $|x|$ and $|y|$ are length of vectors $x$ and $y$, and $\theta_{xy}$ is an angle between them. Also note that $cos(\theta)$ corresponds to Pearson's correlation $\rho$.  If $x$ and $v$ are z-scores with mean of zero and standard deviation of one then their length is $1$ then their dot product computes Pearson's correlation directly: 
+$$x c\dot y = |x| |y| cos(\theta_{xy}) = 1 \times 1 \times cos(\theta_{xy}) = cos(\theta_{xy})$$
+
+This means that we can rewrite our correlation matrix as a matrix of cosines of angles between individual variables (axes):
+$$\Sigma = \begin{vmatrix} cos(\theta_{xx}) & cos(\theta_{xy})) \\ cos(\theta_{yx}) & cos(\theta_{yy})) \end{vmatrix} $$
+
+
+
+Recall that a correlation is a scaled (normalized) covariance: $corr(x,y) = \frac{cov(x, y)}{\sigma_x  \sigma_y}$. If $x$ and $v$ are z-scores with mean of zero and standard deviation of one then 
+$$corr(x,y) = \frac{cov(x, y)}{\sigma_x \sigma_y} =\frac{cov(x, y)}{1 \times 1} = cov(x, y)$$
+
+Thus, our matrix of correlations is a covariance matrix for standardized (z-scored) variables:
+$$\Sigma = \begin{vmatrix} cov(x, x) & cov(x, y) \\ cov (y, x) & cov(y, y) \end{vmatrix} $$
+
+Now we need some linear algebra, namely that cov
+$cov(x, y) = 
