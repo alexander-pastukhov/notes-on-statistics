@@ -86,7 +86,7 @@ L
 Z <- matrix(rnorm(n = 200), ncol = 2)
 cor(Z)
 ```
-Below is the plot of the original data. Note two highlighted points, here, values of x (positive for a red dot, negative for a lube one) are uncorrelated with values of y (roughly zero, which is why I have picked these two points). 
+Below is the plot of the original data. Note two highlighted points, here, values of x (positive for a red dot, negative for a blue one) are uncorrelated with values of y (roughly zero, which is why I have picked these two points). 
 ```{r echo=FALSE}
 ggplot() + 
   geom_point(aes(x=Z[, 1], y=Z[, 2])) +
