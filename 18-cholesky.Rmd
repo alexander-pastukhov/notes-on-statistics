@@ -6,31 +6,7 @@ library(ggplot2)
 
 In chapter 14 of the "Statistical Rethinking", a Cholesky decomposition of a partial correlations matrix is used to generate _correlated_ random variables with matching partial correlations. For uninitiated the whole procedure looks magic but "It would be magic, except that it is just algebra." The purpose of these notes is to provide an intuition of how this works. I will present two explanations: A purely algebraic one and a more visual one. Unfortunately, both of them require knowledge of essentials of linear algebra. I would recommend the entire [Essense of linear algebra](https://youtu.be/fNk_zzaMoSs) series by Grant Sanderson, a.k.a. [3Blue1Brown](https://www.3blue1brown.com/) but first three videos are a must at least for the visual proof. These are bite-sized 10-15 minute videos that deep you a deep intuition about a single topic, so you can always watch them when you have a break.
 
-## Purely algebraic proof
-Below is a very brief description, for further details please refer to an excellent [post](https://mlisi.xyz/post/simulating-correlated-variables-with-the-cholesky-factorization) by [Matteo Lisi](https://mlisi.xyz/). Given that we have a correlations matrix $\Sigma$, we can use [Cholesky decomposition](https://en.wikipedia.org/wiki/Cholesky_decomposition):
-$$\Sigma = LL^T$$
-
-Next, we can generate a matrix of _uncorrelated_ random numbers $Z$ (e.g., z-scores from a standard normal distribution). Assuming that samples are uncorrelated then the covariance matrix is $\mathbb{E}(ZZ^T) = I$ (an identity matrix with $1$ on the diagonal and $0$ everywhere else). For the proof you need to remember that:
-
-1. order of factor is reversed if you apply transposition or inverse to the individual factors of a matrix product $(AB)^T = B^TA^T$,
-2. $\mathbb{E}(cX) = c\mathbb{E}(X)$ an expected value of a scaled quantity is equal to an expected value of the unscaled quantity times the scaling factor (e.g., $mean(3\cdot x) = 3\cdot mean(x)$)
-3. matrix multiplication by an identity matrix does not change anything $IM=M$ (this is just like multiplying a scalar by $1$: $1\cdot m = m$),
-
-Now, given that $M=LZ$ (we matrix multiply our uncorrelated data with the Cholesky factor of the desired pairwise correlations matrix), we can compute partial correlations for these new values
-$$\mathbb{E}(MM^T) = \\
-\mathbb{E}((LZ)(LZ)^T) =$$
-Applying rule #1 to open the brackets:
-$$\mathbb{E}(L Z Z^T L^T) =$$
-Applying rule #2 to move constant $L$ out of expected value operator:
-$$L\mathbb{E}(Z Z^T) L^T =$$
-Remembering that $\mathbb{E}(ZZ^T) = I$
-$$L I L^T =$$
-Applying rule #3 to multiply by an identity matrix
-$$L L^T = \Sigma$$
-
-The proof is very simple and you see that you must end up with a roughly the same^[Depending on how close $\mathbb{E}(ZZ^T)$ to $I$.] correlations. Unfortunately, although I can see _why_ this should work (because algebra), I do not get any intuition about _how_ it works. If you are like me, keep on reading for a more verbose and visual explanation.
-
-## More verbose and visual proof
+## A verbose and visual proof
 For me the critical part was to understand what exactly does the Cholesky decomposition perform, i.e., what information the matrix $L$ holds and what kind of linear transformation it represents. First, let us think what a correlations matrix is:
 $$\Sigma = \begin{vmatrix} corr(x, x) & corr(x, y) \\ corr (y, x) & corr(y, y) \end{vmatrix} $$
 
@@ -128,3 +104,28 @@ ggplot() +
   ylab("y") +
   coord_equal()
 ```
+
+## Purely algebraic proof
+Here is an alternative purely algebraic take on it. Note that this is a very brief description, for further details please refer to an excellent [post](https://mlisi.xyz/post/simulating-correlated-variables-with-the-cholesky-factorization) by [Matteo Lisi](https://mlisi.xyz/). 
+
+Given that we have a correlations matrix $\Sigma$, we can use [Cholesky decomposition](https://en.wikipedia.org/wiki/Cholesky_decomposition):
+$$\Sigma = LL^T$$
+Next, we can generate a matrix of _uncorrelated_ random numbers $Z$ (e.g., z-scores from a standard normal distribution). Assuming that samples are uncorrelated then the covariance matrix is $\mathbb{E}(ZZ^T) = I$ (an identity matrix with $1$ on the diagonal and $0$ everywhere else). For the proof you need to remember that:
+
+1. order of factor is reversed if you apply transposition or inverse to the individual factors of a matrix product $(AB)^T = B^TA^T$,
+2. $\mathbb{E}(cX) = c\mathbb{E}(X)$ an expected value of a scaled quantity is equal to an expected value of the unscaled quantity times the scaling factor (e.g., $mean(3\cdot x) = 3\cdot mean(x)$)
+3. matrix multiplication by an identity matrix does not change anything $IM=M$ (this is just like multiplying a scalar by $1$: $1\cdot m = m$),
+
+Now, given that $M=LZ$ (we matrix multiply our uncorrelated data with the Cholesky factor of the desired pairwise correlations matrix), we can compute partial correlations for these new values
+$$\mathbb{E}(MM^T) = \\
+\mathbb{E}((LZ)(LZ)^T) =$$
+Applying rule #1 to open the brackets:
+$$\mathbb{E}(L Z Z^T L^T) =$$
+Applying rule #2 to move constant $L$ out of expected value operator:
+$$L\mathbb{E}(Z Z^T) L^T =$$
+Remembering that $\mathbb{E}(ZZ^T) = I$
+$$L I L^T =$$
+Applying rule #3 to multiply by an identity matrix
+$$L L^T = \Sigma$$
+
+The proof is very simple and you see that you must end up with a roughly the same^[Depending on how close $\mathbb{E}(ZZ^T)$ to $I$.] correlations. Unfortunately, although I can see _why_ this should work (because algebra), I do not get any intuition about _how_ it works, which is I came up with a slower visual explanation above.

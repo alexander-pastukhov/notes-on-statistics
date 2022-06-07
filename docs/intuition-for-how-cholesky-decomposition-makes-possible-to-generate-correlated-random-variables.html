@@ -74,35 +74,9 @@
 <span class="header-section-number">19</span> Intuition for how Cholesky decomposition makes possible to generate correlated random variables<a class="anchor" aria-label="anchor" href="#intuition-for-how-cholesky-decomposition-makes-possible-to-generate-correlated-random-variables"><i class="fas fa-link"></i></a>
 </h1>
 <p>In chapter 14 of the “Statistical Rethinking”, a Cholesky decomposition of a partial correlations matrix is used to generate <em>correlated</em> random variables with matching partial correlations. For uninitiated the whole procedure looks magic but “It would be magic, except that it is just algebra.” The purpose of these notes is to provide an intuition of how this works. I will present two explanations: A purely algebraic one and a more visual one. Unfortunately, both of them require knowledge of essentials of linear algebra. I would recommend the entire <a href="https://youtu.be/fNk_zzaMoSs">Essense of linear algebra</a> series by Grant Sanderson, a.k.a. <a href="https://www.3blue1brown.com/">3Blue1Brown</a> but first three videos are a must at least for the visual proof. These are bite-sized 10-15 minute videos that deep you a deep intuition about a single topic, so you can always watch them when you have a break.</p>
-<div id="purely-algebraic-proof" class="section level2" number="19.1">
+<div id="a-verbose-and-visual-proof" class="section level2" number="19.1">
 <h2>
-<span class="header-section-number">19.1</span> Purely algebraic proof<a class="anchor" aria-label="anchor" href="#purely-algebraic-proof"><i class="fas fa-link"></i></a>
-</h2>
-<p>Below is a very brief description, for further details please refer to an excellent <a href="https://mlisi.xyz/post/simulating-correlated-variables-with-the-cholesky-factorization">post</a> by <a href="https://mlisi.xyz/">Matteo Lisi</a>. Given that we have a correlations matrix <span class="math inline">\(\Sigma\)</span>, we can use <a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">Cholesky decomposition</a>:
-<span class="math display">\[\Sigma = LL^T\]</span></p>
-<p>Next, we can generate a matrix of <em>uncorrelated</em> random numbers <span class="math inline">\(Z\)</span> (e.g., z-scores from a standard normal distribution). Assuming that samples are uncorrelated then the covariance matrix is <span class="math inline">\(\mathbb{E}(ZZ^T) = I\)</span> (an identity matrix with <span class="math inline">\(1\)</span> on the diagonal and <span class="math inline">\(0\)</span> everywhere else). For the proof you need to remember that:</p>
-<ol style="list-style-type: decimal">
-<li>order of factor is reversed if you apply transposition or inverse to the individual factors of a matrix product <span class="math inline">\((AB)^T = B^TA^T\)</span>,</li>
-<li>
-<span class="math inline">\(\mathbb{E}(cX) = c\mathbb{E}(X)\)</span> an expected value of a scaled quantity is equal to an expected value of the unscaled quantity times the scaling factor (e.g., <span class="math inline">\(mean(3\cdot x) = 3\cdot mean(x)\)</span>)</li>
-<li>matrix multiplication by an identity matrix does not change anything <span class="math inline">\(IM=M\)</span> (this is just like multiplying a scalar by <span class="math inline">\(1\)</span>: <span class="math inline">\(1\cdot m = m\)</span>),</li>
-</ol>
-<p>Now, given that <span class="math inline">\(M=LZ\)</span> (we matrix multiply our uncorrelated data with the Cholesky factor of the desired pairwise correlations matrix), we can compute partial correlations for these new values
-<span class="math display">\[\mathbb{E}(MM^T) = \\
-\mathbb{E}((LZ)(LZ)^T) =\]</span>
-Applying rule #1 to open the brackets:
-<span class="math display">\[\mathbb{E}(L Z Z^T L^T) =\]</span>
-Applying rule #2 to move constant <span class="math inline">\(L\)</span> out of expected value operator:
-<span class="math display">\[L\mathbb{E}(Z Z^T) L^T =\]</span>
-Remembering that <span class="math inline">\(\mathbb{E}(ZZ^T) = I\)</span>
-<span class="math display">\[L I L^T =\]</span>
-Applying rule #3 to multiply by an identity matrix
-<span class="math display">\[L L^T = \Sigma\]</span></p>
-<p>The proof is very simple and you see that you must end up with a roughly the same<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;Depending on how close &lt;span class="math inline"&gt;\(\mathbb{E}(ZZ^T)\)&lt;/span&gt; to &lt;span class="math inline"&gt;\(I\)&lt;/span&gt;.&lt;/p&gt;'><sup>41</sup></a> correlations. Unfortunately, although I can see <em>why</em> this should work (because algebra), I do not get any intuition about <em>how</em> it works. If you are like me, keep on reading for a more verbose and visual explanation.</p>
-</div>
-<div id="more-verbose-and-visual-proof" class="section level2" number="19.2">
-<h2>
-<span class="header-section-number">19.2</span> More verbose and visual proof<a class="anchor" aria-label="anchor" href="#more-verbose-and-visual-proof"><i class="fas fa-link"></i></a>
+<span class="header-section-number">19.1</span> A verbose and visual proof<a class="anchor" aria-label="anchor" href="#a-verbose-and-visual-proof"><i class="fas fa-link"></i></a>
 </h2>
 <p>For me the critical part was to understand what exactly does the Cholesky decomposition perform, i.e., what information the matrix <span class="math inline">\(L\)</span> holds and what kind of linear transformation it represents. First, let us think what a correlations matrix is:
 <span class="math display">\[\Sigma = \begin{vmatrix} corr(x, x) &amp; corr(x, y) \\ corr (y, x) &amp; corr(y, y) \end{vmatrix} \]</span></p>
@@ -130,7 +104,7 @@ Applying rule #3 to multiply by an identity matrix
 ## [2,]    0  0.8660254</code></pre>
 <div class="inline-figure"><img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-92-1.png" width="672"></div>
 <p>The same logic applies to cases beyond 2D but are trickier to visualize.</p>
-<p>Now that we know what matrix <span class="math inline">\(L\)</span> represents (set of vectors that are positioned at desired angles relative to each other), we can think about what <span class="math inline">\(LZ\)</span> achieves given that <span class="math inline">\(Z\)</span> is our <span class="math inline">\(N\times 2\)</span> matrix random numbers. Recall that a (square) matrix describes a linear transformation of space and can be understood by where it sends basis vectors (axes) <span class="math inline">\(\hat{i}\)</span> and <span class="math inline">\(\hat{j}\)</span> (watch <a href="https://youtu.be/kYB8IZa5AuE">this video</a> to get a visual feel for it). Our matrix <span class="math inline">\(L\)</span> sends <span class="math inline">\(\hat{i}\)</span> to a new location described by its first column<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Spoilers: it is the same location as before.&lt;/p&gt;"><sup>42</sup></a> and <span class="math inline">\(\hat{j}\)</span> to a location defined by its second column. This rotates and sheers the space. When applied to our random vectors, this means that although they started as independent (lying along orthogonal axes) they become correlated (as the axes they lie along stop being orthogonal).</p>
+<p>Now that we know what matrix <span class="math inline">\(L\)</span> represents (set of vectors that are positioned at desired angles relative to each other), we can think about what <span class="math inline">\(LZ\)</span> achieves given that <span class="math inline">\(Z\)</span> is our <span class="math inline">\(N\times 2\)</span> matrix random numbers. Recall that a (square) matrix describes a linear transformation of space and can be understood by where it sends basis vectors (axes) <span class="math inline">\(\hat{i}\)</span> and <span class="math inline">\(\hat{j}\)</span> (watch <a href="https://youtu.be/kYB8IZa5AuE">this video</a> to get a visual feel for it). Our matrix <span class="math inline">\(L\)</span> sends <span class="math inline">\(\hat{i}\)</span> to a new location described by its first column<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Spoilers: it is the same location as before.&lt;/p&gt;"><sup>41</sup></a> and <span class="math inline">\(\hat{j}\)</span> to a location defined by its second column. This rotates and sheers the space. When applied to our random vectors, this means that although they started as independent (lying along orthogonal axes) they become correlated (as the axes they lie along stop being orthogonal).</p>
 <p>Again let us visualize for the case of <span class="math inline">\(\rho=0.5\)</span>, i.e., <span class="math inline">\(\theta_{xy} = 60 ^\circ\)</span>:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">192405</span><span class="op">)</span>
@@ -152,6 +126,33 @@ Now the same plot but for <span class="math inline">\(M = ZL\)</span>. Here, kno
 <img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-95-1.png" width="672"></p>
 <p>Below is the plot for all points, showing their positions before and after the transformation. Note how the dots are only moved along the vertical axes. This is because Cholesky decomposition left the first basis vector <span class="math inline">\(\hat{i}\)</span> (x-axis) unchanged (still <span class="math inline">\((1, 0)\)</span>) but adjusted the <span class="math inline">\(\hat{j}\)</span> to achieve the desired angle of <span class="math inline">\(60^\circ\)</span>. Also note that we <em>could have</em> used a different vector for <span class="math inline">\(\hat{i}\)</span>, after all there are infinite pairs of <span class="math inline">\(\hat{i}\)</span> and <span class="math inline">\(\hat{j}\)</span> with <span class="math inline">\(60^\circ\)</span> between them. However, Cholesky decomposition needs a starting point — a first vector — and keeping <span class="math inline">\(\hat{i}\)</span> at its original position is as good of a starting point as any.
 <img src="notes-on-statistical-rethinking_files/figure-html/unnamed-chunk-96-1.png" width="672"></p>
+</div>
+<div id="purely-algebraic-proof" class="section level2" number="19.2">
+<h2>
+<span class="header-section-number">19.2</span> Purely algebraic proof<a class="anchor" aria-label="anchor" href="#purely-algebraic-proof"><i class="fas fa-link"></i></a>
+</h2>
+<p>Here is an alternative purely algebraic take on it. Note that this is a very brief description, for further details please refer to an excellent <a href="https://mlisi.xyz/post/simulating-correlated-variables-with-the-cholesky-factorization">post</a> by <a href="https://mlisi.xyz/">Matteo Lisi</a>.</p>
+<p>Given that we have a correlations matrix <span class="math inline">\(\Sigma\)</span>, we can use <a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">Cholesky decomposition</a>:
+<span class="math display">\[\Sigma = LL^T\]</span>
+Next, we can generate a matrix of <em>uncorrelated</em> random numbers <span class="math inline">\(Z\)</span> (e.g., z-scores from a standard normal distribution). Assuming that samples are uncorrelated then the covariance matrix is <span class="math inline">\(\mathbb{E}(ZZ^T) = I\)</span> (an identity matrix with <span class="math inline">\(1\)</span> on the diagonal and <span class="math inline">\(0\)</span> everywhere else). For the proof you need to remember that:</p>
+<ol style="list-style-type: decimal">
+<li>order of factor is reversed if you apply transposition or inverse to the individual factors of a matrix product <span class="math inline">\((AB)^T = B^TA^T\)</span>,</li>
+<li>
+<span class="math inline">\(\mathbb{E}(cX) = c\mathbb{E}(X)\)</span> an expected value of a scaled quantity is equal to an expected value of the unscaled quantity times the scaling factor (e.g., <span class="math inline">\(mean(3\cdot x) = 3\cdot mean(x)\)</span>)</li>
+<li>matrix multiplication by an identity matrix does not change anything <span class="math inline">\(IM=M\)</span> (this is just like multiplying a scalar by <span class="math inline">\(1\)</span>: <span class="math inline">\(1\cdot m = m\)</span>),</li>
+</ol>
+<p>Now, given that <span class="math inline">\(M=LZ\)</span> (we matrix multiply our uncorrelated data with the Cholesky factor of the desired pairwise correlations matrix), we can compute partial correlations for these new values
+<span class="math display">\[\mathbb{E}(MM^T) = \\
+\mathbb{E}((LZ)(LZ)^T) =\]</span>
+Applying rule #1 to open the brackets:
+<span class="math display">\[\mathbb{E}(L Z Z^T L^T) =\]</span>
+Applying rule #2 to move constant <span class="math inline">\(L\)</span> out of expected value operator:
+<span class="math display">\[L\mathbb{E}(Z Z^T) L^T =\]</span>
+Remembering that <span class="math inline">\(\mathbb{E}(ZZ^T) = I\)</span>
+<span class="math display">\[L I L^T =\]</span>
+Applying rule #3 to multiply by an identity matrix
+<span class="math display">\[L L^T = \Sigma\]</span></p>
+<p>The proof is very simple and you see that you must end up with a roughly the same<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;Depending on how close &lt;span class="math inline"&gt;\(\mathbb{E}(ZZ^T)\)&lt;/span&gt; to &lt;span class="math inline"&gt;\(I\)&lt;/span&gt;.&lt;/p&gt;'><sup>42</sup></a> correlations. Unfortunately, although I can see <em>why</em> this should work (because algebra), I do not get any intuition about <em>how</em> it works, which is I came up with a slower visual explanation above.</p>
 
 </div>
 </div>
@@ -210,8 +211,8 @@ Now the same plot but for <span class="math inline">\(M = ZL\)</span>. Here, kno
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
 <li><a class="nav-link" href="#intuition-for-how-cholesky-decomposition-makes-possible-to-generate-correlated-random-variables"><span class="header-section-number">19</span> Intuition for how Cholesky decomposition makes possible to generate correlated random variables</a></li>
-<li><a class="nav-link" href="#purely-algebraic-proof"><span class="header-section-number">19.1</span> Purely algebraic proof</a></li>
-<li><a class="nav-link" href="#more-verbose-and-visual-proof"><span class="header-section-number">19.2</span> More verbose and visual proof</a></li>
+<li><a class="nav-link" href="#a-verbose-and-visual-proof"><span class="header-section-number">19.1</span> A verbose and visual proof</a></li>
+<li><a class="nav-link" href="#purely-algebraic-proof"><span class="header-section-number">19.2</span> Purely algebraic proof</a></li>
 </ul>
 
       <div class="book-extra">
@@ -229,7 +230,7 @@ Now the same plot but for <span class="math inline">\(M = ZL\)</span>. Here, kno
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-06-05.</p>
+    <p>"<strong>Notes on Statistics</strong>" was written by Alexander Pastukhov. It was last built on 2022-06-07.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
