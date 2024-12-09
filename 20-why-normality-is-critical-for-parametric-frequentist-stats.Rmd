@@ -1,0 +1,2 @@
+# Why normality is critical for parametric frequentist stats
+When you studied frequentist (normal) statistics, you've learned that normality assumptions is critical for 
