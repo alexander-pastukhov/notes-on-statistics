@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>8&nbsp; Information Criteria – Notes on statistics</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./general-01-probability-mass-versus-density.html" rel="next">
+<link href="./loss-functions-03-asymmetric-loss-functions.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-8da5b4427184b79ecddefad3d342027e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./information-criteria.html">Information criteria</a></li><li class="breadcrumb-item"><a href="./information-criteria.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Information Criteria</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Notes on statistics</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Disclaimer</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Multiple regression</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./multiple-regression-01-spurious-association.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Spurious Associations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./multiple-regression-02-masked-relationship.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Masked Relationship</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./multiple-regression-03-collider-bias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Collider Bias: The Haunted DAG</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./multiple-regression-04-dags.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Directed Acyclic Graphs and Causal Reasoning</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Loss functions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./loss-functions-01-L0-L1-L2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Overview of Loss functions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./loss-functions-02-measurement-error.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Incorporating measurement error: a rubber band metaphor</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./loss-functions-03-asymmetric-loss-functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Asymmetric loss functions</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Information criteria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./information-criteria.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Information Criteria</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">General topics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./general-01-probability-mass-versus-density.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Probability mass versus probability density</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./general-02-pooling-information-for-parameters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Parameters: combining information from an individual with population</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./general-03-measurement-error.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Incorporating measurement error: a rubber band metaphor</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./general-04-effective-degrees-of-freedom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Effective degrees of freedom / number of parameters</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./general-05-mediation-in-triangles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">general-05-mediation-in-triangles.html</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Frequentist statistics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./frequentist-01-vs-bayesian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian vs.&nbsp;fequentist statisics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./frequentist-02-flat-priors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Flat priors: the strings attached</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./frequentist-03-bias-in-estimators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Unbiased mean versus biased variance in plain English</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./frequentist-04-why-normality-is-critical-for-parametric-frequentist-stats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Why normality is critical for parametric frequentist stats</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Advanced topics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./advanced-01-mixtures.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Mixtures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./advanced-02-instrumental-variables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./advanced-03-gam.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./advanced-04-cholesky.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#deviance" id="toc-deviance" class="nav-link active" data-scroll-target="#deviance"><span class="header-section-number">8.1</span> Deviance</a></li>
+  <li><a href="#general-idea-information-criteria-as-miles-per-gallon" id="toc-general-idea-information-criteria-as-miles-per-gallon" class="nav-link" data-scroll-target="#general-idea-information-criteria-as-miles-per-gallon"><span class="header-section-number">8.2</span> General idea: information criteria as miles-per-gallon</a></li>
+  <li><a href="#akaike-information-criterion-aic" id="toc-akaike-information-criterion-aic" class="nav-link" data-scroll-target="#akaike-information-criterion-aic"><span class="header-section-number">8.3</span> Akaike Information Criterion (AIC)</a></li>
+  <li><a href="#bayesian-information-criterion-bic" id="toc-bayesian-information-criterion-bic" class="nav-link" data-scroll-target="#bayesian-information-criterion-bic"><span class="header-section-number">8.4</span> Bayesian information criterion (BIC)</a></li>
+  <li><a href="#problem-of-aic-and-bic-one-size-may-not-fit-all" id="toc-problem-of-aic-and-bic-one-size-may-not-fit-all" class="nav-link" data-scroll-target="#problem-of-aic-and-bic-one-size-may-not-fit-all"><span class="header-section-number">8.5</span> Problem of AIC and BIC: one size may not fit all</a></li>
+  <li><a href="#musical-instruments-metaphor" id="toc-musical-instruments-metaphor" class="nav-link" data-scroll-target="#musical-instruments-metaphor"><span class="header-section-number">8.6</span> Musical instruments metaphor</a></li>
+  <li><a href="#deviance-information-criterion-dic-and-widely-applicable-information-criterion-waic" id="toc-deviance-information-criterion-dic-and-widely-applicable-information-criterion-waic" class="nav-link" data-scroll-target="#deviance-information-criterion-dic-and-widely-applicable-information-criterion-waic"><span class="header-section-number">8.7</span> Deviance information criterion (DIC) and widely-applicable information criterion (WAIC)</a></li>
+  <li><a href="#importance-sampling" id="toc-importance-sampling" class="nav-link" data-scroll-target="#importance-sampling"><span class="header-section-number">8.8</span> Importance sampling</a></li>
+  <li><a href="#pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo" id="toc-pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo" class="nav-link" data-scroll-target="#pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo"><span class="header-section-number">8.9</span> Pareto-smoothed importance sampling / leave-one-out cross-validation (PSIS/LOO)</a></li>
+  <li><a href="#bayes-factor" id="toc-bayes-factor" class="nav-link" data-scroll-target="#bayes-factor"><span class="header-section-number">8.10</span> Bayes Factor</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./information-criteria.html">Information criteria</a></li><li class="breadcrumb-item"><a href="./information-criteria.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Information Criteria</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Information Criteria</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>These are notes on information criteria. Their purpose is to provide some intuition about the information criteria, supplementing information presented in chapter 7 of the <em>Statistical Rethinking</em> book by Richard McElreath. I deliberately oversimplified and overgeneralized certain aspects to paint a “bigger picture”.</p>
+<section id="deviance" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="deviance"><span class="header-section-number">8.1</span> Deviance</h2>
+<p>In the chapter, deviance is introduced as an estimate for KL-divergence, which in turn is a relative entropy, i.e., the difference between cross-entropy and actual entropy of events. Keep that in mind but you could look at deviance itself as a straightforward goodness-of-fit measure, similar to squared residuals (RMSE, Root Mean Square Error) and coefficient of determination <span class="math inline">\(R^2\)</span>. In both cases, you have difference between model prediction (the regression line) and an actual data point. In ordinary least squares (OLS) approach, you quantify this imperfection of prediction by squaring residuals. You sum up all residuals to get the sum of squared residuals (<span class="math inline">\(SS_{res}\)</span>) and then you can compute <span class="math inline">\(R^2\)</span> by comparing it to the total sum of residuals in the data (<span class="math inline">\(SS_{total}\)</span>): <span class="math display">\[R^2 = 1 - \frac{SS_{res}}{SS_{total}} = \frac{SS_{total} - SS_{res}}{SS_{total}}\]</span> As the total sum of residuals <span class="math inline">\(SS_{res}\)</span> gets close to zero, the fraction gets close to 1. The disadvantage of squared residuals and <span class="math inline">\(R^2\)</span> is that tricky to use with non-metric data, such as binomial, ordered categorical data, etc., or when deviations from the prediction might be asymmetric (binomial data, response times, etc.). Instead, you can use likelihood to compute the probability that a data point comes from a distribution defined by a model. Then, you compute the (total) joint probability by multiplying all probabilities or, better still, by computing the sum of their log-transform (log likelihood)<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. Then, you can compare the observed log likelihood to the highest theoretically possible log likelihood for a <em>saturated model</em> (<span class="math inline">\(\Theta_s\)</span>), which has as many parameters as there are data points, so that it predicts each point perfectly. This is the original definition of (total) <em>deviance</em>: <span class="math display">\[D = -2 \cdot (log(p(y|\Theta)) - log(p(y|\Theta_s)))\]</span></p>
+<p>Recall that <span class="math inline">\(log(\frac{a}{b}) = log(a) - log(b)\)</span>, so we can rearrange it and see that it is a log-ratio of likelihoods: <span class="math display">\[D = -2 \cdot  log \left(\frac{p(y|\Theta)}{p(y|\Theta_s)}\right)\]</span> As <span class="math inline">\(p(y|\Theta)\)</span> increases, the fraction inside get closer to 1. The <span class="math inline">\(log()\)</span> bit flips and non-linearly scales it. The minus sign flips it back and we end up with smaller numbers meaning better fit.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="information-criteria_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The <span class="math inline">\(2\)</span> is there to facilitate significance testing for <em>nested</em> models. Models <span class="math inline">\(\Theta1\)</span> and <span class="math inline">\(\Theta2\)</span> are nested, if <span class="math inline">\(\Theta2\)</span> has all predictors of <span class="math inline">\(\Theta1\)</span> plus <em>k</em> predictors. E.g., model <span class="math inline">\(Divorce = Marriage~Rate\)</span> is nested inside <span class="math inline">\(Divorce = Marriage~Rate + Marriage~Age\)</span> with later model having 1 more parameter. Your actual model <span class="math inline">\(\Theta\)</span> is nested inside the saturated model <span class="math inline">\(\Theta_s\)</span> that has <span class="math inline">\(k = n - k_{model}\)</span> more parameters, where <span class="math inline">\(n\)</span> is sample size and <span class="math inline">\(k_{model}\)</span> is number of parameters in your model. It turns out that in this case, you can determine whether the difference in goodness-of-fit between two models is significant using <span class="math inline">\(\chi^2\)</span> distribution with <em>k</em> degrees of freedom. The only catch is that log-ratio is half the magnitude, so you need that <span class="math inline">\(2\)</span> to match things up<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+<p>At this point, you might remember that the definition of deviance for a single model in the book was: <span class="math display">\[D = -2 \cdot log(p(y|\Theta))\]</span></p>
+<p>Unfortunately, same term can be used both ways, to refer to a log likelihood of a single model or, technically more correctly, to the log-ratio you saw above. In reality, you will mostly see the deviance defined as in the book because it is used to compare nested models via <span class="math inline">\(\chi^2\)</span> distribution as I’ve described above, with only difference that you compare any two nested models, not just to a saturated one. This is how nested models are frequently compared, for example, see <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/anova.html">anova()</a> function in R.</p>
+<p>Note that a deviance for a single model still expresses the same idea of goodness-of-fit but is merely not normalized by the deviance of the saturated model. Thus deviance as in the book <span class="math inline">\(D = -2 \cdot log(p(y|\Theta))\)</span> corresponds to sum of residuals (absolute values mean nothing but you can use them to compare two models on the same data), whereas <em>total</em> deviance corresponds to the <span class="math inline">\(R^2\)</span> (values are directly interpretable).</p>
+</section>
+<section id="general-idea-information-criteria-as-miles-per-gallon" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="general-idea-information-criteria-as-miles-per-gallon"><span class="header-section-number">8.2</span> General idea: information criteria as miles-per-gallon</h2>
+<p>The general formula for all information criteria discussed below is <span class="math display">\[-2\cdot log \left( \frac{goodness~of~fit}{model~complexity} \right)\]</span></p>
+<p>The goodness-of-fit in the numerator is the likelihood, the joint probability of observing the model given each data point <span class="math inline">\(\prod_i p(\Theta|y_i)\)</span>. The denominator expresses model complexity, i.e., its flexibility in fitting the sample and, therefore, its tendency to overfit. Thus, the fraction itself is <em>goodness-of-fit per unit of model complexity</em>. This is like miles-per-gallon for car efficiency, so better models are more efficient models, churning out more goodness per complexity.</p>
+<p>The numerator is the same<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> for all information criteria discussed below and they differ only in how they compute the model complexity.</p>
+</section>
+<section id="akaike-information-criterion-aic" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="akaike-information-criterion-aic"><span class="header-section-number">8.3</span> Akaike Information Criterion (AIC)</h2>
+<p>The formula most commonly used<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> is <span class="math display">\[ AIC = -2\cdot log(p(\Theta|y)) + 2k \]</span> where <span class="math inline">\(k\)</span> is the number of parameters of the model. If you are not a mathematician who is used to translate back-and-forth using logarithms, you may fail spot the ratio I was talking about earlier. For this, you need to keep in mind that <span class="math inline">\(log(\frac{a}{b}) = log(a) - log(b)\)</span> and that <span class="math inline">\(a = log(exp(a))\)</span>. Let us re-arrange a bit to get the log-ratio back: <span class="math display">\[ AIC = -2\cdot log(p(\Theta|y)) + 2k \]</span> <span class="math display">\[ AIC = -2 (log(p(\Theta|y)) - k)\]</span> <span class="math display">\[ AIC = -2 (log(p(\Theta|y)) - log(exp(k))\]</span> <span class="math display">\[ AIC = -2 \cdot log \left(\frac{p(\Theta|y)}{exp(k)} \right)\]</span> And here it is, the log-ratio I’ve promised! As you can see, AIC assumes that model complexity grows exponentially with the number of parameters.</p>
+<p>If you are to use AIC, the current recommendation is to <em>correct it</em> with an extra penalty for the size of the sample <span class="math display">\[AICc = AIC + \frac{2k^2 + 2k}{n - k - 1}\]</span> where <span class="math inline">\(n\)</span> is the sample size. I won’t do it here but you should be able to work out how it is added to the exponent in the denominator.</p>
+</section>
+<section id="bayesian-information-criterion-bic" class="level2" data-number="8.4">
+<h2 data-number="8.4" class="anchored" data-anchor-id="bayesian-information-criterion-bic"><span class="header-section-number">8.4</span> Bayesian information criterion (BIC)</h2>
+<p>A.k.a. Schwarz information criterion (SIC, SBC, SBIC)<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>. The motivation is the same as with AIC but the penalty (complexity term), in addition to the number of parameters, also reflects the sample size <span class="math inline">\(n\)</span>.</p>
+<p><span class="math display">\[BIC = -2\cdot log(p(\Theta|y)) + log(n) k \]</span></p>
+<p>Let us do re-arranging again <span class="math display">\[BIC = -2\cdot log(p(\Theta|y)) + log(n) k \]</span> <span class="math display">\[BIC = -2 \left( log(p(\Theta|y)) + log(n) \frac{k}{2} \right) \]</span> <span class="math display">\[BIC = -2 \left( log(p(\Theta|y)) - log \left(exp(log(n) \cdot \frac{k}{2} \right) \right) \]</span></p>
+<p>For the complexity term, we need to keep in mind that <span class="math inline">\(exp(a \cdot b) = exp(a)^b\)</span>. Thus, <span class="math display">\[exp \left(log(n) \cdot \frac{k}{2} \right)= exp(log(n)) ^ \frac{k}{2} = n^\frac{k}{2}\]</span> Putting the complexity term back, we get <span class="math display">\[BIC = -2 \left( log(p(\Theta|y)) - log \left(n^\frac{k}{2} \right) \right)\]</span> <span class="math display">\[BIC = -2 \cdot log \left(\frac{p(\Theta|y)}{n^\frac{k}{2}} \right)\]</span> Thus, we end up with very similar power law complexity term which uses sample size instead of Euler’s number as the base.</p>
+</section>
+<section id="problem-of-aic-and-bic-one-size-may-not-fit-all" class="level2" data-number="8.5">
+<h2 data-number="8.5" class="anchored" data-anchor-id="problem-of-aic-and-bic-one-size-may-not-fit-all"><span class="header-section-number">8.5</span> Problem of AIC and BIC: one size may not fit all</h2>
+<p>Both AIC and BIC assume that model complexity and flexibility, that leads to overfitting, is reflected in the number of parameters <em>k</em>. However, this is a fairly indirect measure of model flexibility, based on how models <em>in general</em> tend to overfit data <em>in general</em>. But you probably want to know how <em>your specific</em> model uses its parameters to fit <em>your specific</em> sample and how much overfitting you should expect in that specific case. Because even if a parameter is present in the model, it may not be able to fully use it in case of regularization or multilevel (adaptive regularization) models.</p>
+<p>Regularization, in form of strong priors, lasso/ridge regression, etc., restricts the range of values that a given parameter can take. Thus, a model cannot exploit it as much as <em>other</em> parameters and will be less able to use it to improve fit to the sample. Similarly, in hierarchical multilevel modeling, you may have dozens or hundreds of parameters that describe intercepts and/or slopes for individual participants (random factors, in general), but most of them could be trivially zero (same as or very similar to the group average) and contribute little to the actual fit. In these cases, a simple raw count, which treats all parameters as equals, will overestimate model complexity.</p>
+<p>The desire to go beyond one-size-fits-all approach and be as model- and data-specific led to development of deviance information criterion (DIC) and widely-applicable information criterion (WAIC). Both use the entire posterior distribution of <em>in-sample</em> deviance and base their penalty on how <em>variable</em> this posterior distribution is. Higher variance, meaning that a model produces very different fits ranging from excellent to terrible, hints that model is too flexible for its own good and leads to higher complexity estimate (penalty for overfitting). Conversely, very similar posterior deviance (low variance) means that model is too restricted to fine-tune itself to the sample and its complexity is low.</p>
+<p>If you understand why variance of the posterior distribution of divergence is related to models’ flexibility and, therefore, to the number of effective parameters, just skip the next section. If not, I came up with a musical instruments metaphor that I and at least some people I’ve tested it upon found useful.</p>
+</section>
+<section id="musical-instruments-metaphor" class="level2" data-number="8.6">
+<h2 data-number="8.6" class="anchored" data-anchor-id="musical-instruments-metaphor"><span class="header-section-number">8.6</span> Musical instruments metaphor</h2>
+<p>Imagine that you are trying to play a song that you have just heard. But the only instrument you have is a triangle. This is not a particularly flexible instruments pitch-wise, so your rendition of that song will not be very good (your model underfits the data). The good news is that even if you do your worst and do not really try, no one will notice because your worst performance will sound very much like your best one. Simply because it is very hard to make songs sound different using a triangle. Thus, if you play that song many times, trying different versions of it with us judging how close you are to the original, the score we will give you will probably be not particularly high but very similar (low variance of the deviance for fitting to sample).</p>
+<p>What if I give you an instrument that can vary the pitch at least a bit, like a xylophone for children. Now you have more freedom and your version of the music will sound much more like the original. But, it also gives you an opportunity to make a mess of it, so your rendition might sound nothing like the music you’ve just heard. In other words, a more flexbile instrument increases the difference between the best and the worst possible performance, so the variance of your performances (on how close they are to the original) also increases (higher variance of the deviance). A more flexible instrument will make the difference even bigger. Think violin or trombone which are not restricted to the scale, so you can play any sound in-between and you can match the music you just heard exactly. Imagine that the music your just heard has odd off-the-scale sounds. Was it a defect of the turntable, which cannot go at constant speed, so overall pitch wobbles overtime (noise)? Or is it an experimental music piece that was deliberately designed to sound odd (signal)? If you do not know for sure, you will try to play as close to the original music your heard as possible, matching those off-scale sounds. And, because you can play any sound, your range of possible performance is even larger from one-to-one to “please, have mercy and stop!” (even larger variance of deviance).</p>
+<p>In short, variance of your performance (posterior divergence) reflects how flexible your instrument is. But why is it indicative of the <em>effective</em> number of parameters? Here are regularizing priors in the world of music instrument metaphor. Imagine that in addition to the triangle, I also give you a rubber bell<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>. Now, technically you have two instruments (your number of parameters is 2) but that bell does not affect your performance (we put very strong regularizing priors so that coefficients are zero or something very-very close to zero). Thus, your ability to play the song did not change and your variance of performance stays the same. Two actual instruments, but only one “effective” one. Or, I give you a piano but allow you to use only one octave and only white keys. Yes, you have a piano but with this regularization it is as complex as as kids’ xylophone. The <em>potential</em> number of notes you can play is great (AIC and BIC would be very impressed and slap a heavy penalty on you) but the actual “effective” range is small. Or, you regularize yourself to play scale-only notes using violin (something you learn to do). In all of these cases, you deliberately restrict yourself. But why? Why not just play as you heard it? I.e., why not fit as well as you can? Because if the song you heard is short (sample is small), regularization based on your knowledge about real life helps you to ignore the noise that is always present. E.g., you know that song is for kids’ xylophone, so even if you heard notes outside of a single octave that was probably a problem with recording. Or, you never heard that piece for violin but you do know other works of this composer and they always use scale-only notes, so you should not use violin to play off-scale sounds <em>in that case</em>.</p>
+<p>Multilevel models also limit the actual use of parameters. Imagine you heard a recording of a symphonic orchestra. Lots of violins but you figured out that most of them actually play the same melody. So you can get away with using one violin score (sample group average) and assume that most violins play like that (most participants are very close to group average). Any deviations from that group melody are probably mistakes by individual musicians, not the actual melody. Same goes if you hear a choir. Again, many people sing (lots of parameters!) but, mostly, in unison, so you do not need to create an individual score sheet (parameter) for each singer, just one per group of singers.</p>
+<p>Wrapping up the metaphor, the more flexible your instrument is, the more variable your performance can be, the easier it is for you to mimic noise and imperfections of the recording that have nothing to do with the piece itself. But when you play it next time, matching the recording with all its noise and distortions perfectly, people who know the piece will be puzzled or may not even recognize it (poor out-of-sample predictions). Adopting the melody for a more limited instrument may make it easier for others to recognize the song! Thus, higher variance in performance accuracy (higher variance of deviance) indicates that you can overfit easily with that instrument (model) and you should be extra careful (impose higher penalty for complexity).</p>
+</section>
+<section id="deviance-information-criterion-dic-and-widely-applicable-information-criterion-waic" class="level2" data-number="8.7">
+<h2 data-number="8.7" class="anchored" data-anchor-id="deviance-information-criterion-dic-and-widely-applicable-information-criterion-waic"><span class="header-section-number">8.7</span> Deviance information criterion (DIC) and widely-applicable information criterion (WAIC)</h2>
+<p>The two are very similar, as both compute the model complexity based on posterior distribution of log likelihood. The key difference is that DIC sums the log likelihood for each model (sample) first and then computes the variance over samples. WAIC computes variance of log likelihood per point and then sums those variances up. In the musical instrument metaphor, for DIC you perform the piece many times (generate many posterior samples), compute accuracy for each performance (deviance for a single sample), and then compute how variable they are. For WAIC, you go note by note (observation by observation). For each note you compute variance over all samples to see how consistent you are in playing it. Then, you sum this up.</p>
+<p><span class="math display">\[DIC = -2 \cdot \left( log(p(y|\Theta)) - var(\sum log(p(y|\Theta_i))) \right)\]</span> <span class="math display">\[WAIC = -2 \cdot \left( log(p(y|\Theta)) - \sum_i var(log(p(y_i|\Theta))) \right)\]</span></p>
+<p>The penalty replaces <span class="math inline">\(k\)</span> in AIC and, therefore, will go into the exponent inside the ratio. Again, same idea, that increase in variance of deviance (either per sample in DIC or per point in WAIC) leads to exponentially increasing estimate of complexity.</p>
+<p>WAIC is more stable mathematically and is mode widely applicable (that’s what statisticians tell us). Moreover, its advantage is that it explicitly recognizes that not all data points in your sample are equal. Some (outliers) are much harder to predict than others. And it is variance of log likelihood for these points that determines how much your model can overfit. An inflexible model will make a poor but consistent job (triangles don’t care about pitch!), whereas a complex model can do anything from spot-on to terrible (violins can do anything). In short, you should use WAIC yourself but recognize DIC when you see it and think of it as somewhat less reliable WAIC, which is still better than AIC or BIC when you use regularizing priors and/or hierarchical models.</p>
+</section>
+<section id="importance-sampling" class="level2" data-number="8.8">
+<h2 data-number="8.8" class="anchored" data-anchor-id="importance-sampling"><span class="header-section-number">8.8</span> Importance sampling</h2>
+<p>Importance sampling is mentioned in the chapter but is never explained, so here is a brief description. The core idea is to pretend that you sample from a distribution you need (but have no access to or sampling from it directly is very inefficient) by sampling from another distribution (the one you have access to and that you can sample efficiently) and “translating” the probabilities via <em>importance ratios</em>. What does this mean?</p>
+<p>Imagine that you want to know an average total score for a given die after you throw it ten times. The procedure is as simple as it gets: you toss the die ten times, record the number you get on each throw, sum them up at the end. Repeat the same toss-ten-times-and-sum-it-up as many times as you want and compute your average. But what if you do not have access to that die because it is <em>the die</em> and is kept under lock in International Bureau of Weights and Measures? Well, you have <em>a die</em> which you can toss and you have a list of <em>importance ratios</em> for each number. These <em>important ratios</em> tell you how much more likely is the number for <em>the die</em> (the one you are after) compared to <em>a die</em> you have in your hand. Let’s say the importance ratio for <em>1</em> (so, number 1 comes up on top) is <code>3.0</code>. This means that whenever <em>your die</em> gives you <em>1</em>, you assume that <em>the die</em> came up <em>1</em> on <strong>three</strong> throws. If the importance ratio for <em>2</em> is 0.5, whenever you see <em>2</em> on your die, you record only half the throw (<em>2</em> comes up twice as rarely for real die than for your die, so two throws that give you <em>2</em> amount to a single throw). This way you can toss your die and every toss equates to different number of throws that generated the same number for <em>the die</em>. So, you sample your die but record outcomes for the other die. Funny thing is that you don’t even need to know how fair your die is and what is the probability of individual sides. As long as you know the importance ratios, keep tossing it and translating the probabilities, you will get the samples for <em>the die</em> you are interested in.</p>
+<p>Note that if you toss your die ten times, the translated number of tosses for <em>the die</em> does not need to add up to ten. Imagine that, just by chance, you got <em>1</em> four times. Given the importance ratio of <code>3.0</code> that alone translates into twelve tosses. Solution? You <em>normalize</em> your result by <em>sum of importance ratios</em> and get back you ten tosses.</p>
+<p>The very obvious catch is, <em>how do we know the importance ratios</em>? Well, that is situation specific. Sometimes, we can compute them because we know both distributions, it just that one is easier to sample than the target one, so, we optimize the use of computing power<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a>. Sometimes, as in case of PSIS/LOO below, we can use an approximation.</p>
+</section>
+<section id="pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo" class="level2" data-number="8.9">
+<h2 data-number="8.9" class="anchored" data-anchor-id="pareto-smoothed-importance-sampling-leave-one-out-cross-validation-psisloo"><span class="header-section-number">8.9</span> Pareto-smoothed importance sampling / leave-one-out cross-validation (PSIS/LOO)</h2>
+<p>The importance sampling I’ve described above is the key to the PSIS/LOO. The idea is the same, we want to sample from the posterior of the model that was fitted <em>without</em> a specific data point <span class="math inline">\(y_i\)</span> (we write it as <span class="math inline">\(p(\Theta_{-i,s}|y_i)\)</span>). But we do not really want to refit the model. Instead, we want to use what we already have, samples from the model that was fit on all the data, <em>including</em> point <span class="math inline">\(y_i\)</span>. So, wise minds figured out how to use the importance sampling trick, sampling from <span class="math inline">\(p(\Theta_s|y_i)\)</span> and translating it to <span class="math inline">\(p(\Theta_{-i,s}|y_i)\)</span>. The only thing we need are importance factors <span class="math display">\[r_i = \frac{p(\Theta_{-i,s}|y_i)}{p(\Theta_s|y_i)} \propto \frac{1}{p(y_i|\Theta_s)}\]</span></p>
+<p>The importance ratio tells you the worse you are at predicting a point <span class="math inline">\(y_i\)</span> <em>in-sample</em> (the smaller the <span class="math inline">\(p(y_i|\Theta_s)\)</span> is), the more important it is when you consider model’s performance <em>out-of-sample</em> (the larger is <span class="math inline">\(\frac{1}{p(y_i|\Theta_s)}\)</span>). Here is an intuition behind this. <em>Any</em> observation will be harder to predict, if it was not included into the data the model was trained on. This is because, in its absence the model will use its parameters to fit the data that is present, including fitting noise, if it has spare parameters. So, you expect that out-of-sample deviance (<span class="math inline">\(p(y_i|\Theta_{-i}\)</span>) should be always worse than in-sample deviance for the same observation (<span class="math inline">\(p(y_i|\Theta\)</span>). How much worse depends on how “typical” the observation is. If it is typical and “easy” for a model to predict, in its absence the model will still see many similar “typical” observations and will be well prepared to predict it. However, if the observations is atypical, an outlier, the model won’t see too many observations that are alike and will concentrate more on typical points.</p>
+<p>More specifically, the penalty for a particular point based on the importance ratios across all samples reflects how <em>variable</em> <span class="math inline">\(p(y_i|\Theta_s)\)</span> is across the samples. Recall the definition in the book <span class="math display">\[lppd_{IS} = \sum^N_{i=1} log \frac{\sum^S_{s=1}r(\theta_s)p(y_i|\theta_s)}{\sum^S_{s=1}r(\theta_s)}\]</span> Substituting the <span class="math inline">\(r_i = \frac{1}{p(y_i|\Theta_s)}\)</span> we get <span class="math display">\[lppd_{IS} = \sum^N_{i=1} log \frac{\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}p(y_i|\theta_s)}{\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]</span> <span class="math display">\[lppd_{IS} = \sum^N_{i=1} log \frac{\sum^S_{s=1}\frac{p(y_i|\theta_s)}{p(y_i|\Theta_s)}}{\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]</span> <span class="math display">\[lppd_{IS} = \sum^N_{i=1} log \frac{\sum^S_{s=1}1}{\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]</span></p>
+<p><span class="math display">\[lppd_{IS} = \sum^N_{i=1} log \frac{S}{\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]</span> <span class="math display">\[lppd_{IS} = \sum^N_{i=1} log \frac{1}{\frac{1}{S}\sum^S_{s=1}\frac{1}{p(y_i|\Theta_s)}}\]</span></p>
+<p>This might look like some bizarre re-arrangement of the terms but it ends up producing a <a href="https://en.wikipedia.org/wiki/Harmonic_mean">harmonic mean</a>, so you get a point-wise variance-based penalty very similar to WAIC. You can build your intuition for this by playing with easy to compute numbers. Let us take a vector where all values are the same, i.e., variance is zero and compute <span class="math inline">\(lppd\)</span> and <span class="math inline">\(lppd_{IS}\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.2</span>, <span class="fl">0.2</span>) <span class="co"># mean = 0.2, variance = 0</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>logp <span class="ot">&lt;-</span> <span class="fu">log</span>(p)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>lppd <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="fu">sum</span>(p)<span class="sc">/</span><span class="fu">length</span>(p))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>lppd_IS <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="dv">1</span> <span class="sc">/</span> ( (<span class="dv">1</span> <span class="sc">/</span> <span class="fu">length</span>(p)) <span class="sc">*</span> <span class="fu">sum</span>( <span class="dv">1</span><span class="sc">/</span> p)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>mean = 0.2, variance of log(p) = 0</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lppd    = -1.609438 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lppd_IS = -1.609438 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lppd - lppd_IS =  0 </code></pre>
+</div>
+</div>
+<p>Now let us keep <em>mean</em> the same but very slightly increase <em>variance</em>. As you can see that tiny increase in sample induces a small <em>decrease</em> in <span class="math inline">\(lppd_{IS}\)</span> (harmonic means is biased towards lower numbers compared to an arithmetic mean). Conceptually, this corresponds to an assumption that since the model is variable about this point, it probably has too much power leading to <em>in-sample</em> overfitting and, therefore, the lower values produced by the harmonic mean are indicative of poor expected <em>out-of-sample</em> performance.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.19</span>, <span class="fl">0.2</span>, <span class="fl">0.21</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>logp <span class="ot">&lt;-</span> <span class="fu">log</span>(p)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>lppd <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="fu">sum</span>(p)<span class="sc">/</span><span class="fu">length</span>(p))</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>lppd_IS <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="dv">1</span> <span class="sc">/</span> ( (<span class="dv">1</span> <span class="sc">/</span> <span class="fu">length</span>(p)) <span class="sc">*</span> <span class="fu">sum</span>( <span class="dv">1</span><span class="sc">/</span> p)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>mean = 0.2, variance of log(p) = 0.001669798</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lppd    = -1.609438 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lppd_IS = -1.611107 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lppd - lppd_IS =  0.001669449 </code></pre>
+</div>
+</div>
+<p>To understand where does the penalty comes from, it was helpful for me to derive the solution for the case of just two values <span class="math inline">\([p_1, p_2]\)</span>. In this case you can define them as difference to the their mean, just as we did above: <span class="math inline">\(p_1 = \mu - \epsilon\)</span> and <span class="math inline">\(p_2 = \mu + \epsilon\)</span>. The <span class="math inline">\(lppd\)</span> should be trivially equal to <span class="math inline">\(\mu\)</span>: <span class="math display">\[lppd = \frac{p_1 + p_2}{2}\]</span> <span class="math display">\[lppd =\frac{(\mu - \epsilon) + (\mu + \epsilon)}{2}\]</span> <span class="math display">\[lppd =\frac{2 \cdot \mu}{2}\]</span> <span class="math display">\[lppd = \mu\]</span></p>
+<p>What about <span class="math inline">\(lppd_{IS}\)</span>? <span class="math display">\[lppd_{IS} = \frac{2}{\frac{1}{p_1} + \frac{1}{p_2}}\]</span></p>
+<p><span class="math display">\[lppd_{IS} = \frac{2}{\frac{1}{\mu - \epsilon} + \frac{1}{\mu + \epsilon}}\]</span></p>
+<p>Bringing the two fractions to a common denominator we get <span class="math display">\[lppd_{IS} = \frac{2}{\frac{(\mu + \epsilon) + (\mu - \epsilon)}{(\mu + \epsilon)(\mu - \epsilon)}}\]</span> Opening the brackets in the numerator <span class="math display">\[lppd_{IS} = \frac{2}{\frac{2 \cdot \mu }{(\mu + \epsilon)(\mu - \epsilon)}}\]</span> Now we can get flip the bottom fraction <span class="math display">\[lppd_{IS} = \frac{2 \cdot \frac{(\mu + \epsilon)(\mu - \epsilon)}{2 \cdot \mu}}{\frac{2 \cdot \mu }{(\mu + \epsilon)(\mu - \epsilon)} \cdot \frac{(\mu + \epsilon)(\mu - \epsilon)}{2 \cdot \mu}} \]</span></p>
+<p><span class="math display">\[lppd_{IS} = 2 \cdot \frac{(\mu + \epsilon)(\mu - \epsilon)}{2 \cdot \mu}\]</span> The two goes away <span class="math display">\[lppd_{IS} = \frac{(\mu + \epsilon)(\mu - \epsilon)}{\mu}\]</span> Opening the brackets in the numerator <span class="math display">\[lppd_{IS} = \frac{\mu^2 + \mu\epsilon - \mu\epsilon - \epsilon^2}{\mu}\]</span> Simplifying <span class="math display">\[lppd_{IS} = \frac{\mu^2 - \epsilon^2}{\mu}\]</span> <span class="math display">\[lppd_{IS} = \mu - \frac{\epsilon^2}{\mu}\]</span></p>
+<p>Thus when variance (<span class="math inline">\(\epsilon\)</span>, deviation from the mean) increases, the <span class="math inline">\(lppd_{IS}\)</span> decreases</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>delta <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.0</span>, <span class="fl">0.19</span>, <span class="at">length.out =</span> <span class="dv">100</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>create_p <span class="ot">&lt;-</span> <span class="cf">function</span>(dp) {<span class="fl">0.2</span> <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span>dp, <span class="dv">0</span>, dp)}</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>lppd_df <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">Variance =</span> purrr<span class="sc">::</span><span class="fu">map_dbl</span>(delta, <span class="sc">~</span><span class="fu">var2</span>(<span class="fu">log</span>(<span class="fu">create_p</span>(.)))),</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">LPPD =</span> purrr<span class="sc">::</span><span class="fu">map_dbl</span>(delta, <span class="sc">~</span><span class="fu">log</span>(<span class="fu">sum</span>(<span class="fu">create_p</span>(.))<span class="sc">/</span><span class="fu">length</span>(<span class="fu">create_p</span>(.)))),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">Kind =</span> <span class="st">"lppd"</span>),</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">Variance =</span> purrr<span class="sc">::</span><span class="fu">map_dbl</span>(delta, <span class="sc">~</span><span class="fu">var2</span>(<span class="fu">log</span>(<span class="fu">create_p</span>(.)))),</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">LPPD =</span> purrr<span class="sc">::</span><span class="fu">map_dbl</span>(delta, <span class="sc">~</span><span class="fu">log</span>(<span class="dv">1</span> <span class="sc">/</span> ( (<span class="dv">1</span> <span class="sc">/</span> <span class="fu">length</span>(<span class="fu">create_p</span>(.))) <span class="sc">*</span> <span class="fu">sum</span>( <span class="dv">1</span><span class="sc">/</span> <span class="fu">create_p</span>(.))))),</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">Kind =</span> <span class="st">"lppd_IS"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">SD =</span> <span class="fu">sqrt</span>(Variance))</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>together_plot <span class="ot">&lt;-</span> </span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(lppd_df, <span class="fu">aes</span>(<span class="at">x=</span>Variance, <span class="at">y=</span>LPPD, <span class="at">color=</span>Kind)) <span class="sc">+</span> </span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"var log p (WAIC penalty)"</span>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>difference_plot <span class="ot">&lt;-</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  lppd_df <span class="sc">%&gt;%</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Kind, <span class="at">values_from =</span> LPPD) <span class="sc">%&gt;%</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">lppd_IS - lppd</span><span class="st">`</span> <span class="ot">=</span> lppd_IS <span class="sc">-</span> lppd) <span class="sc">%&gt;%</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Variance, <span class="at">y=</span><span class="st">`</span><span class="at">lppd_IS - lppd</span><span class="st">`</span>)) <span class="sc">+</span> </span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"var log p (WAIC penalty)"</span>)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>together_plot <span class="sc">+</span> difference_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="information-criteria_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Compare the <span class="math inline">\(var log p(y_i|\Theta_s)\)</span>, which is a WAIC penalty term, with the decrease due to variance-based importance ratios. As you can see the two are very close and, therefore, will produce very similar estimates of out-of-sample performance. A <em>Pareto smoothed</em> importance sampling has an advantage over WAIC is that it less keen on reducing the performance based on a few samples, which are smoothed away. Still, both methods should identify the same problematic (high variance) data points that you should pay closer attention to.</p>
+</section>
+<section id="bayes-factor" class="level2" data-number="8.10">
+<h2 data-number="8.10" class="anchored" data-anchor-id="bayes-factor"><span class="header-section-number">8.10</span> Bayes Factor</h2>
+<p>Not an information criterion. However, it is a popular way to compare Bayesian models. Compared to information criteria, the logic is reversed. In case of the information criteria, we are asking which <strong>model fits data</strong> the best given the penalty we impose for its complexity. In case of Bayes Factor, we already have two models (could be different models with different number of parameters or just with different parameter values) and we are interested how well the <strong>data matches models</strong> we already have.</p>
+<p>Let’s start with the Bayes theorem: <span class="math display">\[Pr(M|D)=\frac {\Pr(D|M)\Pr(M)}{\Pr(D)}\]</span> where, <em>D</em> is data and <em>M</em> is the model (hypothesis). The tricky part is the marginal probability (prior) of data <span class="math inline">\(Pr(D)\)</span>. We hardly ever know it for sure, making computing the “correct” value for <span class="math inline">\(Pr(M|D)\)</span> problematic. When using posterior sampling, we side-step the issue by ignoring it and normalizing the posterior by the sum of the posterior distribution. Alternatively, when comparing two models, you can compute their ratio: <span class="math display">\[{\frac {\Pr(D|M_{1})}{\Pr(D|M_{2})}}={\frac {\Pr(M_{1}|D)}{\Pr(M_{2}|D)}} \cdot {\frac {\Pr(M_{1})}{\Pr(M_{2})}}\]</span> here <span class="math inline">\(\frac{\Pr(D|M_{1})}{\Pr(D|M_{2})}\)</span> are <strong>posterior odds</strong>, <span class="math inline">\(\frac {\Pr(M_{1}|D)}{\Pr(M_{2}|D)}\)</span> is <strong>Bayes Factor</strong>, and <span class="math inline">\(\frac {\Pr(M_{2})}{\Pr(M_{1})}\)</span> are <strong>prior odds</strong>. The common <span class="math inline">\(Pr(D)\)</span> nicely cancels out!</p>
+<p>If you assume that both hypotheses/models are equally likely (you have flat priors), the prior odds are 1:1 and your posterior odds are equal to Bayes Factor or, vice versa, Bayes Factor is equal to posterior odds. This means you can just pick their likelihoods from the posterior sampled distribution and compute the ratio.</p>
+<p>I am not a big fan of Bayes Factor for conceptual reasons. Although it can compare any two models (as long as the sample is the same), it looks a lot like a Bayesian version of a p-value and, therefore, lends itself naturally to the null-hypothesis testing. And, as far as my reading of literature in my field is concerned, this is how people most frequently use it, as a cooler Bayesian way of null-hypothesis testing. You have no worries about multiple comparisons (it is Bayesian, so no need for error correction!) and it can prove null hypothesis (it is the ratio, so flip it and see how much stronger <em>H0</em> is)! There is nothing wrong with this per se but the advantage of Bayesian statistics and information criteria is that you do not <em>need</em> to think in terms of null hypothesis testing and nested models. Adopting Bayes Factor may prevent you from seeing this and will allow you to continue doing same analysis just in a differently colored wrapper. Again, there is nothing wrong with exploratory analysis using null hypothesis testing until you can formulate a better model. But it should not be the <em>only</em> way you approach modeling.</p>
+
+
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>Mathematically equivalent but the sum of logs is far more numerically stable.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>I did not follow the derivation of that correspondence yet, so I cannot comment on how and why.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Almost, the minor difference is whether you use the entire posterior averaging over samples (DIC, WAIC, PSIS-LOO) or only a single maximum a posteriori sample (AIC, BIC).<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>And the one you should use to actually compute it, as it offers a better computation stability.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>McElreath writes that “BIC…it’s not actually an “information criterion.”“. So far, I was not able to figure out why.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>It was used during a super-secret meeting in Stanislaw Lem’s Eleventh Voyage of Ijon Tichy, so that no one would hear when they ring that bell!<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>A canonical example is using importance ratios to sample tails of a distribution, which you have access to but the data points from tails comes up by chance so rarely that sampling them directly is very inefficient.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./loss-functions-03-asymmetric-loss-functions.html" class="pagination-link" aria-label="Asymmetric loss functions">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Asymmetric loss functions</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./general-01-probability-mass-versus-density.html" class="pagination-link" aria-label="Probability mass versus probability density">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Probability mass versus probability density</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
