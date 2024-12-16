@@ -1,2 +1,4 @@
 # Notes on statistics
-Brief notes on various topics on statistics inspired, primarily by "Statistical Rethinking" by Richard McElreath
+This is a collection of notes on statistics that attempt to provide further details and intuition for some topics, such as loss functions, information theory, information criteria, MCMC algorithms, etc. The primary source for these notes is ["Statistical Rethinking"](https://www.routledge.com/Statistical-Rethinking-A-Bayesian-Course-with-Examples-in-R-and-STAN/McElreath/p/book/9780367139919) book by [Richard McElreath](https://xcelab.net/rm/), so if I mention a chapter, I mean a chapter from that book.
+
+These notes are aimed primarily at future-me, but I hope that might be useful others, which is why this material is **free to use** and is licensed under the [Creative Commons Attribution-NonCommercial-NoDerivatives V4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).
