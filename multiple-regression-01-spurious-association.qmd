@@ -1,17 +1,25 @@
-# Multiple regression - Spurious association {#spurious-association}
+# Spurious Associations {#spurious-association}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+#| echo: false
+library(tidyverse)
+
 library(dagitty)
 library(patchwork)
 library(rethinking)
-library(tidyverse)
 ```
 
 These notes are on Chapter 5 "The Many Variables & The Spurious Waffles", specifically, on section 5.1 "Spurious association". If you are to remember one thing from that chapter, it should be "doing multiple regression is easy, understanding and interpreting it is hard". As you will see below, fully understanding relationship between variables is complicate even when we are working with a minimal multiple regression with just two predictors.
 
 When reading section 5.1 "Spurious association", I found relationships between the *marriage age*, *marriage rate*, and *divorce rate* to be both clear and mysterious. On the one hand, everything is correlated with everything.
 
-```{r echo=FALSE, out.width = "100%", fig.align = 'center'}
+```{r}
+#| echo: false
+#| out-width: 100%
+#| fig-align: center 
 data(WaffleDivorce)
 waffles <- WaffleDivorce
 
@@ -52,13 +60,15 @@ So, what's going on? *How does it know?* To understand this, let us start with a
 To make things easier to understand, let us use simulated data. Imagine that both marriage and divorce rate are both _caused by_ marriage age and are almost perfectly linearly dependent it, so that $D_i = \beta_A^{true} \cdot A_i$ (for the sake of simplicity $\beta_A^{true} = -1$) and $M_i = -A_i$. The _causal_ relationship that we are modeling is called a fork: 
 $$Marriage~rate~\leftarrow~Age~of~marriage~\rightarrow~Divorce~rate$$
 We pretend our variables are already standardized, so the plots would look something like this.
-```{r out.width = "100%", fig.align = 'center'}
+```{r}
+#| out.width: 100%
+#| fig.align: center
 data("WaffleDivorce")
 set.seed(1212)
 N <- nrow(WaffleDivorce)
 sim_waffles <- tibble(MedianAgeMarriage = rnorm(N),
-                      Divorce = -rnorm(N, MedianAgeMarriage, 0.1),
-                      Marriage = -rnorm(N, MedianAgeMarriage, 0.01))
+                      Divorce =  -MedianAgeMarriage + rnorm(N, 0, 0.1),
+                      Marriage = -MedianAgeMarriage + rnorm(N, 0, 0.01))
 
 MD_plot <- 
   ggplot(data=sim_waffles, aes(x=Marriage, y=Divorce)) + 
@@ -85,9 +95,9 @@ MD_plot | AD_plot | AM_plot
 ```
 
 The relationship is the same as in the plots above but, as we assumed an almost perfect correlation, there is not much spread around the regression line. Still, by definition of _how we constructed the data_, both marriage and divorce rate are *caused* (computed from) median age and, importantly, marriage rate is _never_ used to compute the divorce rate. What happens if we analyze this simulated data using the same model 5.1.3, will it be able to figure "marriage rate does not matter" again?
-```{r message=FALSE, warning=FALSE}
+```{r}
 sim_waffles <-
-  sim_waffles %>%
+  sim_waffles |>
   mutate(A = MedianAgeMarriage,
          M = Marriage,
          D = Divorce)
@@ -122,9 +132,9 @@ That last bit is the curse of multicollinearity, because if two variable have *t
 $$\beta_A^{true} = \beta_A - \beta_M = 0.27 - 1.25 = -0.98$$
 
 Hey, that is the slope that we used to construct divorce rate, so fitting does work! Moreover, we can see that there is very little uncertainty about $\beta_A^{true}$
-```{r message=FALSE, warning=FALSE}
+```{r}
 posterior_samples <- 
-  rethinking::extract.samples(sim_waffles_fit) %>%
+  rethinking::extract.samples(sim_waffles_fit) |>
   mutate(bA_true = bA - bM)
 
 ggplot(posterior_samples, aes(x=bA_true)) + 
@@ -145,9 +155,9 @@ By definition, $\epsilon$ is _pure noise_ and has zero predictive value with res
 ```{r}
 set.seed(1231455)
 sim_waffles <- tibble(MedianAgeMarriage = rnorm(N),
-                      Divorce = rnorm(N, MedianAgeMarriage, 0.1),
-                      Marriage = -rnorm(N, MedianAgeMarriage, 0.01),
-                      epsilon = rnorm(N))
+                      Divorce =  -MedianAgeMarriage + rnorm(N, 0, 0.1),
+                      Marriage = -MedianAgeMarriage + rnorm(N, 0, 0.01),
+                      epsilon = rnorm(N, 0, 1))
 
 ggplot(sim_waffles, aes(x=epsilon, y=Divorce)) + 
   geom_smooth(method="lm", formula=y~x) + 
@@ -169,7 +179,8 @@ simulate_waffles <- function(sigma_noise){
                                   Marriage = -rnorm(N, MedianAgeMarriage, sigma_noise))
   
   # fit data using OLS and pulling out two slope coefficients
-  lm(Divorce ~ Marriage + MedianAgeMarriage, data=sim_df) %>% 
+  # I am using Magritt pipe because modern pipe is incompatible with $
+  lm(Divorce ~ Marriage + MedianAgeMarriage, data=sim_df) %>%
     summary() %>%
     .$coefficients %>%
     data.frame() %>%
@@ -181,8 +192,8 @@ simulate_waffles <- function(sigma_noise){
 }
 
 simulated_noise <- 
-  tibble(epsilon =exp(seq(log(0.001), log(0.3), length.out = 100))) %>%
-  group_by(epsilon) %>%
+  tibble(epsilon =exp(seq(log(0.001), log(0.3), length.out = 100))) |>
+  group_by(epsilon) |>
   do(simulate_waffles(.$epsilon))
 
 ggplot(simulated_noise, aes(x=epsilon, y=Estimate)) + 
@@ -201,7 +212,9 @@ So, a bit of noise will fix everything and we can _know_ causal relationships be
 $$Marriage~rate~\rightarrow~Age~of~marriage~\rightarrow~Divorce~rate$$
 Now marriage rate causes age of marriage that, in turn, causes divorce rate. Again, let us use synthetic data, so that we can be sure what causes what. However, we will add a fair amount of noise to make it more like real data and avoid multicoliniarity.
 
-```{r out.width = "100%", fig.align = 'center'}
+```{r}
+#| out.width: "100%"
+#| fig.align: 'center'
 data("WaffleDivorce")
 set.seed(8973791)
 N <- nrow(WaffleDivorce)
@@ -234,9 +247,9 @@ MD_plot | AD_plot | AM_plot
 ```
 
 The plots look very similar to those that we had before, so let us run the model.
-```{r message=FALSE, warning=FALSE}
+```{r}
 sim_waffles <-
-  sim_waffles %>%
+  sim_waffles |>
   mutate(A = MedianAgeMarriage,
          M = Marriage,
          D = Divorce)

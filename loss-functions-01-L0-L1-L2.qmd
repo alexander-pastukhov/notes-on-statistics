@@ -1,4 +1,4 @@
-# Loss functions {#loss-functions}
+# Overview of Loss functions {#loss-functions-overview}
 
 The purpose of this comment is to give you an intuition about loss functions, mentioned in chapter 3. In particular, I want you to understand why different loss functions (L0, L1, and L2) correspond to different point-estimates (mode, median, and mean). Plus, I want you to understand that you can view a choice of a likelihood function, as in picking Gaussian in chapter 4, as being analogous to picking a loss function.
 

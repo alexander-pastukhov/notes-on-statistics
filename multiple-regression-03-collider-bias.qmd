@@ -1,10 +1,14 @@
-# The haunted DAG
+# Collider Bias: The Haunted DAG
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+#| echo: false
+#| message: false
+#| warning: false
+library(tidyverse)
+
 library(dagitty)
 library(patchwork)
 library(rethinking)
-library(tidyverse)
 ```
 
 These are notes on section **6.3.2 The haunted DAG** that demonstrates how collider bias can arise, if one of the variables is unobserved and we do not realize that the have a collider in our DAG. The DAG itself is below, I've only changed `Unobserved` into `Neighborhood`.

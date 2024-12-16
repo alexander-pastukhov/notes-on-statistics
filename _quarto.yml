@@ -1,0 +1,54 @@
+project:
+  type: book
+
+book:
+  title: "Notes on statistics"
+  author: "Alexander (Sasha) Pastukhov"
+  date: "9.12.2024"
+  chapters:
+    - index.qmd
+    - part: "Multiple regression"
+      chapters:
+      - multiple-regression-01-spurious-association.qmd
+      - multiple-regression-02-masked-relationship.qmd
+      - multiple-regression-03-collider-bias.qmd
+      - multiple-regression-04-dags.qmd
+    - part: "Loss functions"
+      chapters: 
+        - loss-functions-01-L0-L1-L2.qmd
+        - loss-functions-02-measurement-error.qmd
+        - loss-functions-03-asymmetric-loss-functions.qmd
+    - part: "Information criteria"
+      chapters:
+        - information-criteria.qmd
+    - part: "General topics"
+      chapters: 
+        - general-01-probability-mass-versus-density.qmd
+        - general-02-pooling-information-for-parameters.qmd
+        - general-03-measurement-error.qmd
+        - general-04-effective-degrees-of-freedom.qmd
+        - general-05-mediation-in-triangles.qmd
+    - part: "Frequentist statistics"
+      chapters:
+        - frequentist-01-vs-bayesian.qmd
+        - frequentist-02-flat-priors.qmd
+        - frequentist-03-bias-in-estimators.qmd
+        - frequentist-04-why-normality-is-critical-for-parametric-frequentist-stats.qmd
+    - part: "Advanced topics"
+      chapters: 
+        - advanced-01-mixtures.qmd
+        - advanced-02-instrumental-variables.qmd
+        - advanced-03-gam.qmd
+        - advanced-04-cholesky.qmd
+  # - references.qmd
+
+# bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+
+

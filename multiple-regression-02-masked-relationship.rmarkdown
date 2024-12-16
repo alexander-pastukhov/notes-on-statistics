@@ -1,0 +1,246 @@
+# Masked Relationship
+
+
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r}
+#| echo: false 
+library(tidyverse)
+
+library(dagitty)
+library(patchwork)
+library(rethinking)
+```
+
+
+
+
+
+
+These notes are on section 5.2 "Masked relationship" from chapter 5 "The Many Variables & The Spurious Waffles". This section introduces is a mirror twin of section 5.1 on [spurious associations](#spurious-association). The latter explores how each of two predictors can have a strong relationship with an outcome variable _if fitted individually_ but how only one of them retains that relationship when both predictors are used in multiple regression. Section 5.2 is concerned with the exact opposite. When we look at the association between each predictor variable (_neocortex percent_ and _log body mass_) and the richness of milk _individually_, we find nothing. However, when you use _both_ simultaneously via multiple regression, we find that both are strongly associated with the outcome variable. 
+
+The key to understanding this are figure 5.9 (particularly, the bottom counterfactual plots) and an explanation on page 151 that coefficients of regression model shows that "species that have high neocortex percent _for their body mass_ have higher milk energy" and "species with high body mass _for their neocortex percent_ have lower milk energy". In other words, if you take several species with very similar body mass, you expect those with higher percent of neocortex to have richer milk. Conversely, if you handpick several species with very similar neocortex percentage, you expect that the larger ones will have a less energetic milk. But because these two predictor variables are correlated, this relationship is easy to see only when you fix one of them. Figure 5.9 tries to show that but we can do better by (artificially) grouping the data looking at relationship between each predictor variable and the milk energy individually.
+
+Let us start by replicating top subplots in figure 5.9. Note that 1) I used frequentist linear model fit with flat priors via `geom_smooth()` and, therefore, 2) the stripes correspond to standard error rather than 89% credible interval. However, the two are close enough in this case for illustration purposes.
+
+
+
+
+
+
+```{r}
+data(milk)
+milk_df <- 
+  milk %>%
+  # standardize
+  mutate(K = standardize(kcal.per.g),
+         N = standardize(neocortex.perc),
+         M = standardize(log(mass))) %>%
+  
+  # keep only complete cases
+  na.omit()
+
+NK_plot <- 
+  ggplot(milk_df, aes(x = N, y=K)) + 
+  geom_point() + 
+  geom_smooth(method="lm", formula=y~x) + 
+  xlab("neocortex percent (std)") + 
+  ylab("kilocal per g (std)") + 
+  coord_equal()
+
+MK_plot <- 
+  ggplot(milk_df, aes(x = M, y=K)) + 
+  geom_point() + 
+  geom_smooth(method="lm", formula=y~x) + 
+  xlab("log body mass (std)") + 
+  ylab("kilocal per g (std)") + 
+  coord_equal()
+
+NK_plot | MK_plot
+```
+
+
+
+
+
+
+So, once again, we see that there is no clear relationship is evident if we consider neocortex percent while ignoring body mass of an animal and, vice versa, when we look only at the log body mass ignoring the cortex. Let  us reduce our state of ignorance by splitting individual species into three groups based on their similarity in neocortex percentage. Note that I have put no extra care into the grouping process apart from ensuring that all groups have roughly the same number of species. Also note that connecting lines have no specific meaning and I've added them only to make visual grouping of dots of the same color easier.
+
+
+
+
+
+```{r}
+milk_df <- 
+  milk_df %>%
+  # split data into three groups
+  mutate(`Mass group` = cut_number(M, 3), 
+         `Neocortex group` = cut_number(N, 3))
+
+NK_plot <- 
+  ggplot(milk_df, aes(x = N, y=K, color=`Neocortex group`)) + 
+  geom_point() +
+  geom_line() +
+  xlab("neocortex percent (std)") + 
+  ylab("kilocal per g (std)") +
+  theme(legend.position="bottom") +
+  guides(col = guide_legend(nrow = 3, byrow = TRUE)) +
+  coord_equal()
+
+MK_plot <- 
+  ggplot(milk_df, aes(x = M, y=K, color=`Neocortex group`)) + 
+  geom_point() + 
+  geom_line() +
+  xlab("log body mass (std)") + 
+  ylab("kilocal per g (std)") + 
+  theme(legend.position="bottom") +
+  guides(col = guide_legend(nrow = 3, byrow = TRUE)) +
+  coord_equal()
+
+NK_plot | MK_plot
+```
+
+
+
+
+
+
+Once we group species either by their their neocortex percent, you can immediately see the pattern. The pattern on the left is trivial as it merely shows our grouping based on low (red), medium (green), and high (blue) percentage of neocortex. However, when we look at the right plot, we see how species with similar neocortex percentage cluster nicely together and this way you can see a nice negative correlation between log body mass and milk energy _within each group_. This is because the same _absolute_ log body mass corresponds to different _relative_ log body mass with each group. I.e., a vertical slice through body mass leads to different values of milk energy _because_ these values come from different neocortex percent groups. To summarize, we can see that log body mass is informative _only_ if we know neocortex percent of an animal.
+
+Let us try to visualize what multiple regression is doing. Keep in mind that this will only be a rough approximation because we will use just three means (one for each neocortex percent group), whereas our model computes an appropriate mean for every single specie. We will emulate the model check of whether "species that have _particular_ neocortex percent _for their body mass_ have lower milk energy" by centering each group, i.e., subtracting each groups' mean from body mass of each specie from that group. In other words, we align each group so that average bogy mass species _for each group_ are in the center, the larger species _within each group_ are on the right and the smaller species _within each group_ are on the left. This way we remove a positive correlation between neocortex percent and body mass and, therefore, can see the effect of the body mass on the milk energy _alone_. And, even in this approximate way the dependence in very clear.
+
+
+
+
+
+```{r}
+milk_df <- 
+  milk_df %>%
+  group_by(`Neocortex group`) %>%
+  mutate(cM = M - mean(M))
+
+ggplot(milk_df, aes(x = cM, y=K)) + 
+  geom_smooth(method="lm", formula=y~x, color="black") +
+  geom_point(aes(color=`Neocortex group`)) + 
+  xlab("log body mass - group mean log body mass (std)") + 
+  ylab("kilocal per g (std)") + 
+  theme(legend.position="right") +
+  guides(col = guide_legend(nrow = 3, byrow = TRUE)) +
+  xlim(-2, 2) +
+  coord_equal()
+```
+
+
+
+
+
+
+The plot above expresses the same idea as a counterfactual right bottom plot in figure 5.9. Where, the question was "what is the effect of log body mass for _all_ species with an average neocortex percent", so single very specific group of animals. Our plot merely extended that idea to three groups. To appreciate this the link, let us fit the model and plot same counterfactuals for each group that we identified.
+
+
+
+
+
+
+```{r}
+m5.7 <- quap(
+  alist(
+    K ~ dnorm( mu , sigma ) ,
+    mu <- a + bN*N + bM*M ,
+    a ~ dnorm( 0 , 0.2 ) ,
+    bN ~ dnorm( 0 , 0.5 ) ,
+    bM ~ dnorm( 0 , 0.5 ) ,
+    sigma ~ dexp( 1 )
+  ),
+  data=milk_df)
+
+
+# function to compute counterfactuals
+compute_counterfactual <- function(quap_fit, neocortex, logmass){
+  mu <- link(quap_fit, data=data.frame(N=neocortex, M=logmass))
+  mu_PI <- apply(mu,2,PI)
+  tibble(M = logmass,
+         N = neocortex,
+         K = apply(mu,2,mean),
+         KLower = mu_PI[1, ],
+         KUpper = mu_PI[2, ])
+}
+
+
+
+# defining x-ticks as all milk values at regular intervals
+x_seq <- seq( from=min(milk_df$M)-0.15 , to=max(milk_df$M)+0.15 , length.out=30)
+
+# mean neocortex percent for each neocortex percent group
+neocortex_counterfactuals_df <-
+  # compute average neocortex for each group
+  milk_df %>%
+  group_by(`Neocortex group`) %>%
+  summarise(MeanPercent = mean(N), .groups="keep") %>%
+  
+  # compute counterfactual predictions for each group
+  group_modify(~compute_counterfactual(m5.7, neocortex=.x$MeanPercent, logmass=x_seq)) %>%
+  ungroup()
+  
+# plotting data
+ggplot(milk_df, aes(x = M, y=K, color=`Neocortex group`)) + 
+  geom_ribbon(data=neocortex_counterfactuals_df, aes(ymin=KLower, ymax=KUpper, fill=`Neocortex group`), color=NA, alpha=0.25) +
+  geom_line(data=neocortex_counterfactuals_df) +
+  geom_point(shape=21, fill="white", size=3) +
+  xlab("log body mass (std)") + 
+  ylab("kilocal per g (std)") + 
+  xlim(-2.5, 2.5) +
+  theme(legend.position="right") +
+  guides(col = guide_legend(nrow = 3, byrow = TRUE)) +
+  coord_equal()
+```
+
+
+
+
+
+
+
+And we can do this the other way around grouping species by their log body mass.
+
+
+
+
+
+```{r}
+logmass_counterfactuals_df <-
+  milk_df %>%
+  group_by(`Mass group`) %>%
+  summarise(MeanMass = mean(M), .groups="keep") %>%
+  
+  # compute counterfactual predictions for each group
+  group_modify(~compute_counterfactual(m5.7, neocortex=x_seq, logmass=.x$MeanMass)) %>%
+  ungroup()
+  
+# plotting data
+ggplot(milk_df, aes(x = N, y=K, color=`Mass group`)) + 
+  geom_ribbon(data=logmass_counterfactuals_df, aes(ymin=KLower, ymax=KUpper, fill=`Mass group`), color=NA, alpha=0.25) +
+  geom_line(data=logmass_counterfactuals_df) +
+  geom_point(shape=21, fill="white", size=3) +
+  xlab("neocortex percent (std)") + 
+  ylab("kilocal per g (std)") + 
+  xlim(-2.5, 2.5) +
+  theme(legend.position="right") +
+  guides(col = guide_legend(nrow = 3, byrow = TRUE)) +
+  coord_equal()
+```
+
+
+
+
+
+
+## A warning message
+Do these two examples (spriouos associations and masked relationship) mean that putting _all_ variables into a model is always a good idea because "magic"? Unfortunately, no. These examples were handpicked by McElreath to show the power of multiple regression. He can also handpick an example when mindlessly throwing variables into a model would lead to a disaster, a.k.a. [Causal Salad](https://elevanth.org/blog/2021/06/15/regression-fire-and-dangerous-things-1-3/) (watch his [**three hour talk**](https://youtu.be/KNPYUVmY3NM) on that on YouTube). The take home message is same as before: Models are golems, they can help you understand the process you are investigating but they won't understand it for you! It is your job to think about causal relationship using statistical inferences merely as an aid, not as an oracle.
+

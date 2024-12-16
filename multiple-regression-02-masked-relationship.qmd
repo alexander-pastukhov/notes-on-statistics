@@ -1,10 +1,16 @@
-# Multiple regression - Masked relationship
+# Masked Relationship
 
-```{r, include=FALSE}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r}
+#| echo: false 
+library(tidyverse)
+
 library(dagitty)
 library(patchwork)
 library(rethinking)
-library(tidyverse)
 ```
 
 These notes are on section 5.2 "Masked relationship" from chapter 5 "The Many Variables & The Spurious Waffles". This section introduces is a mirror twin of section 5.1 on [spurious associations](#spurious-association). The latter explores how each of two predictors can have a strong relationship with an outcome variable _if fitted individually_ but how only one of them retains that relationship when both predictors are used in multiple regression. Section 5.2 is concerned with the exact opposite. When we look at the association between each predictor variable (_neocortex percent_ and _log body mass_) and the richness of milk _individually_, we find nothing. However, when you use _both_ simultaneously via multiple regression, we find that both are strongly associated with the outcome variable. 

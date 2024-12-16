@@ -1,0 +1,55 @@
+# Incorporating measurement error: a rubber band metaphor
+
+One way to think about [loss functions](#loss-functions) is as if they are rubber bands^[As Hook's law is a first-order linear approximation, this metaphor works fully only if we assume L1 distance, i.e., that error increases / probability decreases linearly with distance. Still you could imagine a better rubber band whose force will be proportional to the squared (L2) distance, as for the normal likelihood.] (black vertical segments) connecting observations (white dots) with its corresponding mean (red dots) on the regression line. Each band tries to pull the mean and, therefore, the regression line towards the observation and the final estimate is simply a minimal energy state: The total sum of pulling forces is minimal, so that any movement of the regression line would decrease the stretch for sum dots but will produce way more pulling for other dots, increasing the overall force. This is the "usual" way that we performed the regression analysis assuming that _same_ rubber bands connect every dot with the regression line.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+set.seed(2853)
+df <- 
+  tibble(x = 1:10) %>%
+  mutate(y = rnorm(n(), x, sd=4))
+
+lmfit <- lm(y~x, data=df)
+
+df$ypred <- predict(lmfit)
+
+ggplot(df, aes(x = x, y = y)) + 
+  geom_segment(aes(xend=x, yend=ypred)) + 
+  geom_smooth(method="lm", formula = y~x, se=FALSE, color="black") +
+  geom_point(shape=21, fill="white", size=2) +
+  geom_point(aes(y=ypred), shape=21, fill="red", size=2)
+```
+Within this metaphor, measurement error is incorporated as additional inferred value (blue dots, true value of a measurement) that is connected to the observed value via a _custom_ rubber band (colored) whose strength depends on the measurement error. I.e., large measurement errors make for a very weak stretchable bands, whereas high certainty leads to very small and strong bands. Note the connectivity pattern: observed value --- (via custom rubber band) --- (estimated) true value --- (via common rubber band) --- mean on the regression line. Here, dots with smaller measurement error will pull the regression line much stronger towards the observed value, whereas dots with large error will tolerate having regression line even very far away.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+set.seed(2853)
+
+df <- 
+  tibble(x = 1:10) %>%
+  mutate(y = rnorm(n(), x, sd=4),
+         `Measurement error` = abs(rnorm(n(), mean = 0, sd=2)))
+
+lmfit <- lm(y~x, data=df)
+
+df <- df %>%
+  mutate(ypred = predict(lmfit),
+         ytrue = y + sign(ypred-y) * `Measurement error`)
+
+lmfit <- lm(ytrue~x, data=df)
+df$ypred <- predict(lmfit)
+
+
+ggplot(df, aes(x = x, y = y)) + 
+  geom_segment(aes(xend=x, yend=ytrue, color=`Measurement error`)) + 
+  geom_segment(aes(xend=x, y=ytrue, yend=ypred)) + 
+  geom_smooth(aes(y=ytrue),  method="lm", formula = y~x, se=FALSE, color="black") +
+  geom_point(shape=21, fill="white", size=2) +
+  geom_point(aes(y=ytrue), shape=21, fill="blue", size=2) +
+  geom_point(aes(y=ypred), shape=21, fill="red", size=2)
+```
+
+Note that in some cases, information about measurement error is incorporated directly. For example, in binomial likelihood the number of successes and the total number of observations determine not only the proportion of success but also confidence about that value.
+
+
