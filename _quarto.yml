@@ -5,6 +5,7 @@ book:
   title: "Notes on statistics"
   author: "Alexander (Sasha) Pastukhov"
   date: "9.12.2024"
+  cover: cover.jpeg
   chapters:
     - index.qmd
     - part: "Multiple regression"
@@ -47,8 +48,9 @@ book:
 format:
   html:
     theme: cosmo
-  pdf:
-    documentclass: scrreprt
-
+  # pdf:
+  #   documentclass: scrreprt
+  epub:
+      cover-image: cover.jpeg
 
 
