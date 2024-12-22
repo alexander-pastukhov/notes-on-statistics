@@ -35,7 +35,7 @@ book:
         - frequentist-02-flat-priors.qmd
         - frequentist-03-bias-in-estimators.qmd
         - frequentist-04-why-normality-is-critical-for-parametric-frequentist-stats.qmd
-          frequentist-05-deriving-tstats.qmd
+        - frequentist-05-deriving-tstats.qmd
     - part: "Advanced topics"
       chapters: 
         - advanced-01-mixtures.qmd
