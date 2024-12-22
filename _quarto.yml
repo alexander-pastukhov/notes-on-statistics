@@ -5,7 +5,7 @@ book:
   title: "Notes on statistics"
   author: "Alexander (Sasha) Pastukhov"
   date: "9.12.2024"
-  cover: cover.jpeg
+  cover-image: cover.jpeg
   chapters:
     - index.qmd
     - part: "Multiple regression"
@@ -35,6 +35,7 @@ book:
         - frequentist-02-flat-priors.qmd
         - frequentist-03-bias-in-estimators.qmd
         - frequentist-04-why-normality-is-critical-for-parametric-frequentist-stats.qmd
+          frequentist-05-deriving-tstats.qmd
     - part: "Advanced topics"
       chapters: 
         - advanced-01-mixtures.qmd
@@ -54,3 +55,5 @@ format:
       cover-image: cover.jpeg
 
 
+execute:
+  freeze: auto
