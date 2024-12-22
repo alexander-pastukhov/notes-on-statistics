@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>21&nbsp; Intuition for how Cholesky decomposition makes possible to generate correlated random variables – Notes on statistics</title>
+<title>22&nbsp; Intuition for how Cholesky decomposition makes possible to generate correlated random variables – Notes on statistics</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -143,7 +143,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-04-cholesky.html"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-04-cholesky.html"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -329,6 +329,12 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Why normality is critical for parametric frequentist stats</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./frequentist-05-deriving-tstats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Deriving the formula for t-statistics</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -343,25 +349,25 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-01-mixtures.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Mixtures</span></span></a>
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Mixtures</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-02-instrumental-variables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-03-gam.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></span></a>
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-04-cholesky.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></span></a>
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></span></a>
   </div>
 </li>
       </ul>
@@ -376,17 +382,17 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#a-verbose-and-visual-proof" id="toc-a-verbose-and-visual-proof" class="nav-link active" data-scroll-target="#a-verbose-and-visual-proof"><span class="header-section-number">21.1</span> A verbose and visual proof</a></li>
-  <li><a href="#purely-algebraic-proof" id="toc-purely-algebraic-proof" class="nav-link" data-scroll-target="#purely-algebraic-proof"><span class="header-section-number">21.2</span> Purely algebraic proof</a></li>
+  <li><a href="#a-verbose-and-visual-proof" id="toc-a-verbose-and-visual-proof" class="nav-link active" data-scroll-target="#a-verbose-and-visual-proof"><span class="header-section-number">22.1</span> A verbose and visual proof</a></li>
+  <li><a href="#purely-algebraic-proof" id="toc-purely-algebraic-proof" class="nav-link" data-scroll-target="#purely-algebraic-proof"><span class="header-section-number">22.2</span> Purely algebraic proof</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-04-cholesky.html"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-04-cholesky.html"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></h1>
+<h1 class="title"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></h1>
 </div>
 
 
@@ -404,8 +410,8 @@ window.Quarto = {
 
 
 <p>In chapter 14 of the “Statistical Rethinking”, a Cholesky decomposition of a partial correlations matrix is used to generate <em>correlated</em> random variables with matching partial correlations. For uninitiated the whole procedure looks magic but “It would be magic, except that it is just algebra.” The purpose of these notes is to provide an intuition of how this works. I will present two explanations: A purely algebraic one and a more visual one. Unfortunately, both of them require knowledge of essentials of linear algebra. I would recommend the entire <a href="https://youtu.be/fNk_zzaMoSs">Essense of linear algebra</a> series by Grant Sanderson, a.k.a. <a href="https://www.3blue1brown.com/">3Blue1Brown</a> but first three videos are a must at least for the visual proof. These are bite-sized 10-15 minute videos that deep you a deep intuition about a single topic, so you can always watch them when you have a break.</p>
-<section id="a-verbose-and-visual-proof" class="level2" data-number="21.1">
-<h2 data-number="21.1" class="anchored" data-anchor-id="a-verbose-and-visual-proof"><span class="header-section-number">21.1</span> A verbose and visual proof</h2>
+<section id="a-verbose-and-visual-proof" class="level2" data-number="22.1">
+<h2 data-number="22.1" class="anchored" data-anchor-id="a-verbose-and-visual-proof"><span class="header-section-number">22.1</span> A verbose and visual proof</h2>
 <p>For me the critical part was to understand what exactly does the Cholesky decomposition perform, i.e., what information the matrix <span class="math inline">\(L\)</span> holds and what kind of linear transformation it represents. First, let us think what a correlations matrix is: <span class="math display">\[\Sigma = \begin{vmatrix} corr(x, x) &amp; corr(x, y) \\ corr (y, x) &amp; corr(y, y) \end{vmatrix} \]</span></p>
 <p>Now we need to recall some linear algebra, namely that a dot product between to vectors is <span class="math inline">\(x \cdot y = |x| |y| cos(\theta_{xy})\)</span>, where <span class="math inline">\(|x|\)</span> and <span class="math inline">\(|y|\)</span> are length of vectors <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, and <span class="math inline">\(\theta_{xy}\)</span> is an angle between them. Also note that <span class="math inline">\(cos(\theta)\)</span> corresponds to Pearson’s correlation <span class="math inline">\(\rho\)</span>. If <span class="math inline">\(x\)</span> and <span class="math inline">\(v\)</span> are z-scores with mean of zero and standard deviation of one then their length is <span class="math inline">\(1\)</span> then their dot product computes Pearson’s correlation directly: <span class="math display">\[x \cdot y = |x| |y| cos(\theta_{xy}) = 1 \times 1 \times cos(\theta_{xy}) = cos(\theta_{xy})\]</span></p>
 <p>This means that we can rewrite our correlation matrix as a matrix of cosines of angles between individual vectors (variables): <span class="math display">\[\Sigma = \begin{vmatrix} cos(\theta_{xx}) &amp; cos(\theta_{xy})) \\ cos(\theta_{yx}) &amp; cos(\theta_{yy})) \end{vmatrix} \]</span></p>
@@ -502,8 +508,8 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="purely-algebraic-proof" class="level2" data-number="21.2">
-<h2 data-number="21.2" class="anchored" data-anchor-id="purely-algebraic-proof"><span class="header-section-number">21.2</span> Purely algebraic proof</h2>
+<section id="purely-algebraic-proof" class="level2" data-number="22.2">
+<h2 data-number="22.2" class="anchored" data-anchor-id="purely-algebraic-proof"><span class="header-section-number">22.2</span> Purely algebraic proof</h2>
 <p>Here is an alternative purely algebraic take on it. Note that this is a very brief description, for further details please refer to an excellent <a href="https://mlisi.xyz/post/simulating-correlated-variables-with-the-cholesky-factorization">post</a> by <a href="https://mlisi.xyz/">Matteo Lisi</a>.</p>
 <p>Given that we have a correlations matrix <span class="math inline">\(\Sigma\)</span>, we can use <a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">Cholesky decomposition</a>: <span class="math display">\[\Sigma = LL^T\]</span> Next, we can generate a matrix of <em>uncorrelated</em> random numbers <span class="math inline">\(Z\)</span> (e.g., z-scores from a standard normal distribution). Assuming that samples are uncorrelated then the covariance matrix is <span class="math inline">\(\mathbb{E}(ZZ^T) = I\)</span> (an identity matrix with <span class="math inline">\(1\)</span> on the diagonal and <span class="math inline">\(0\)</span> everywhere else). For the proof you need to remember that:</p>
 <ol type="1">
@@ -946,7 +952,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./advanced-03-gam.html" class="pagination-link" aria-label="Generalized Additive Models as continuous random effects">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

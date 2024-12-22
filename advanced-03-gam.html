@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>20&nbsp; Generalized Additive Models as continuous random effects – Notes on statistics</title>
+<title>21&nbsp; Generalized Additive Models as continuous random effects – Notes on statistics</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -81,7 +81,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-03-gam.html"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-03-gam.html"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -267,6 +267,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Why normality is critical for parametric frequentist stats</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./frequentist-05-deriving-tstats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Deriving the formula for t-statistics</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -281,25 +287,25 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-01-mixtures.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Mixtures</span></span></a>
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Mixtures</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-02-instrumental-variables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-03-gam.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></span></a>
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-04-cholesky.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></span></a>
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></span></a>
   </div>
 </li>
       </ul>
@@ -314,19 +320,19 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#generalized-additive-models-an-über-brief-introduction" id="toc-generalized-additive-models-an-über-brief-introduction" class="nav-link active" data-scroll-target="#generalized-additive-models-an-über-brief-introduction"><span class="header-section-number">20.1</span> Generalized Additive Models: An Über-brief Introduction</a></li>
-  <li><a href="#what-are-gams-good-for" id="toc-what-are-gams-good-for" class="nav-link" data-scroll-target="#what-are-gams-good-for"><span class="header-section-number">20.2</span> What are GAMs good for?</a></li>
-  <li><a href="#covariates-random-factors" id="toc-covariates-random-factors" class="nav-link" data-scroll-target="#covariates-random-factors"><span class="header-section-number">20.3</span> Covariates / random factors</a></li>
-  <li><a href="#gams-as-continuous-random-factors" id="toc-gams-as-continuous-random-factors" class="nav-link" data-scroll-target="#gams-as-continuous-random-factors"><span class="header-section-number">20.4</span> GAMs as continuous random factors</a></li>
+  <li><a href="#generalized-additive-models-an-über-brief-introduction" id="toc-generalized-additive-models-an-über-brief-introduction" class="nav-link active" data-scroll-target="#generalized-additive-models-an-über-brief-introduction"><span class="header-section-number">21.1</span> Generalized Additive Models: An Über-brief Introduction</a></li>
+  <li><a href="#what-are-gams-good-for" id="toc-what-are-gams-good-for" class="nav-link" data-scroll-target="#what-are-gams-good-for"><span class="header-section-number">21.2</span> What are GAMs good for?</a></li>
+  <li><a href="#covariates-random-factors" id="toc-covariates-random-factors" class="nav-link" data-scroll-target="#covariates-random-factors"><span class="header-section-number">21.3</span> Covariates / random factors</a></li>
+  <li><a href="#gams-as-continuous-random-factors" id="toc-gams-as-continuous-random-factors" class="nav-link" data-scroll-target="#gams-as-continuous-random-factors"><span class="header-section-number">21.4</span> GAMs as continuous random factors</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-03-gam.html"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-03-gam.html"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></h1>
+<h1 class="title"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></h1>
 </div>
 
 
@@ -344,8 +350,8 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>The purpose of this note is to give an intuition about what generalized additive models (GAMs) are and, more importantly, when can they be handy for <em>causal</em> inferences. Thus, I will leave most mathematical details out<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
-<section id="generalized-additive-models-an-über-brief-introduction" class="level2" data-number="20.1">
-<h2 data-number="20.1" class="anchored" data-anchor-id="generalized-additive-models-an-über-brief-introduction"><span class="header-section-number">20.1</span> Generalized Additive Models: An Über-brief Introduction</h2>
+<section id="generalized-additive-models-an-über-brief-introduction" class="level2" data-number="21.1">
+<h2 data-number="21.1" class="anchored" data-anchor-id="generalized-additive-models-an-über-brief-introduction"><span class="header-section-number">21.1</span> Generalized Additive Models: An Über-brief Introduction</h2>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -368,17 +374,17 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </section>
-<section id="what-are-gams-good-for" class="level2" data-number="20.2">
-<h2 data-number="20.2" class="anchored" data-anchor-id="what-are-gams-good-for"><span class="header-section-number">20.2</span> What are GAMs good for?</h2>
+<section id="what-are-gams-good-for" class="level2" data-number="21.2">
+<h2 data-number="21.2" class="anchored" data-anchor-id="what-are-gams-good-for"><span class="header-section-number">21.2</span> What are GAMs good for?</h2>
 <p>As mentioned above, GAMs are just smoothers. They approximate a smooth relationship in the data without any knowledge or assumptions about a generative process behind it. As such they have at least two clear usage cases: an exploratory data analysis and generating predictions. In the former case, the shape of the smoothed line might hint at the underlying mechanisms and facilitate development of a causal model. In the latter case, as long as we stick to interpolation, we can use smoothed line to predict unobserved values for future use.</p>
 <p>But what about causal inference? Can GAMs be useful for in this case? Yes, they can play a useful and obvious role. But to make this “obvious” obvious, we must take a detour and talk about random factors.</p>
 </section>
-<section id="covariates-random-factors" class="level2" data-number="20.3">
-<h2 data-number="20.3" class="anchored" data-anchor-id="covariates-random-factors"><span class="header-section-number">20.3</span> Covariates / random factors</h2>
+<section id="covariates-random-factors" class="level2" data-number="21.3">
+<h2 data-number="21.3" class="anchored" data-anchor-id="covariates-random-factors"><span class="header-section-number">21.3</span> Covariates / random factors</h2>
 <p>Imagine that we have data on ice-cream consumption and, among other things, we measured respondents’ eye color. What you find is that people with different eye color tend to consume different amount of ice-cream (on average). Why? It is a made-up example, so I do not know. But it could be genetic, same group of genes being responsible for eye color and ice-cream craving. Or it could be something else. Point is, we do not have a good (or any) causal model of a generative process that would link these two variables. Because of that we are not really interested in this link but we also cannot ignore it. Any systematic relationship that we ignore will we leave unexplained variance that, it turn, will make it harder for us to see a causal effect for predictors that we are interested in. What do we do? We include eye color either as a covariate (fixed effect) or a random effect. For frequentist models, the difference is whether intercept for each group are estimated independently (the former, flat priors, no shrinkage) or by pooling information across groups (the latter, produces shrinkage). For Bayesian models, the difference is between fixed (covariates) and adaptative (random effect) priors. Still, the idea is to stress that we have no idea why this particular variable is correlated with the outcome and that we have no causal generative model.</p>
 </section>
-<section id="gams-as-continuous-random-factors" class="level2" data-number="20.4">
-<h2 data-number="20.4" class="anchored" data-anchor-id="gams-as-continuous-random-factors"><span class="header-section-number">20.4</span> GAMs as continuous random factors</h2>
+<section id="gams-as-continuous-random-factors" class="level2" data-number="21.4">
+<h2 data-number="21.4" class="anchored" data-anchor-id="gams-as-continuous-random-factors"><span class="header-section-number">21.4</span> GAMs as continuous random factors</h2>
 <p>Let us get back to ice-cream consumption as a function of age. It is easy to that we are in the same situation as with eye color: We have no idea about the generative process but the dependence is strong and should not be ignored. Thus, we must include age in the bigger model, even if we do not care <em>how</em> the age causes ice-cream consumption. But how can we do it? The relationship is not linear or even monotonic, so we cannot use age as a linear covariate. And, unlike categorical data for eye color, the data is continuous and we do not have well-defined few levels to estimate values for (unless we introduce some artificial discrete levels). Plus, the latter approach would actually <em>ignore</em> the dependence, because will ignore the fact that nearby levels should be more similar than more distance ones. So, what do we do?</p>
 <p>It is GAMs to the rescue! By pooling information from nearby data samples, GAMs produce a smooth estimate for each age that can be used in the model. The smooth estimate is, effectively, a continuous random effect! Thus, you should use GAMs whenever you have a <em>continuous</em> variable that is correlated with an outcome, you have no idea about the underlying causal link but the relationship is not simple and monotonic enough to use conventional methods.</p>
 
@@ -812,12 +818,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./advanced-02-instrumental-variables.html" class="pagination-link" aria-label="Instrumental Variables">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./advanced-04-cholesky.html" class="pagination-link" aria-label="Intuition for how Cholesky decomposition makes possible to generate correlated random variables">
-        <span class="nav-page-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>18&nbsp; Mixtures – Notes on statistics</title>
+<title>19&nbsp; Mixtures – Notes on statistics</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,7 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./advanced-02-instrumental-variables.html" rel="next">
-<link href="./frequentist-04-why-normality-is-critical-for-parametric-frequentist-stats.html" rel="prev">
+<link href="./frequentist-05-deriving-tstats.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -144,7 +144,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Mixtures</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Mixtures</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -330,6 +330,12 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Why normality is critical for parametric frequentist stats</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./frequentist-05-deriving-tstats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Deriving the formula for t-statistics</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -344,25 +350,25 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-01-mixtures.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Mixtures</span></span></a>
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Mixtures</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-02-instrumental-variables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-03-gam.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></span></a>
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Generalized Additive Models as continuous random effects</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-04-cholesky.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></span></a>
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Intuition for how Cholesky decomposition makes possible to generate correlated random variables</span></span></a>
   </div>
 </li>
       </ul>
@@ -377,18 +383,18 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#beta-binomial" id="toc-beta-binomial" class="nav-link active" data-scroll-target="#beta-binomial"><span class="header-section-number">18.1</span> Beta Binomial</a></li>
-  <li><a href="#negative-binomial-a.k.a.-gamma-poisson" id="toc-negative-binomial-a.k.a.-gamma-poisson" class="nav-link" data-scroll-target="#negative-binomial-a.k.a.-gamma-poisson"><span class="header-section-number">18.2</span> Negative binomial, a.k.a. Gamma Poisson</a></li>
-  <li><a href="#ordered-categorical" id="toc-ordered-categorical" class="nav-link" data-scroll-target="#ordered-categorical"><span class="header-section-number">18.3</span> Ordered categorical</a></li>
+  <li><a href="#beta-binomial" id="toc-beta-binomial" class="nav-link active" data-scroll-target="#beta-binomial"><span class="header-section-number">19.1</span> Beta Binomial</a></li>
+  <li><a href="#negative-binomial-a.k.a.-gamma-poisson" id="toc-negative-binomial-a.k.a.-gamma-poisson" class="nav-link" data-scroll-target="#negative-binomial-a.k.a.-gamma-poisson"><span class="header-section-number">19.2</span> Negative binomial, a.k.a. Gamma Poisson</a></li>
+  <li><a href="#ordered-categorical" id="toc-ordered-categorical" class="nav-link" data-scroll-target="#ordered-categorical"><span class="header-section-number">19.3</span> Ordered categorical</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Mixtures</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Mixtures</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Mixtures</span></h1>
+<h1 class="title"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Mixtures</span></h1>
 </div>
 
 
@@ -405,8 +411,8 @@ window.Quarto = {
 </header>
 
 
-<section id="beta-binomial" class="level2" data-number="18.1">
-<h2 data-number="18.1" class="anchored" data-anchor-id="beta-binomial"><span class="header-section-number">18.1</span> Beta Binomial</h2>
+<section id="beta-binomial" class="level2" data-number="19.1">
+<h2 data-number="19.1" class="anchored" data-anchor-id="beta-binomial"><span class="header-section-number">19.1</span> Beta Binomial</h2>
 <p>Beta binomial is defined as a product of binomial and beta distributions. <span class="math display">\[BetaBinomial(k|N, p, \theta) = Binomial(k|N,p) \cdot Beta(p|\beta_1, \beta_2),\]</span> where <span class="math inline">\(k\)</span> is number of successes (e.g., “heads” in a coin toss), <span class="math inline">\(N\)</span> is total number of trials/draws, and <span class="math inline">\(p\)</span> is the probability of success), and <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span> determine the shape of the beta distribution. The book uses reparametrized version of the beta distribution, sometimes called <em>beta proportion</em>: <span class="math display">\[BetaBinomial(k|N, p, \theta) = Binomial(k|N,p) \cdot Beta(p|p, \theta),\]</span> where <span class="math inline">\(\theta\)</span> is precision parameter. <span class="math inline">\(p\)</span> and <span class="math inline">\(\theta\)</span> can be computed from <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span> as <span class="math display">\[
 p = \frac{\beta_1}{\beta_1 + \beta_2}\\
 \theta = \beta_1 + \beta_2
@@ -441,8 +447,8 @@ dplyr 1.1.0.
 </div>
 </div>
 </section>
-<section id="negative-binomial-a.k.a.-gamma-poisson" class="level2" data-number="18.2">
-<h2 data-number="18.2" class="anchored" data-anchor-id="negative-binomial-a.k.a.-gamma-poisson"><span class="header-section-number">18.2</span> Negative binomial, a.k.a. Gamma Poisson</h2>
+<section id="negative-binomial-a.k.a.-gamma-poisson" class="level2" data-number="19.2">
+<h2 data-number="19.2" class="anchored" data-anchor-id="negative-binomial-a.k.a.-gamma-poisson"><span class="header-section-number">19.2</span> Negative binomial, a.k.a. Gamma Poisson</h2>
 <p>The idea is the same: We do not have enough information to compute the rate of events, so instead, we compute the mean of the Gamma distribution rates come from and let data determine its variance (scale). Again, in practical terms this means that for the smallest scale our uncertainty about the rate is minimal and distribution matches the Poisson processes with a fixed rate. Any increase in uncertainty (larger values for scale parameter), mean broader distribution that is capable to account for more extreme values.</p>
 <div class="cell">
 <div class="cell-output cell-output-stderr">
@@ -468,8 +474,8 @@ dplyr 1.1.0.
 </div>
 </div>
 </section>
-<section id="ordered-categorical" class="level2" data-number="18.3">
-<h2 data-number="18.3" class="anchored" data-anchor-id="ordered-categorical"><span class="header-section-number">18.3</span> Ordered categorical</h2>
+<section id="ordered-categorical" class="level2" data-number="19.3">
+<h2 data-number="19.3" class="anchored" data-anchor-id="ordered-categorical"><span class="header-section-number">19.3</span> Ordered categorical</h2>
 <p>From log odds to logit link. <span class="math display">\[
 log(\frac{Pr(y_i \leq k)}{1 - Pr(y_i \leq k)}) = \alpha_k \\
 \frac{Pr(y_i \leq k)}{1 - Pr(y_i \leq k)} = e^{\alpha_k} \\
@@ -964,13 +970,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./frequentist-04-why-normality-is-critical-for-parametric-frequentist-stats.html" class="pagination-link" aria-label="Why normality is critical for parametric frequentist stats">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Why normality is critical for parametric frequentist stats</span></span>
+      <a href="./frequentist-05-deriving-tstats.html" class="pagination-link" aria-label="Deriving the formula for t-statistics">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Deriving the formula for t-statistics</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./advanced-02-instrumental-variables.html" class="pagination-link" aria-label="Instrumental Variables">
-        <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
