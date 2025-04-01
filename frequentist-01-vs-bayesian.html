@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>14&nbsp; Bayesian vs.&nbsp;fequentist statisics – Notes on statistics</title>
+<title>13&nbsp; Bayesian vs.&nbsp;fequentist statisics – Notes on statistics</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./frequentist-02-flat-priors.html" rel="next">
-<link href="./general-05-mediation-in-triangles.html" rel="prev">
+<link href="./general-04-effective-degrees-of-freedom.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -110,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./frequentist-01-vs-bayesian.html">Frequentist statistics</a></li><li class="breadcrumb-item"><a href="./frequentist-01-vs-bayesian.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian vs.&nbsp;fequentist statisics</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./frequentist-01-vs-bayesian.html">Frequentist statistics</a></li><li class="breadcrumb-item"><a href="./frequentist-01-vs-bayesian.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian vs.&nbsp;fequentist statisics</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -255,12 +255,6 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Effective degrees of freedom / number of parameters</span></span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./general-05-mediation-in-triangles.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">general-05-mediation-in-triangles.html</span></span></a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -275,31 +269,31 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./frequentist-01-vs-bayesian.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian vs.&nbsp;fequentist statisics</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian vs.&nbsp;fequentist statisics</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./frequentist-02-flat-priors.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Flat priors: the strings attached</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Flat priors: the strings attached</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./frequentist-03-bias-in-estimators.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Unbiased mean versus biased variance in plain English</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Unbiased mean versus biased variance in plain English</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./frequentist-04-why-normality-is-critical-for-parametric-frequentist-stats.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Why normality is critical for parametric frequentist stats</span></span></a>
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Why normality is critical for parametric frequentist stats</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./frequentist-05-deriving-tstats.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Deriving the formula for t-statistics</span></span></a>
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Deriving the formula for t-statistics</span></span></a>
   </div>
 </li>
       </ul>
@@ -316,7 +310,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./advanced-01-mixtures.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Mixtures</span></span></a>
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Mixtures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./advanced-01-ordered-categorical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Ordered Categorical Data, i.e., Likert-scales</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -349,24 +349,24 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#choice-of-likelihood-both" id="toc-choice-of-likelihood-both" class="nav-link active" data-scroll-target="#choice-of-likelihood-both"><span class="header-section-number">14.1</span> Choice of likelihood (both)</a></li>
-  <li><a href="#linear-model-both" id="toc-linear-model-both" class="nav-link" data-scroll-target="#linear-model-both"><span class="header-section-number">14.2</span> Linear model (both)</a></li>
-  <li><a href="#priors-optional-for-bayesian" id="toc-priors-optional-for-bayesian" class="nav-link" data-scroll-target="#priors-optional-for-bayesian"><span class="header-section-number">14.3</span> Priors (optional for Bayesian)</a></li>
-  <li><a href="#maximum-likelihood-maximum-a-posteriori-estimate-both" id="toc-maximum-likelihood-maximum-a-posteriori-estimate-both" class="nav-link" data-scroll-target="#maximum-likelihood-maximum-a-posteriori-estimate-both"><span class="header-section-number">14.4</span> Maximum-likelihood / Maximum A Posteriori estimate (both)</a></li>
-  <li><a href="#uncertainty-about-estimates-different-but-comparable" id="toc-uncertainty-about-estimates-different-but-comparable" class="nav-link" data-scroll-target="#uncertainty-about-estimates-different-but-comparable"><span class="header-section-number">14.5</span> Uncertainty about estimates (different but comparable)</a></li>
-  <li><a href="#model-comparison-via-information-criteria-both" id="toc-model-comparison-via-information-criteria-both" class="nav-link" data-scroll-target="#model-comparison-via-information-criteria-both"><span class="header-section-number">14.6</span> Model comparison via information criteria (both)</a></li>
-  <li><a href="#generating-predictions-both" id="toc-generating-predictions-both" class="nav-link" data-scroll-target="#generating-predictions-both"><span class="header-section-number">14.7</span> Generating predictions (both)</a></li>
-  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions"><span class="header-section-number">14.8</span> Conclusions</a></li>
-  <li><a href="#take-home-message" id="toc-take-home-message" class="nav-link" data-scroll-target="#take-home-message"><span class="header-section-number">14.9</span> Take home message</a></li>
+  <li><a href="#choice-of-likelihood-both" id="toc-choice-of-likelihood-both" class="nav-link active" data-scroll-target="#choice-of-likelihood-both"><span class="header-section-number">13.1</span> Choice of likelihood (both)</a></li>
+  <li><a href="#linear-model-both" id="toc-linear-model-both" class="nav-link" data-scroll-target="#linear-model-both"><span class="header-section-number">13.2</span> Linear model (both)</a></li>
+  <li><a href="#priors-optional-for-bayesian" id="toc-priors-optional-for-bayesian" class="nav-link" data-scroll-target="#priors-optional-for-bayesian"><span class="header-section-number">13.3</span> Priors (optional for Bayesian)</a></li>
+  <li><a href="#maximum-likelihood-maximum-a-posteriori-estimate-both" id="toc-maximum-likelihood-maximum-a-posteriori-estimate-both" class="nav-link" data-scroll-target="#maximum-likelihood-maximum-a-posteriori-estimate-both"><span class="header-section-number">13.4</span> Maximum-likelihood / Maximum A Posteriori estimate (both)</a></li>
+  <li><a href="#uncertainty-about-estimates-different-but-comparable" id="toc-uncertainty-about-estimates-different-but-comparable" class="nav-link" data-scroll-target="#uncertainty-about-estimates-different-but-comparable"><span class="header-section-number">13.5</span> Uncertainty about estimates (different but comparable)</a></li>
+  <li><a href="#model-comparison-via-information-criteria-both" id="toc-model-comparison-via-information-criteria-both" class="nav-link" data-scroll-target="#model-comparison-via-information-criteria-both"><span class="header-section-number">13.6</span> Model comparison via information criteria (both)</a></li>
+  <li><a href="#generating-predictions-both" id="toc-generating-predictions-both" class="nav-link" data-scroll-target="#generating-predictions-both"><span class="header-section-number">13.7</span> Generating predictions (both)</a></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions"><span class="header-section-number">13.8</span> Conclusions</a></li>
+  <li><a href="#take-home-message" id="toc-take-home-message" class="nav-link" data-scroll-target="#take-home-message"><span class="header-section-number">13.9</span> Take home message</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./frequentist-01-vs-bayesian.html">Frequentist statistics</a></li><li class="breadcrumb-item"><a href="./frequentist-01-vs-bayesian.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian vs.&nbsp;fequentist statisics</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./frequentist-01-vs-bayesian.html">Frequentist statistics</a></li><li class="breadcrumb-item"><a href="./frequentist-01-vs-bayesian.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian vs.&nbsp;fequentist statisics</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian vs.&nbsp;fequentist statisics</span></h1>
+<h1 class="title"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian vs.&nbsp;fequentist statisics</span></h1>
 </div>
 
 
@@ -384,8 +384,8 @@ window.Quarto = {
 
 
 <p>I suspect that many student who read “Statistical Rethinking” have a feeling that it is something completely different from what they have been learning in “traditional” statistics classes. That Bayesian approach is more “hands-on” and complicated, whereas “normal” statistics is simpler and easy to work with even it is “less powerful.”<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> Thus, the purpose of this note is to walk you through a typical statistical analysis and focus on practical differences and, more importantly, similarity of the two approaches.</p>
-<section id="choice-of-likelihood-both" class="level2" data-number="14.1">
-<h2 data-number="14.1" class="anchored" data-anchor-id="choice-of-likelihood-both"><span class="header-section-number">14.1</span> Choice of likelihood (both)</h2>
+<section id="choice-of-likelihood-both" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="choice-of-likelihood-both"><span class="header-section-number">13.1</span> Choice of likelihood (both)</h2>
 <p>The very first we do is to look at the data and decide which distribution we will use to model the data / residuals be it normal, binomial, Poisson, beta, etc. That is the very first line of our models that goes like this <span class="math display">\[
 \color{red}{y_i \sim Normal(\mu_i, \sigma)} \\
 \mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso \\
@@ -396,8 +396,8 @@ window.Quarto = {
 \]</span></p>
 <p>This decision is neither Bayesian, nor frequentist. This is a decision about the model that best describes the data, so it is independent of the inference method you will use. This is a decision that you are making even if you are using “prepackaged” statistical tests like the t-test or ANOVA that assume normally distributed residuals<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
 </section>
-<section id="linear-model-both" class="level2" data-number="14.2">
-<h2 data-number="14.2" class="anchored" data-anchor-id="linear-model-both"><span class="header-section-number">14.2</span> Linear model (both)</h2>
+<section id="linear-model-both" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="linear-model-both"><span class="header-section-number">13.2</span> Linear model (both)</h2>
 <p>Next, you decide on the deterministic part of the model that expresses how a parameter of the distribution you chose on the previous step is computed from various predictors. E.g., for the linear regression with normally distributed residuals, you decide which predictors do you use to compute the mean. The model line would look something like this <span class="math display">\[
 y_i \sim Normal(\mu_i, \sigma) \\
 \color{red}{\mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso} \\
@@ -407,8 +407,8 @@ y_i \sim Normal(\mu_i, \sigma) \\
 \]</span> Again, this is neither Bayesian, nor frequentist decision, it is a linear model decision. Chapters 4-6 and 8 concentrate on how to make this decision using directed-acyclic graphs (DAGs) and introduce concepts of multicollinearity, colliders and bias they can produce, backdoor paths and how to identify them, etc. They explain how you can make educated decision on which predictors to use based on your knowledge of the field or of the problem. At this stage you also decide on whether to normalize data, as it could make interpreting the model easier.</p>
 <p>You always have to make this decision. For example, if you use the (repeated measures) ANOVA, you do need to decide which factors to use, whether to include interactions, should you transform the data to make coefficients directly interpretable, do you use a link function, etc.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
 </section>
-<section id="priors-optional-for-bayesian" class="level2" data-number="14.3">
-<h2 data-number="14.3" class="anchored" data-anchor-id="priors-optional-for-bayesian"><span class="header-section-number">14.3</span> Priors (optional for Bayesian)</h2>
+<section id="priors-optional-for-bayesian" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="priors-optional-for-bayesian"><span class="header-section-number">13.3</span> Priors (optional for Bayesian)</h2>
 <p>Priors are a Bayesian way to regularize the model, so this is something you do need to think about when doing Bayesian statistics<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>. In a model this part would look something like this <span class="math display">\[
 y_i \sim Normal(\mu_i, \sigma) \\
 \mu_i = \alpha + \beta_{x1} \cdot X1 + \beta_{x2} \cdot X2 + \beta_{x1\cdot x2} \cdot X1 \cdot X2 \dotso \\
@@ -427,30 +427,30 @@ y_i \sim Normal(\mu_i, \sigma) \\
 <p>In short, Bayesian inference gives you an <em>option</em> to specify priors. You do not need to take on the option and can use flat frequentist’s priors.</p>
 <p><em>Side note.</em> In reality, flat priors are never good priors. If there is sufficient data then, in most cases, the priors (flat or not) do not have much influence. However, if the data is limited then flat priors almost inevitably lead to overfitting as there is no additional information to counteract the effect of noise. This overfitting may feel more “objective” and “data-driven” than a more conservative underfitting of data via strongly regularizing priors but the latter is more likely to lead to better out-of-sample predictions and, therefore, are more likely to be replicated.</p>
 </section>
-<section id="maximum-likelihood-maximum-a-posteriori-estimate-both" class="level2" data-number="14.4">
-<h2 data-number="14.4" class="anchored" data-anchor-id="maximum-likelihood-maximum-a-posteriori-estimate-both"><span class="header-section-number">14.4</span> Maximum-likelihood / Maximum A Posteriori estimate (both)</h2>
+<section id="maximum-likelihood-maximum-a-posteriori-estimate-both" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="maximum-likelihood-maximum-a-posteriori-estimate-both"><span class="header-section-number">13.4</span> Maximum-likelihood / Maximum A Posteriori estimate (both)</h2>
 <p>Once you fitted the model, you get estimates for each parameter you specified. If you opted for flat priors, these estimates will be the same but for very minor differences due to sampling in Bayesian statistics. If you did specify regularizing priors then MAP estimates will be different from MLE, although the magnitude of that difference will depend the amount of data: the more data you have, the smaller the influence of the priors, we closer the estimates will be (see also the side note above). Importantly, both types of inferences will produce (very similar) estimates and you interpret their values the same way.</p>
 </section>
-<section id="uncertainty-about-estimates-different-but-comparable" class="level2" data-number="14.5">
-<h2 data-number="14.5" class="anchored" data-anchor-id="uncertainty-about-estimates-different-but-comparable"><span class="header-section-number">14.5</span> Uncertainty about estimates (different but comparable)</h2>
+<section id="uncertainty-about-estimates-different-but-comparable" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="uncertainty-about-estimates-different-but-comparable"><span class="header-section-number">13.5</span> Uncertainty about estimates (different but comparable)</h2>
 <p>This is the point where the two approach fundamentally diverge. In case of frenquetists statistics you obtain confidence intervals and p-values based on appropriate statistics and degrees of freedom, whereas in case of Bayesian inference you obtain credible/compatibility intervals and can use posterior distribution for individual parameters to compute probability that they are strictly positive, negative, concentrated within a certain region around zero, etc.</p>
 <p>These measures are conceptually different but tend to be interpreted similarly and mostly from Bayesian perspective. I think it is a good idea to compute and report all of them. If they are close, it would make you more certain about the results. More importantly, whenever they diverge it serves as a warning to investigate the case and what can cause this difference.</p>
 </section>
-<section id="model-comparison-via-information-criteria-both" class="level2" data-number="14.6">
-<h2 data-number="14.6" class="anchored" data-anchor-id="model-comparison-via-information-criteria-both"><span class="header-section-number">14.6</span> Model comparison via information criteria (both)</h2>
+<section id="model-comparison-via-information-criteria-both" class="level2" data-number="13.6">
+<h2 data-number="13.6" class="anchored" data-anchor-id="model-comparison-via-information-criteria-both"><span class="header-section-number">13.6</span> Model comparison via information criteria (both)</h2>
 <p>Both approaches use information criteria to compare models with Akaike and Bayesian/Schwarz information criteria being developed specifically for the case of flat priors of frenquetist models. Here, Bayesian approach holds an advantage as the full posterior allows for more elaborate information criteria such as DIC, WAIC, or LOO. Still the core idea and the interpretation of the comparison results are the same.</p>
 </section>
-<section id="generating-predictions-both" class="level2" data-number="14.7">
-<h2 data-number="14.7" class="anchored" data-anchor-id="generating-predictions-both"><span class="header-section-number">14.7</span> Generating predictions (both)</h2>
+<section id="generating-predictions-both" class="level2" data-number="13.7">
+<h2 data-number="13.7" class="anchored" data-anchor-id="generating-predictions-both"><span class="header-section-number">13.7</span> Generating predictions (both)</h2>
 <p>You generate predictions using the model definition which is the same for both approach. Hence, you are going to get similar predictions, at least for the mean (depending on your priors, see MLE vs.&nbsp;MAP above). As the two approach differ in how they characterize uncertainty, the uncertainty of predictions will be different but, typically, comparable.</p>
 </section>
-<section id="conclusions" class="level2" data-number="14.8">
-<h2 data-number="14.8" class="anchored" data-anchor-id="conclusions"><span class="header-section-number">14.8</span> Conclusions</h2>
+<section id="conclusions" class="level2" data-number="13.8">
+<h2 data-number="13.8" class="anchored" data-anchor-id="conclusions"><span class="header-section-number">13.8</span> Conclusions</h2>
 <p>As you can see, from <em>practical</em> point of view, apart from optional Bayesian priors and different ways to quantify the uncertainty of estimates, the two approaches are the same. They require you making same decisions and the results are interpreted the same way. This lack of difference becomes even more apparent when you use software packages for running your statistical models. E.g., the way you specify your model in <code>lme4</code> (frenquetist) and <code>brms</code> (Bayesian) is very much the same to the point that in most cases you only need to change the function name (<code>lmer</code> to <code>brm</code> or vice versa) and leave the rest the same.</p>
 <p>Thus, the point is that you should not be choosing between studying or doing frenquetists or Bayesian statistic. I feel more comfortable with Bayesian, mostly because it makes it easier interpret statistical significance. However, my typical approach is to start with frenquetist statistics (fast, good for shooting from a hip), once I am certain about my decisions (likelihood, model) I re-impliement the same model in Bayesian using informative priors and see whether results match (with reason). Then, I report both sets of inferences. This costs me remarkably little time precisely because there is so little difference between the two approaches from practical point of view!</p>
 </section>
-<section id="take-home-message" class="level2" data-number="14.9">
-<h2 data-number="14.9" class="anchored" data-anchor-id="take-home-message"><span class="header-section-number">14.9</span> Take home message</h2>
+<section id="take-home-message" class="level2" data-number="13.9">
+<h2 data-number="13.9" class="anchored" data-anchor-id="take-home-message"><span class="header-section-number">13.9</span> Take home message</h2>
 <p>We are not studying something completely different! We are merely approaching it from an unusual angle that leads to deeper understanding and interesting insights in the long run.</p>
 
 
@@ -886,13 +886,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./general-05-mediation-in-triangles.html" class="pagination-link" aria-label="general-05-mediation-in-triangles.html">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">general-05-mediation-in-triangles.html</span></span>
+      <a href="./general-04-effective-degrees-of-freedom.html" class="pagination-link" aria-label="Effective degrees of freedom / number of parameters">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Effective degrees of freedom / number of parameters</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./frequentist-02-flat-priors.html" class="pagination-link" aria-label="Flat priors: the strings attached">
-        <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Flat priors: the strings attached</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Flat priors: the strings attached</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

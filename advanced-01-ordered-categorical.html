@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>4&nbsp; Directed Acyclic Graphs and Causal Reasoning – Notes on statistics</title>
+<title>19&nbsp; Ordered Categorical Data, i.e., Likert-scales – Notes on statistics</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -64,8 +30,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./loss-functions-01-L0-L1-L2.html" rel="next">
-<link href="./multiple-regression-03-collider-bias.html" rel="prev">
+<link href="./advanced-02-instrumental-variables.html" rel="next">
+<link href="./advanced-01-mixtures.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -144,7 +110,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./multiple-regression-01-spurious-association.html">Multiple regression</a></li><li class="breadcrumb-item"><a href="./multiple-regression-04-dags.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Directed Acyclic Graphs and Causal Reasoning</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-01-ordered-categorical.html"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Ordered Categorical Data, i.e., Likert-scales</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -204,7 +170,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./multiple-regression-04-dags.html" class="sidebar-item-text sidebar-link active">
+  <a href="./multiple-regression-04-dags.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Directed Acyclic Graphs and Causal Reasoning</span></span></a>
   </div>
 </li>
@@ -349,7 +315,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./advanced-01-ordered-categorical.html" class="sidebar-item-text sidebar-link">
+  <a href="./advanced-01-ordered-categorical.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Ordered Categorical Data, i.e., Likert-scales</span></span></a>
   </div>
 </li>
@@ -383,17 +349,21 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#peering-into-a-black-box" id="toc-peering-into-a-black-box" class="nav-link active" data-scroll-target="#peering-into-a-black-box"><span class="header-section-number">4.1</span> Peering into a black box</a></li>
-  <li><a href="#turning-unconditional-dependence-into-conditional-independence" id="toc-turning-unconditional-dependence-into-conditional-independence" class="nav-link" data-scroll-target="#turning-unconditional-dependence-into-conditional-independence"><span class="header-section-number">4.2</span> Turning unconditional dependence into conditional independence</a></li>
+  <li><a href="#conceptualization-of-responses-internal-continuous-variable-discritized-into-external-responses-via-a-set-of-cut-points" id="toc-conceptualization-of-responses-internal-continuous-variable-discritized-into-external-responses-via-a-set-of-cut-points" class="nav-link active" data-scroll-target="#conceptualization-of-responses-internal-continuous-variable-discritized-into-external-responses-via-a-set-of-cut-points"><span class="header-section-number">19.1</span> Conceptualization of responses: internal continuous variable discritized into external responses via a set of cut-points</a></li>
+  <li><a href="#conceptual-problem-with-linear-models-we-change-our-mind-about-what-responses-correspond-to." id="toc-conceptual-problem-with-linear-models-we-change-our-mind-about-what-responses-correspond-to." class="nav-link" data-scroll-target="#conceptual-problem-with-linear-models-we-change-our-mind-about-what-responses-correspond-to."><span class="header-section-number">19.2</span> Conceptual problem with linear models: we change our mind about what responses correspond to.</a></li>
+  <li><a href="#a-technical-problem-data-that-bunches-up-near-a-range-limit." id="toc-a-technical-problem-data-that-bunches-up-near-a-range-limit." class="nav-link" data-scroll-target="#a-technical-problem-data-that-bunches-up-near-a-range-limit."><span class="header-section-number">19.3</span> A technical problem: Data that bunches up near a range limit.</a></li>
+  <li><a href="#another-technical-problem-can-we-assume-that-responses-correspond-to-real-numbers-that-we-picked" id="toc-another-technical-problem-can-we-assume-that-responses-correspond-to-real-numbers-that-we-picked" class="nav-link" data-scroll-target="#another-technical-problem-can-we-assume-that-responses-correspond-to-real-numbers-that-we-picked"><span class="header-section-number">19.4</span> Another technical problem: Can we assume that responses correspond to real numbers that we picked?</a></li>
+  <li><a href="#solution-an-ordered-logitprobit-model" id="toc-solution-an-ordered-logitprobit-model" class="nav-link" data-scroll-target="#solution-an-ordered-logitprobit-model"><span class="header-section-number">19.5</span> Solution: an ordered logit/probit model</a></li>
+  <li><a href="#using-ordered-logitprobit-models" id="toc-using-ordered-logitprobit-models" class="nav-link" data-scroll-target="#using-ordered-logitprobit-models"><span class="header-section-number">19.6</span> Using ordered logit/probit models</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./multiple-regression-01-spurious-association.html">Multiple regression</a></li><li class="breadcrumb-item"><a href="./multiple-regression-04-dags.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Directed Acyclic Graphs and Causal Reasoning</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./advanced-01-mixtures.html">Advanced topics</a></li><li class="breadcrumb-item"><a href="./advanced-01-ordered-categorical.html"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Ordered Categorical Data, i.e., Likert-scales</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Directed Acyclic Graphs and Causal Reasoning</span></h1>
+<h1 class="title"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Ordered Categorical Data, i.e., Likert-scales</span></h1>
 </div>
 
 
@@ -410,112 +380,205 @@ window.Quarto = {
 </header>
 
 
-<section id="peering-into-a-black-box" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="peering-into-a-black-box"><span class="header-section-number">4.1</span> Peering into a black box</h2>
-<p>To better understand the relationship between data and statistical analysis on the one hand and DAGs (directed acyclic graphs) on the other hand, I came up with an electric engineering metaphor<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. Imagine that you have an electric device that you cannot take apart. However, there are certain points where you can connect your multimeter and check whether current flows between these two points. You also have a schematics for the device but you have no idea whether it is accurate. The names of the connector nodes match but <em>the connectivity</em> between them is anybody’s guess. So, what do you do? You look at the schematics and identify two nodes where current should <em>definitely flow</em> and you measure whether that is the case. Do you have signal? Good, that means that <em>at least with respect to the connectivity between these two nodes</em> you schematics is not completely wrong. No signal? Sorry, your schematics is no good, find a different one or try making one yourself. Conversely, you can identify two nodes, so that <em>no current</em> should flow between them and measure it <em>empirically</em>. No current? Good! Current? Bad, your schematics is wrong.</p>
-<p>The relationship between the device and the schematics is that of the large (device) and small (schematics) world. Your job is to iteratively adjust the latter, so that it matches the former. You need to keep prodding the black box until predictions from your schematics start matching the actual readings. Only then you can say that you understand how device works and you can make predictions about what it will do under different conditions. Although testing based on schematics can be automated, generating such schematics is a creating process. It depends on our knowledge about devices of that kind and about individual exposed nodes.</p>
-<p>Hopefully, you can see how it maps on our observational or experimental data (large world, readings from the device) and DAGs (small world, presumed schematics). As a scientist, you <em>guess</em><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> the causal relationships between individual variables and you draw a schematics for that (a DAG). Using this DAG, you identify pairs of variables that must be dependent or independent <em>assuming your DAG is correct</em> and check the data on whether this is indeed the case. It is? Good, your DAG is not (entirely) wrong! They are not? Bad news, their causal relationship is different from what you (or others in prior work) came up with. You need to modify DAG or draw a completely different one, just like a engineer must modify the schematics.</p>
-<p>Note that this process is the opposite to that in a typical multivariate analysis approach using, say, ANOVA. In the latter case, you throw <em>everything</em> together, including some/all interactions between the terms, and try figuring out causal relationship between individual independent and the dependent variable based on magnitude and significance of individual terms. So, <em>first</em> you run the statistical analysis and <em>then</em> you make your inferences about causal relationships. In causal reasoning using DAG, you <em>first</em> formulate causal relationships and <em>then</em> you use statistical analysis to check whether these relationship are correct. The second approach is much more powerful, because you can run ANOVA only once but you can formulate many DAGs that describe your data and test them iteratively, refining your understanding step-by-step. Moreover, ANOVA (or any other regression model like that) is about identifying relationships between invididual independent and the signle dependent variable (individual coefficients tell you how independent variables can be used to predict the dependent). DAG-based analysis allows you to predict and test relationship between pairs of <em>dependent</em> variables as well, decomposing your complex model into <em>testable</em> and <em>verifyable</em> chunks. It is a more involved and time-consuming approach but it gives you much deeper understanding of the process you are styding compared to “throw everything into ANOVA and hope it will magically figure it out”.</p>
-<p>Moreover, causal calculus via DAGs has another trick up its sleeve. You can use <em>conditional probabilities</em> (see below) to flip the relationship between variables. If two variables are independent, they may be dependent when conditioned on some third variable. Or vice versa, depedent variables can become <em>conditionally independent</em>. This means that your predictions about connectivity between pairs of variables can be both more specific (e.g., they are related via a third variable or they both independently cause that third variable) and more testable, as you now have two <em>opposite</em> predictions for the same pair of variables! You can check that current flows when it should (unconditional probability) and <em>does not flow</em> once you condition it on the third variable. Both tests match? DAG is not that bad! One or none match? Back to the drawing board!</p>
+<p>One very popular type of response in psychology and social sciences are so-called Likert-scale responses. For example, you may be asked to respond on how attractive you find a person in a photo from 1 (very unattractive) to 7 (very attractive). Or to respond on how satisfied you are with a service from 1 (very unsatisfied) to 4 (very satisfied). Or rate your confidence on a 5-point scale, etc. Likert-scale responses are extremely common and are quite often analyzed via linear models (i.e., a <em>t</em>-test, a repeated measures ANOVA, or linear-mixed models) assuming that response levels correspond directly to real numbers. The purpose of these notes is to document conceptual and technical problems this approach entails.</p>
+<section id="conceptualization-of-responses-internal-continuous-variable-discritized-into-external-responses-via-a-set-of-cut-points" class="level2" data-number="19.1">
+<h2 data-number="19.1" class="anchored" data-anchor-id="conceptualization-of-responses-internal-continuous-variable-discritized-into-external-responses-via-a-set-of-cut-points"><span class="header-section-number">19.1</span> Conceptualization of responses: internal continuous variable discritized into external responses via a set of cut-points</h2>
+<p>First, let us think what behavioral responses correspond to as it will become very important once we discuss conceptual problems with a common “direct” approach of using linear models for Likert-scale data.</p>
+<p>When we ask a participant to respond “On a scale from 1 to 7, how attractive do you find the face in the photo?”, we assume that there is a <em>continuous</em> internal variable (for example, encoded via a neural ensemble) that represents attractiveness of a face (our satisfaction with service, our confidence, etc.). The strength of that representation varies in a continuous manner from its minimum (e.g., baseline firing rate, if we assume that strength is encoded by spiking rate) to maximum (maximum firing rate for that neural ensemble). When we impose a seven-point scale on participants, we force them to discretize (bin) this continuous variable, creating a <em>many-to-one</em> mapping. In other words, a participant decides that values (intensities) within a particular range all get mapped on <span class="math inline">\(1\)</span>, a different but adjacent range of higher value corresponds to <span class="math inline">\(2\)</span>, etc. You can think about it as values within that range being “rounded”<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> towards the mean that defines the responses. Or, equivalently, you can think in terms of cut points that define range for individual values. This is how the discretization is depicted in the figure below. If the signal is below the first cut point, our participant’s response is “1”. When it is between the first and second cut points, the response is “2” and so on. When it is to the right of the last sixth cut point, it is “7”. This conceptualization means that responses are an ordered categorical variable, as any underlying intensity for a response “1” is necessarily smaller than <em>any</em> intensity for response “2” and both are smaller than, again, <em>any</em> intensity for response “3”, etc.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="advanced-01-ordered-categorical_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As per usual, even when we use the same stimulus and ask the same question, participant’s internal continuous response varies from trial to trial due to noise. We model this by assuming that on a given trial a value is drawn from a normal distribution centered at the “true” intensity level<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>. When the noisy intensity is converted to discrete responses, their variability will depend on the location (mean) and the width (standard deviation) of this distribution. The broader this distribution and / or closer it is to a cut point, the more activity will “spill over” a cut point into adjacent regions and the more variable discrete responses will be.</p>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="advanced-01-ordered-categorical_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Given this conceptualization, our goal is to recover cut points and model shifts of the mean for the <em>continuous</em> internal variable (in response to our experimental manipulation) using only observed <em>discrete</em> responses.</p>
 </section>
-<section id="turning-unconditional-dependence-into-conditional-independence" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="turning-unconditional-dependence-into-conditional-independence"><span class="header-section-number">4.2</span> Turning unconditional dependence into conditional independence</h2>
-<p>Below, you will see how multiple regression can show conditional independence of two variable in case of the fork DAG in divorce data. However, there is another more general way to understand this concept it terms of conditional probabilities <span class="math inline">\(Pr(M|A)\)</span> and <span class="math inline">\(Pr(D|A)\)</span>. For this, it helps to understand condition probabilities as <em>filtering</em> operation. When we compute conditional probability for a <em>specific</em> value of <span class="math inline">\(A\)</span>, this means that we slice the data, keeping only whose values of <span class="math inline">\(M\)</span> and <span class="math inline">\(D\)</span> that correspond to that chosen level of <span class="math inline">\(A\)</span>. It is easier to understand, if we visualize that conditional-probability-as-filtering in synthetic data. For illustration purposes, I will synthesize divorce data, keeping the relationships but I will space marriage age linearly and generate the data so that there are 20 data points for each age (makes it easier to see and understand).</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">84321169</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">180</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sigma_noise <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># we repeat each value of age 10 times to make filtering operation easier to see</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>sim_waffles <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">MedianAgeMarriage =</span> <span class="fu">rep</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="at">length.out=</span><span class="dv">9</span>), <span class="dv">20</span>), </span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">Divorce =</span> <span class="fu">rnorm</span>(N, MedianAgeMarriage, sigma_noise),</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">Marriage =</span> <span class="sc">-</span><span class="fu">rnorm</span>(N, MedianAgeMarriage, sigma_noise))</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>MD_plot <span class="ot">&lt;-</span> </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles, <span class="fu">aes</span>(<span class="at">x=</span>Marriage, <span class="at">y=</span>Divorce)) <span class="sc">+</span> </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span> </span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">"Marriage rate"</span>) <span class="sc">+</span> </span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">"Divorce rate"</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>AD_plot <span class="ot">&lt;-</span> </span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles, <span class="fu">aes</span>(<span class="at">x=</span>MedianAgeMarriage, <span class="at">y=</span>Divorce)) <span class="sc">+</span> </span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span> </span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">"Median age marriage"</span>) <span class="sc">+</span> </span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">"Divorce rate"</span>)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>AM_plot <span class="ot">&lt;-</span> </span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles, <span class="fu">aes</span>(<span class="at">x=</span>MedianAgeMarriage, <span class="at">y=</span>Marriage)) <span class="sc">+</span> </span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span> </span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">"Median age marriage"</span>) <span class="sc">+</span> </span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">"Marriage rate"</span>)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>MD_plot <span class="sc">|</span> AD_plot <span class="sc">|</span> AM_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="conceptual-problem-with-linear-models-we-change-our-mind-about-what-responses-correspond-to." class="level2" data-number="19.2">
+<h2 data-number="19.2" class="anchored" data-anchor-id="conceptual-problem-with-linear-models-we-change-our-mind-about-what-responses-correspond-to."><span class="header-section-number">19.2</span> Conceptual problem with linear models: we change our mind about what responses correspond to.</h2>
+<p>A very common approach is to fit Likert-scale data using a linear model (a <em>t</em>-test, a repeated-measures ANOVA, linear-mixed models, etc.) while assuming that responses correspond directly to real numbers. In other words, when participants responded “very unattractive”, or “not confident at all”, or “do not agree at all” they literally meant a real number <span class="math inline">\(1.0\)</span>. When they used the middle (let’s say the third on a five-point scale) option “neither agree, nor disagree” they literally meant <span class="math inline">\(3.0\)</span>.</p>
+<div class="cell">
 <div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
+<div>
 <figure class="figure">
-<p><img src="multiple-regression-04-dags_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
+<p><img src="advanced-01-ordered-categorical_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>As you can see, all variables being dependent on each other, as in case of the original data. However, let us pick an arbitrary value, say <span class="math inline">\(A=1\)</span><a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> and see which dots on the left plot will be selected via <em>filtering</em> on that value.</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>MD_plot <span class="ot">&lt;-</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles, <span class="fu">aes</span>(<span class="at">x=</span>Marriage, <span class="at">y=</span>Divorce)) <span class="sc">+</span> </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>, <span class="at">formula=</span>y<span class="sc">~</span>x, <span class="at">alpha=</span><span class="fl">0.1</span>) <span class="sc">+</span> </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">==</span> <span class="dv">1</span>), <span class="at">color=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">!=</span> <span class="dv">1</span>), <span class="at">alpha=</span><span class="fl">0.15</span>) <span class="sc">+</span> </span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">"Marriage rate"</span>) <span class="sc">+</span> </span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">"Divorce rate"</span>) </span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>AD_plot <span class="ot">&lt;-</span> </span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles, <span class="fu">aes</span>(<span class="at">x=</span>MedianAgeMarriage, <span class="at">y=</span>Divorce)) <span class="sc">+</span> </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span> </span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">==</span> <span class="dv">1</span>), <span class="at">color=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">!=</span> <span class="dv">1</span>), <span class="at">alpha=</span><span class="fl">0.15</span>) <span class="sc">+</span> </span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">"Median age marriage"</span>) <span class="sc">+</span> </span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">"Divorce rate"</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>AM_plot <span class="ot">&lt;-</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles, <span class="fu">aes</span>(<span class="at">x=</span>Marriage, <span class="at">y=</span>MedianAgeMarriage)) <span class="sc">+</span> </span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span> </span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">==</span> <span class="dv">1</span>), <span class="at">color=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">!=</span> <span class="dv">1</span>), <span class="at">alpha=</span><span class="fl">0.15</span>) <span class="sc">+</span> </span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">"Median age marriage"</span>) <span class="sc">+</span> </span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">"Marriage rate"</span>) </span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>MD_A1_plot <span class="ot">&lt;-</span> </span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data=</span>sim_waffles <span class="sc">%&gt;%</span> <span class="fu">filter</span>(MedianAgeMarriage <span class="sc">==</span> <span class="dv">1</span>), </span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>         <span class="fu">aes</span>(<span class="at">x=</span>Marriage, <span class="at">y=</span>Divorce)) <span class="sc">+</span> </span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>, <span class="at">formula=</span>y<span class="sc">~</span>x, <span class="at">color=</span><span class="st">"red"</span>) <span class="sc">+</span> </span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">"Marriage rate"</span>) <span class="sc">+</span> </span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">"Divorce rate"</span>) <span class="sc">+</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="st">"Pr( |Mariage Age = 1)"</span>)</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>(AD_plot <span class="sc">|</span> MD_plot) <span class="sc">/</span></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>(MD_A1_plot <span class="sc">|</span>AM_plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This assumption appears to simplify our life dramatically but at the expense of changing the narrative. Recall that our original (and, for me, very intuitive) conceptualization was that responses reflect a many-to-one mapping between an underlying continuous variable and a discrete (ordered categorical) response. But by converting them directly to real numbers and using them as an outcome variable of a linear model we assume a <em>one-to-one</em> mapping between the <em>continuous</em> real-valued internal variable and <em>continuous</em>(!) real-valued observed responses. This means that from a linear model point of view, for a 7-point Likert scale <em>any</em> real value is a valid and possible response and therefore a participant <em>could have</em> responded with 6.5, 3.14, or 2.71828 but, for whatever reason (sheer luck?), we only observed a handful of (integer) values.</p>
+<div class="cell">
 <div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
+<div>
 <figure class="figure">
-<p><img src="multiple-regression-04-dags_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
+<p><img src="advanced-01-ordered-categorical_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="advanced-01-ordered-categorical_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>First, take at top-left and bottom-right plots that plot, correspondingly, divorce and marriage rate versus marriage age. Note that I’ve flipped axes on the bottom-right plot, so that marriage rate is always mapped on x-axis. The <em>red</em> dots in each plot correspond to divorce and marriage rates <em>given that</em> (filtered on) marriage age is 1. The same dots are marked in red in the top-right plot and are plotted separately at the bottom-right. As you can see, the two variables <em>conditional on A=1</em> are uncorrelated. Why? Because both were fully determined by marriage age and any variation (the spread of red dots vertically or horizontally in the top-left and bottom-right plots) was due to noise. Therefore, the plot on the bottom-left effectively plots noise in marriage rate versus noise in divorce rate and, by our synthetic data design, the noise in two variable was independent, hence, lack of correlation.</p>
-<p>This opportunity to turn dependence into independence by conditioning two variables on the third is at the heart of causal reasoning<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>. You draw a DAG and if it has a fork in it, you know that <em>given your educated guess about causal relationship is correct</em> (small world!), your data (large world!) should show dependence <em>and</em> conditional independence of the two variables (divorce and marriage rates). What if it does not? E.g., the two variables are always dependent or always independent, conditional or not? As we already discussed above, that just means that your educated guess was wrong and that relationship of the variables is different from how you thought it is. Thus, you need to go back to the drawing board, come up with another DAG, repeat the analysis and see if that new DAG is supported by data. If you have more variables, your DAGs will be more complex but the beauty of such causal reasoning is that you can concentrate on <em>parts</em> of it, picking three variables and seeing whether your guess about these three variables was correct. This way, you can tinker with your causal model part-by-part, instead of hoping that you got <em>everything</em> right on the very first attempt.</p>
+<p>Notice that this is <em>not</em> how we thought participants behave. I think everyone<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> would object to the idea that the limited repertoire of responses is due to endogenous processing rather than exogenous limitations imposed by an experimental design. Yet, this is how a <em>linear model</em> “thinks” about it given the outcome variable you gave it and, if you are not careful, it is easy to miss this change in the narrative. It is, however, important as it means that estimates produced by such a model are about that alternative one-to-one kind of continuous responses, not the many-to-one discrete ones that you had in mind! That alternative is not a bad story per se, it is just a <em>different</em> story that should not be confused with the original one.</p>
+<p>This change in the narrative of what responses correspond to is also a problem if you want to use a (fitted) linear model to generate predictions and simulate the data. It will happily spit out real valued responses like 6.5, 3.14, or 2.71828<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>. You have two options. You can bite the bullet and take them at their face value, sticking to “response is a real-valued variable” and one-to-one mapping between an internal variable and an observed response. That lets you keep the narrative but means that real and ideal observers play by different rules. Their responses are different and that means your conclusions based on an ideal observer behavior are of limited use. Alternatively, you can round real-valued responses off to a closest integer getting discrete categorical-like responses. Unfortunately, that means changing the narrative yet again. In this case, you fitted the model assuming a one-to-one mapping but you use its predictions assuming many-to-one. Not good. It is really hard to understand what is going on, if you keep changing your mind on what the responses mean. A linear model will also generate out-of-range responses, like -1 or 8. Here, you have little choice but to clip them into the valid range, forcing the many-to-one mapping on at least some responses. Again, change of narrative means that model fitting and model interpretation rely on different conceptualizations of what the response is.</p>
+<p>This may sound too conceptual but I suspect that few people who use linear models on Likert-scale data directly realize that their model is not doing what they think it is doing and, erroneously!, interpret one-to-one linear-model estimates as many-to-one. The difference may or may not be crucial but, unfortunately, one cannot know how important it is without comparing two kinds of models directly. And that raises a question: Why employ a model that does something different to what you need to to begin with? Remember, using an appropriate model and interpreting it correctly is <em>your</em> job, not that of a mathematical model, nor is it a job of a software package.</p>
+</section>
+<section id="a-technical-problem-data-that-bunches-up-near-a-range-limit." class="level2" data-number="19.3">
+<h2 data-number="19.3" class="anchored" data-anchor-id="a-technical-problem-data-that-bunches-up-near-a-range-limit."><span class="header-section-number">19.3</span> A technical problem: Data that bunches up near a range limit.</h2>
+<p>When you use a linear model, you assume that residuals are normally distributed. This is something that you may not be sure of <em>before</em> you fit a specific model, as it is residuals not the data that must be normally distributed. However, in some cases you may be fairly certain that this will not be the case, such as when a variable has only a limited range of values and the mean (a model prediction) is close to one of these limits. Whenever you have observations that are close to that hard limit, they will “bunch up” against it because they cannot go lower or higher than that. See the figure below for an illustration of how it happens when a <em>continuous</em> variable <span class="math inline">\(x\)</span> is restricted to 1 to 7 range<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="advanced-01-ordered-categorical_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The presence of a limit is not a deal breaker for using linear models per se. Most physical measures cannot be negative<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a> but as long your observations are sufficiently far away from zero, you are fine. You cannot have a negative height but you certainly can use linear models for adult height as, for example, an average female height in USA is 164±6.4 cm. In other words, the mean is more than 25 standards deviations away from the range limit of zero and the latter can be safely ignored.</p>
+<p>Unfortunately, Likert-scale data combines an extremely limited range with a very coarse step. Even a 7-point Likert scale does not give you much wiggle room and routinely used 5-point scales are even narrower. This means that unless the mean is smack in the middle (e.g., at four for a 7-point scale), you are getting closer to one of the limits and your residuals become either positively (when approaching a lower limit) or negatively (for the upper one) skewed. In other words, the residuals are <em>systematically</em> not normally distributed and their distribution depends on the mean. This clearly violates an assumption of normality of residuals and of their conditional i.i.d. (Independent and Identically Distributed). This is a deal breaker for parametric frequentist statistics (a <em>t</em>-test, a repeated-measures ANOVA, linear-mixed models), as their inferences are built on that assumptions and, therefore, become unreliable and should not to be trusted.</p>
+</section>
+<section id="another-technical-problem-can-we-assume-that-responses-correspond-to-real-numbers-that-we-picked" class="level2" data-number="19.4">
+<h2 data-number="19.4" class="anchored" data-anchor-id="another-technical-problem-can-we-assume-that-responses-correspond-to-real-numbers-that-we-picked"><span class="header-section-number">19.4</span> Another technical problem: Can we assume that responses correspond to real numbers that we picked?</h2>
+<p>The skewed residuals described above are a fundamental problem for parametric frequentist methods but are not critical if you use Bayesian or non-parametric bootstrapping/permutation linear models. Does this mean it is safe to use them? Probably not. When you use responses directly, you assume a direct correspondence between a response label (e.g., “agree”) and a real number <span class="math inline">\(4.0\)</span>. If your responses do correspond to the real numbers you have picked, you can perform the usual arithmetic with them. E.g., you can assume that <span class="math inline">\((4.0 + 4.0) / 2\)</span> is equal to <span class="math inline">\((3.0 + 5.0) / 2\)</span> to <span class="math inline">\((2.0 + 6.0) / 2\)</span> to <span class="math inline">\((1.0 + 7.0)/ 2\)</span>. However, what if this is <em>not</em> the case, what if the responses do not correspond to the real numbers that you’ve picked? Then our basic arithmetic stops working the way you think! Take a look at the figure below where “real value” of responses is not an integer that we have picked for it.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="advanced-01-ordered-categorical_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Unless you <em>know</em> that the response levels correspond to the selected real number and that the simple arithmetic holds, you are in danger of computing nonsense. This problem is more obvious when individual response levels are labelled, e.g., <code>"Strongly disagree"</code>, <code>"Disagree"</code>, <code>"Neither disagree, nor agree"</code>, <code>"Agree"</code>, <code>"Strongly agree"</code>. What is an average of <code>"Strongly disagree"</code> and <code>"Strongly agree"</code>? Is it the same as an average of <code>"Disagree"</code> and <code>"Agree"</code>? Is increase from <code>"Strongly disagree"</code> to <code>"Disagree"</code> identical to that from <code>"Neither disagree, nor agree"</code> to <code>"Agree"</code>? The answer is “who knows?!” but in my experience scales are rarely truly linear as people tend to avoid extremes and have their own idea about the range of internal variable levels that corresponds to a particular response.</p>
+<p>As noted above, even when scale levels are explicitly named, it is very common to “convert” them to numbers because you cannot ask a computer to compute an average of <code>"Disagree"</code> and <code>"Agree"</code> (it will flatly refuse to do this) but it will compute an average of <span class="math inline">\(2\)</span> and <span class="math inline">\(4\)</span>. And there will be no error message! And it will return <span class="math inline">\(3\)</span>! Problem solved, right? Not really. Yes, the computer will not complain but this is because it has no idea what <span class="math inline">\(2\)</span> and <span class="math inline">\(4\)</span> stand for. You give it real numbers, it will do the math. So, if you pretend that <code>"Disagree"</code> and <code>"Agree"</code> correspond directly to <span class="math inline">\(2\)</span> and <span class="math inline">\(4\)</span> it will certainly <em>look like</em> normal math. And imagine that responses are <code>"Disagree"</code> and <code>"Strongly agree"</code>, so the numbers are <span class="math inline">\(2\)</span> and <span class="math inline">\(5\)</span> and the computer will return an average value of <span class="math inline">\(3.5\)</span>. It will be even easier to convince yourself that your responses are real numbers (see, there is a <em>decimal point</em> where!), just like linear models assume. Unfortunately, you are not fooling the computer (it seriously does not care), you are fooling yourself. Your math might check out, if the responses do correspond to the real numbers you have picked, or it might not. And in both cases, there will be no warning or an error message, just some numbers that you will interpret at their face value and reach possibly erroneous conclusions. Again, the problem is that you wouldn’t know whether the numbers you are looking at are valid or nonsense and the same dilemma (valid or nonsense?) will be applicable to any inferences and conclusions that you draw from them. In short, a direct correspondence between response levels and specific real numbers is a <em>very</em> strong assumption that should be validated, not taken on pure faith.</p>
+</section>
+<section id="solution-an-ordered-logitprobit-model" class="level2" data-number="19.5">
+<h2 data-number="19.5" class="anchored" data-anchor-id="solution-an-ordered-logitprobit-model"><span class="header-section-number">19.5</span> Solution: an ordered logit/probit model</h2>
+<p>So far I have summarized problems of using linear models when assuming that responses correspond to real numbers. How can we solve them? By using ordered <a href="https://en.wikipedia.org/wiki/Ordered_logit">logistic</a>/<a href="https://en.wikipedia.org/wiki/Ordered_probit#:~:text=In%20statistics%2C%20ordered%20probit%20is,fair%2C%20good%2C%20excellent">probit</a> models. They are built using the many-to-one mapping between a continuous variable that has a limited range (for simplicity it ranges from 0 to 1) and is discretized to match behavioral responses using a set of cut points. In principle, the latter can be fixed but in most cases they should be fitted as part of the model. Both logit and probit models assume that the sampling distribution of the underlying continuous variable is a standard normal distribution and, therefore, both the continuous variable and cut points live on the infinite real number line that is transformed to 0..1 range via either a logit or a probit link function. Strictly speaking, the latter step is not necessary but makes things easier both for doing math and for understanding the outcome.</p>
+<p>From a mathematical point of view, using logit and probit makes it easy to compute the area under the curve between two cut points. Logit or probit are cumulative functions, so for a standard normal distribution (centered at <span class="math inline">\(0\)</span> with standard deviation of <span class="math inline">\(1\)</span>) they compute an area under the curve starting from <span class="math inline">\(-\infty\)</span> up to some point <span class="math inline">\(k_i\)</span>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="advanced-01-ordered-categorical_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="advanced-01-ordered-categorical_files/figure-html/unnamed-chunk-8-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Therefore, if we want to compute an area between two cut points <span class="math inline">\(k_{i-1}\)</span> and <span class="math inline">\(k_i\)</span>, we can do it as <span class="math inline">\(logit(k_{i})-logit(k_{i-1})\)</span> (same goes for probit).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="advanced-01-ordered-categorical_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Because both logit and probit are non-linear transformations cut points evenly distributed on a 0..1 range will be not be evenly distributed on the real numbers line and vice versa. Transforming from real space to 0..1 range also makes it easier to understand relative positions of cut points and changes in the continuous variable (that we translate into discrete responses via cut points).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="advanced-01-ordered-categorical_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="advanced-01-ordered-categorical_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="using-ordered-logitprobit-models" class="level2" data-number="19.6">
+<h2 data-number="19.6" class="anchored" data-anchor-id="using-ordered-logitprobit-models"><span class="header-section-number">19.6</span> Using ordered logit/probit models</h2>
+<p>There are several R packages that implement regression models for ordinal data including specialized packages <a href="https://cran.r-project.org/package=ordinal">ordinal</a>, <a href="https://cran.r-project.org/package=oglmx">oglmx</a>, as well as via a <a href="https://cran.r-project.org/web/packages/brms/vignettes/brms_monotonic.html">ordered</a> option in <a href="https://cran.r-project.org/package=brms">brms</a> package.</p>
+<p>From a coding point of view, fitting an ordered logit/probit the model is as easy as fitting any other regression model. However, the presence of the link function complicates its understanding as all parameters interact<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a>. My current approach is not to try to interpret the parameters directly but to plot a triptych.</p>
+<ol type="1">
+<li>Compute posterior predictions and compare their distribution with behavioral data to understand how well the model fits the data.</li>
+</ol>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/ordinal-predictions.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption>Behavioral data (circles and error bars depict group average and bootstrapped 89% confidence intervals) versus model posterior predictions (lines and ribbons depict mean and 89% compatibility intervals).</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Visualize cut points on a 0..1 range to understand the mapping between continuous intensity and discrete responses as well as uncertainty about their position.</li>
+</ol>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/ordinal-cutpoints.png" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption>Posterior distribution for cut points transformed to 0..1 range.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Visualize and compare changes in continuous intensity on a 0..1 range adding cut points to facilitate understanding.</li>
+</ol>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/ordinal-change.png" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption>Posterior distribution and change for continuous intensity variable transformed to 0..1 range. Text above plot show mean and 89% credible interval for the change.</figcaption>
+</figure>
+</div>
+</div>
+</div>
 
 
 </section>
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr>
 <ol>
-<li id="fn1"><p>Dear electric engineers, yes, I know that’s not quite how it works but it is still a good metaphor!<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>If you feel that science is not about guessing, you are wrong and I have Richard Feynman on my side! You always start by guessing a particular law or rule and then use empirical data to check whether your guess was correct. If you made an <em>educated</em> guess, your chances of it being correct are higher, so your job is to study the field and prior work to make your guess as educated as possible. But, at the end, it is still a guess and it can be wrong. Good news, at least in my experience, is that guesses that turn out to be spectacularly wrong are the most informative ones, as they reveal something unexpected and, thus, hitherto unknown about the process.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>The data is “standardized”, therefore, age of 1 is one standard deviation away from the mean marriage rate.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4"><p>As you will learn later, the opposite is also true, so you can turn independence into conditional dependence.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>regressed?<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Here, I will assume that cut points are fixed and it is parameters of the normal distribution that get adjusted. The actual implementation of ordered logit/probit models has it the other way around, so that intensity always comes from a normal distribution centered at <span class="math inline">\(0\)</span> and with a standard deviation of <span class="math inline">\(1\)</span> and it is cut-points that get adjusted. The two are mostly mathematically equivalent but I find the former to be more intuitive.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Never say always!<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>If you feel lucky enough to expect an integer response, you’d better use this luck on playing an actual lottery<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Note that for skewed distributions their mode is different from the mean!<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>Try coming up with one and don’t say “temperature”!<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>The usual curse of generalized linear models and, probably, one of the reasons while people tend to stick to linear models even if they are potentially or clearly invalid.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
@@ -939,13 +1002,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./multiple-regression-03-collider-bias.html" class="pagination-link" aria-label="Collider Bias: The Haunted DAG">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Collider Bias: The Haunted DAG</span></span>
+      <a href="./advanced-01-mixtures.html" class="pagination-link" aria-label="Mixtures">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Mixtures</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./loss-functions-01-L0-L1-L2.html" class="pagination-link" aria-label="Overview of Loss functions">
-        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Overview of Loss functions</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./advanced-02-instrumental-variables.html" class="pagination-link" aria-label="Instrumental Variables">
+        <span class="nav-page-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
