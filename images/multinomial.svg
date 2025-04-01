@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="141.30656mm"
+   height="52.142227mm"
+   viewBox="0 0 141.30656 52.142227"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="multinomial.svg"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   inkscape:export-filename="multinomial.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="2.1041947"
+     inkscape:cx="350.01513"
+     inkscape:cy="58.692287"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="Triangle"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-13.820365,-11.235472)">
+    <rect
+       style="fill:#0055a5;stroke:#0055a5;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+       id="rect1"
+       width="20.510164"
+       height="12.892283"
+       x="14.070364"
+       y="25.962374" />
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:3.10444px;line-height:1;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:center;text-anchor:middle;fill:#ffffff;stroke:#000000;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:0"
+       x="24.376226"
+       y="31.659691"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="fill:#ffffff;stroke-width:0.5"
+         x="24.376226"
+         y="31.659691">Scores S<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan6">i</tspan></tspan><tspan
+         sodipodi:role="line"
+         style="fill:#ffffff;stroke-width:0.5"
+         x="24.376226"
+         y="34.76413"
+         id="tspan3">(-∞, +∞)</tspan></text>
+    <path
+       style="fill:#ffffff;stroke:#0055a5;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1;marker-end:url(#Triangle)"
+       d="M 36.009458,32.408516 H 53.436257"
+       id="path3" />
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:3.10444px;line-height:1;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+       x="45.516701"
+       y="29.952969"
+       id="text4"><tspan
+         sodipodi:role="line"
+         id="tspan4"
+         style="fill:#000000;stroke:none;stroke-width:0.5"
+         x="45.516701"
+         y="29.952969">exp(S<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan5">i</tspan>)</tspan></text>
+    <rect
+       style="fill:#0055a5;stroke:#0055a5;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+       id="rect6"
+       width="20.510164"
+       height="12.892283"
+       x="56.39072"
+       y="25.962374" />
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:3.10444px;line-height:1;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:center;text-anchor:middle;fill:#ffffff;stroke:#000000;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:0"
+       x="66.62178"
+       y="31.659691"
+       id="text9"><tspan
+         sodipodi:role="line"
+         id="tspan8"
+         style="fill:#ffffff;stroke-width:0.5"
+         x="66.62178"
+         y="31.659691">Rates R<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan7">i</tspan></tspan><tspan
+         sodipodi:role="line"
+         style="fill:#ffffff;stroke-width:0.5"
+         x="66.62178"
+         y="34.76413"
+         id="tspan9">(0, +∞)</tspan></text>
+    <path
+       style="fill:#ffffff;stroke:#0055a5;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1;marker-end:url(#Triangle)"
+       d="M 79.641549,32.408516 H 97.068348"
+       id="path9" />
+    <g
+       id="g17"
+       transform="translate(1.6893326)">
+      <text
+         xml:space="preserve"
+         style="font-weight:bold;font-size:3.10444px;line-height:1;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+         x="86.476799"
+         y="27.071964"
+         id="text11"><tspan
+           sodipodi:role="line"
+           id="tspan11"
+           style="fill:#000000;stroke:none;stroke-width:0.5"
+           x="86.476799"
+           y="27.071964">R<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan10">i</tspan></tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-weight:bold;font-size:3.10444px;line-height:1;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+         x="86.206314"
+         y="31.011303"
+         id="text13"><tspan
+           sodipodi:role="line"
+           id="tspan13"
+           style="fill:#000000;stroke:none;stroke-width:0.5"
+           x="86.206314"
+           y="31.011303">∑R<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan12">i</tspan></tspan></text>
+      <path
+         style="fill:#000000;stroke:#000000;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+         d="m 83.42858,28.222019 h 5.601473"
+         id="path13" />
+    </g>
+    <rect
+       style="fill:#0055a5;stroke:#0055a5;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+       id="rect17"
+       width="24.377857"
+       height="12.892283"
+       x="99.519821"
+       y="25.962374" />
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:3.10444px;line-height:1;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:center;text-anchor:middle;fill:#ffffff;stroke:#000000;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:0"
+       x="111.83102"
+       y="31.659691"
+       id="text19"><tspan
+         sodipodi:role="line"
+         id="tspan18"
+         style="fill:#ffffff;stroke-width:0.5"
+         x="111.83102"
+         y="31.659691">Probabilities P<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan20">i</tspan></tspan><tspan
+         sodipodi:role="line"
+         style="fill:#ffffff;stroke-width:0.5"
+         x="111.83102"
+         y="34.76413"
+         id="tspan19">(0, 1)</tspan></text>
+    <g
+       transform="matrix(0,-0.26458333,0.5985074,0,-390.80799,176.80689)"
+       id="g1"
+       style="stroke-width:0.664885;stroke:#000000">
+      <path
+         d="m 586.5,711.5 c 6.904,0 12.5,5.589 12.5,12.483 v 28.534 c 0,6.894 5.596,12.483 12.5,12.483 -6.904,0 -12.5,5.589 -12.5,12.483 v 28.534 c 0,6.894 -5.596,12.483 -12.5,12.483"
+         stroke="#156082"
+         stroke-width="0.443257"
+         stroke-miterlimit="8"
+         fill="none"
+         fill-rule="evenodd"
+         id="path1"
+         style="stroke:#000000" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:3.10444px;line-height:1;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+       x="67.400444"
+       y="13.495589"
+       id="text22"><tspan
+         sodipodi:role="line"
+         id="tspan22"
+         style="fill:#000000;stroke:none;stroke-width:0.5"
+         x="67.400444"
+         y="13.495589">softmax(S)</tspan></text>
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-opacity:1;marker-end:url(#Triangle)"
+       d="m 66.666005,39.940344 v 6.82654"
+       id="path22" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+       id="rect23"
+       width="20.510164"
+       height="12.892283"
+       x="56.39072"
+       y="50.235416" />
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:3.10444px;line-height:1;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+       x="66.871277"
+       y="57.413929"
+       id="text23"><tspan
+         sodipodi:role="line"
+         id="tspan23"
+         style="fill:#ffffff;stroke:none;stroke-width:0.5"
+         x="66.871277"
+         y="57.413929">Poisson</tspan></text>
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-opacity:1;marker-end:url(#Triangle)"
+       d="m 124.82362,32.408515 h 6.82654"
+       id="path23" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+       id="rect24"
+       width="20.510164"
+       height="12.892283"
+       x="134.36676"
+       y="25.962374" />
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:3.10444px;line-height:1;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+       x="144.6552"
+       y="33.501434"
+       id="text24"><tspan
+         sodipodi:role="line"
+         id="tspan24"
+         style="fill:#ffffff;stroke:none;stroke-width:0.5"
+         x="144.6552"
+         y="33.501434">Categorical</tspan></text>
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.500001;stroke-linecap:round;stroke-opacity:1;marker-end:url(#Triangle)"
+       d="M 79.093568,57.450307 H 96.275486"
+       id="path24" />
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-opacity:1;marker-end:url(#Triangle)"
+       d="m 144.62184,18.589724 v 4.967901"
+       id="path25" />
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:3.10444px;line-height:1;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+       x="144.48694"
+       y="14.579764"
+       id="text25"><tspan
+         sodipodi:role="line"
+         id="tspan25"
+         style="fill:#000000;stroke:none;stroke-width:0.5"
+         x="144.48694"
+         y="14.579764">Number</tspan><tspan
+         sodipodi:role="line"
+         style="fill:#000000;stroke:none;stroke-width:0.5"
+         x="144.48694"
+         y="17.684204"
+         id="tspan26">of trials</tspan></text>
+    <g
+       id="g30"
+       transform="translate(-1.1558609)">
+      <rect
+         style="fill:#ff7f2a;stroke:#ff7f2a;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+         id="rect29"
+         width="24.377857"
+         height="12.892283"
+         x="100.67568"
+         y="49.85516" />
+      <text
+         xml:space="preserve"
+         style="font-weight:bold;font-size:3.10444px;line-height:1;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+         x="112.86613"
+         y="57.412411"
+         id="text28"><tspan
+           sodipodi:role="line"
+           style="fill:#000000;stroke:none;stroke-width:0.5"
+           x="112.86613"
+           y="57.412411"
+           id="tspan28">Counts</tspan></text>
+    </g>
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.500001;stroke-linecap:round;stroke-opacity:1;marker-end:url(#Triangle)"
+       d="M 144.62128,56.691145 H 127.41614"
+       id="path29" />
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.499999;stroke-linecap:round;stroke-opacity:1"
+       d="M 144.62185,41.79582 V 56.691144"
+       id="path30" />
+  </g>
+</svg>

@@ -28,7 +28,7 @@ book:
         - general-02-pooling-information-for-parameters.qmd
         - general-03-measurement-error.qmd
         - general-04-effective-degrees-of-freedom.qmd
-        - general-05-mediation-in-triangles.qmd
+        # - general-05-mediation-in-triangles.qmd
     - part: "Frequentist statistics"
       chapters:
         - frequentist-01-vs-bayesian.qmd
@@ -39,6 +39,7 @@ book:
     - part: "Advanced topics"
       chapters: 
         - advanced-01-mixtures.qmd
+        - advanced-01-ordered-categorical.qmd
         - advanced-02-instrumental-variables.qmd
         - advanced-03-gam.qmd
         - advanced-04-cholesky.qmd
